@@ -127,6 +127,7 @@ typedef struct {
 	unsigned int bw;
 	unsigned int tags;
 	int isfloating, isurgent, isfullscreen;
+	int isfakefullscreen;
 	uint32_t resize; /* configure serial of a pending resize */
 } Client;
 
@@ -317,6 +318,7 @@ static void run(char *startup_cmd);
 static void setcursor(struct wl_listener *listener, void *data);
 static void setfloating(Client *c, int floating);
 static void setfullscreen(Client *c, int fullscreen);
+static void setfakefullscreen(Client *c, int fakefullscreen);
 static void setgaps(int oh, int ov, int ih, int iv);
 static void setlayout(const Arg *arg);
 static void setmfact(const Arg *arg);
@@ -332,6 +334,7 @@ static void tagmon(const Arg *arg);
 static void tile(Monitor *m);
 static void togglefloating(const Arg *arg);
 static void togglefullscreen(const Arg *arg);
+static void togglefakefullscreen(const Arg *arg);
 static void togglegaps(const Arg *arg);
 static void toggletag(const Arg *arg);
 static void toggleview(const Arg *arg);
@@ -2323,6 +2326,37 @@ setfloating(Client *c, int floating)
 }
 
 void
+setfakefullscreen(Client *c, int fakefullscreen)
+{
+	c->isfullscreen = fakefullscreen;
+	struct wlr_box  fakefullscreen_box;
+	if (!c->mon)
+		return;
+	// c->bw = fullscreen ? 0 : borderpx;
+	// client_set_fullscreen(c, fullscreen);
+	// wlr_scene_node_reparent(&c->scene->node, layers[fullscreen
+	// 		? LyrFS : c->isfloating ? LyrFloat : LyrTile]);
+
+	if (fakefullscreen) {
+		c->prev = c->geom;
+		fakefullscreen_box.x = c->mon->w.x + gappov;
+		fakefullscreen_box.y = c->mon->w.y + gappoh;
+		fakefullscreen_box.width = c->mon->w.width - 2 * gappov;
+		fakefullscreen_box.height = c->mon->w.height - 2 * gappov;
+		resize(c, fakefullscreen_box, 0);
+		c->isfakefullscreen = 1;
+	} else {
+		/* restore previous size instead of arrange for floating windows since
+		 * client positions are set by the user and cannot be recalculated */
+		resize(c, c->prev, 0);
+		c->isfakefullscreen = 0;
+	}
+	// arrange(c->mon);
+	// printstatus();
+}
+
+
+void
 setfullscreen(Client *c, int fullscreen)
 {
 	c->isfullscreen = fullscreen;
@@ -2759,6 +2793,15 @@ togglefullscreen(const Arg *arg)
 }
 
 void
+togglefakefullscreen(const Arg *arg)
+{
+	Client *sel = focustop(selmon);
+	if (sel)
+		setfakefullscreen(sel, !sel->isfakefullscreen);
+}
+
+
+void
 togglegaps(const Arg *arg)
 {
 	enablegaps = !enablegaps;
@@ -3102,6 +3145,8 @@ configurex11(struct wl_listener *listener, void *data)
 		arrange(c->mon);
 }
 
+
+/*创建窗口监测函数*/
 void
 createnotifyx11(struct wl_listener *listener, void *data)
 {
@@ -3113,6 +3158,7 @@ createnotifyx11(struct wl_listener *listener, void *data)
 	c->surface.xwayland = xsurface;
 	c->type = xsurface->override_redirect ? X11Unmanaged : X11Managed;
 	c->bw = borderpx;
+	c->isfakefullscreen = 0;
 
 	/* Listen to the various events it can emit */
 	LISTEN(&xsurface->events.map, &c->map, mapnotify);
