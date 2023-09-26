@@ -2419,7 +2419,10 @@ setfakefullscreen(Client *c, int fakefullscreen)
 		/* restore previous size instead of arrange for floating windows since
 		 * client positions are set by the user and cannot be recalculated */
 		// resize(c, c->prev, 0);
+		c->bw = borderpx;
 		c->isfakefullscreen = 0;
+		c->isfullscreen = 0;
+		c->isrealfullscreen = 0;
 		arrange(c->mon);
 		clear_tag_fullscreen_flag(c);
 	}
@@ -2447,6 +2450,8 @@ setrealfullscreen(Client *c, int realfullscreen)
 		// resize(c, c->prev, 0);
 		c->bw = borderpx;
 		c->isrealfullscreen = 0;
+		c->isfullscreen = 0;
+		c->isfakefullscreen = 0;
 		arrange(c->mon);
 		clear_tag_fullscreen_flag(c);
 	}
@@ -2894,16 +2899,21 @@ void
 togglefakefullscreen(const Arg *arg)
 {
 	Client *sel = focustop(selmon);
-	if (sel)
-		setfakefullscreen(sel, !sel->isfakefullscreen);
+	if (sel->isfullscreen || sel->isfakefullscreen || sel->isrealfullscreen)
+		setfakefullscreen(sel, 0);
+	else
+		setfakefullscreen(sel, 1);
+	
 }
 
 void
 togglerealfullscreen(const Arg *arg)
 {
 	Client *sel = focustop(selmon);
-	if (sel)
-		setrealfullscreen(sel, !sel->isrealfullscreen);
+	if (sel->isfullscreen || sel->isfakefullscreen || sel->isrealfullscreen)
+		setrealfullscreen(sel, 0);
+	else
+		setrealfullscreen(sel, 1);
 }
 
 void
