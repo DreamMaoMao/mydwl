@@ -3,8 +3,8 @@
 /* appearance */
 static int smartgaps                 = 0;  /* 1 means no outer gap when there is only one window */
 static int sloppyfocus               = 1;  /* focus follows mouse */
-static unsigned int gappih           = 10; /* horiz inner gap between windows */
-static unsigned int gappiv           = 10; /* vert inner gap between windows */
+static unsigned int gappih           = 5; /* horiz inner gap between windows */
+static unsigned int gappiv           = 5; /* vert inner gap between windows */
 static unsigned int gappoh           = 10; /* horiz outer gap between windows and screen edge */
 static unsigned int gappov           = 10; /* vert outer gap between windows and screen edge */
 static int bypass_surface_visibility = 0;  /* 1 means idle inhibitors will disable idle tracking even if it's surface isn't visible  */
@@ -141,9 +141,9 @@ static const Key keys[] = {
 	{ MODKEY,					 XKB_KEY_space,      spawn,          {.v = menucmd } },
 	{ MODKEY, 					 XKB_KEY_Return,     spawn,          {.v = termcmd } },
     { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_W,          spawn,          {.v = webcmd } },
-    { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_S,          spawn,          SHCMD("speedwm-screenshotutil -s") },
-    { MODKEY|WLR_MODIFIER_SHIFT|WLR_MODIFIER_CTRL, XKB_KEY_B, spawn, SHCMD("speedwm-btctrl") },
-    { MODKEY|WLR_MODIFIER_SHIFT|WLR_MODIFIER_CTRL, XKB_KEY_N, spawn, SHCMD("speedwm-netctrl") },
+    { WLR_MODIFIER_LOGO,         XKB_KEY_Return, 		 spawn, SHCMD("google-chrome") },
+    { WLR_MODIFIER_CTRL,         XKB_KEY_Return, 		 spawn, SHCMD("bash ~/tool/clash.sh") },  
+    { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,         XKB_KEY_a, 		 spawn, SHCMD("grim -g \"$(slurp)\" - | swappy -f -") },  
 	{ MODKEY,                    XKB_KEY_j,          focusstack,     {.i = +1} },
 	{ MODKEY,                    XKB_KEY_k,          focusstack,     {.i = -1} },
 	{ MODKEY,                    XKB_KEY_Right,          focusstack,     {.i = +1} },
@@ -156,13 +156,17 @@ static const Key keys[] = {
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_L,          setmfact,       {.f = +0.05} },
 	{ MODKEY,                    XKB_KEY_s,          zoom,           {0} },
 	{ MODKEY,                    XKB_KEY_Tab,        view,           {0} },
+	{ WLR_MODIFIER_CTRL,                    XKB_KEY_Left,        viewtoleft,           {0} },
+	{ WLR_MODIFIER_CTRL,                    XKB_KEY_Right,        viewtoright,           {0} },
+    { WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO,    XKB_KEY_Left,         tagtoleft,        {0} },                     /* ctrl alt left      |  将本窗口移动到左边tag */
+    { WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO,    XKB_KEY_Right,        tagtoright,       {0} }, 
 	{ MODKEY,					 XKB_KEY_q,          killclient,     {0} },
 	{ MODKEY,                    XKB_KEY_t,          setlayout,      {.v = &layouts[0]} },
 	{ MODKEY,                    XKB_KEY_e,          setlayout,      {.v = &layouts[1]} },
 	{ MODKEY,                    XKB_KEY_m,          setlayout,      {.v = &layouts[2]} },
 	{ MODKEY,                    XKB_KEY_space,      setlayout,      {0} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_space,      togglefloating, {0} },
-	{ MODKEY,                    XKB_KEY_a,          togglefullscreen, {0} },
+	{ MODKEY,                    XKB_KEY_a,          togglefakefullscreen, {0} },
 	{ MODKEY,                    XKB_KEY_0,          view,           {.ui = ~0} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_parenright, tag,            {.ui = ~0} },
 	{ MODKEY,                    XKB_KEY_comma,      focusmon,       {.i = WLR_DIRECTION_LEFT} },

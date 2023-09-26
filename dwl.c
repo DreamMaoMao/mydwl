@@ -198,6 +198,7 @@ struct Monitor {
 	unsigned int seltags;
 	unsigned int sellt;
 	unsigned int tagset[2];
+	Client *sel;
 	double mfact;
 	int nmaster;
 };
@@ -347,6 +348,8 @@ static void urgent(struct wl_listener *listener, void *data);
 static void view(const Arg *arg);
 static void viewtoleft(const Arg *arg);
 static void viewtoright(const Arg *arg);
+static void tagtoleft(const Arg *arg);
+static void tagtoright(const Arg *arg); 
 static void virtualkeyboard(struct wl_listener *listener, void *data);
 static void warp_cursor(const Client *c);
 static Monitor *xytomon(double x, double y);
@@ -1464,6 +1467,10 @@ focusclient(Client *c, int lift)
 
 	if (locked)
 		return;
+
+	if(c && selmon->sel != c){
+		selmon->sel  = c;
+	}
 
 	/* Warp cursor to center of client if it is outside */
 	if (warpcursor && c)
@@ -2716,16 +2723,14 @@ startdrag(struct wl_listener *listener, void *data)
 }
 
 void
-tag(const Arg *arg)
-{
-	Client *sel = focustop(selmon);
-	if (sel && arg->ui & TAGMASK) {
-		sel->tags = arg->ui & TAGMASK;
-		focusclient(focustop(selmon), 1);
-		arrange(selmon);
-	}
-	printstatus();
+tag(const Arg *arg) {
+  if (selmon->sel  && arg->ui & TAGMASK) {
+    selmon->sel->tags = arg->ui & TAGMASK;
+    view(&(Arg){.ui = arg->ui});
+  } else
+    view(arg);
 }
+
 
 void
 tagmon(const Arg *arg)
@@ -3093,6 +3098,24 @@ viewtoright(const Arg *arg)
 	printstatus();
 }
 
+
+void tagtoleft(const Arg *arg) {
+  if (selmon->sel != NULL &&
+      __builtin_popcount(selmon->tagset[selmon->seltags] & TAGMASK) == 1 &&
+      selmon->tagset[selmon->seltags] > 1) {
+    tag(&(Arg){.ui = selmon->tagset[selmon->seltags] >> 1});
+  }
+}
+
+void tagtoright(const Arg *arg) {
+  if (selmon->sel != NULL &&
+      __builtin_popcount(selmon->tagset[selmon->seltags] & TAGMASK) == 1 &&
+      selmon->tagset[selmon->seltags] & (TAGMASK >> 1)) {
+    tag(&(Arg){.ui = selmon->tagset[selmon->seltags] << 1});
+  }
+}
+
+
 void
 virtualkeyboard(struct wl_listener *listener, void *data)
 {
@@ -3224,6 +3247,7 @@ createnotifyx11(struct wl_listener *listener, void *data)
 	c->type = xsurface->override_redirect ? X11Unmanaged : X11Managed;
 	c->bw = borderpx;
 	c->isfakefullscreen = 0;
+	selmon->sel = c;
 
 	/* Listen to the various events it can emit */
 	LISTEN(&xsurface->events.map, &c->map, mapnotify);
