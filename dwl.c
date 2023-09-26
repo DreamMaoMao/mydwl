@@ -127,7 +127,7 @@ typedef struct {
 	unsigned int bw;
 	unsigned int tags;
 	int isfloating, isurgent, isfullscreen;
-	int isfakefullscreen;
+	int isfakefullscreen,isrealfullscreen;
 	uint32_t resize; /* configure serial of a pending resize */
 } Client;
 
@@ -320,6 +320,7 @@ static void setcursor(struct wl_listener *listener, void *data);
 static void setfloating(Client *c, int floating);
 static void setfullscreen(Client *c, int fullscreen);
 static void setfakefullscreen(Client *c, int fakefullscreen);
+static void setrealfullscreen(Client *c, int realfullscreen);
 static void setgaps(int oh, int ov, int ih, int iv);
 static void setlayout(const Arg *arg);
 static void setmfact(const Arg *arg);
@@ -336,6 +337,7 @@ static void tile(Monitor *m);
 static void togglefloating(const Arg *arg);
 static void togglefullscreen(const Arg *arg);
 static void togglefakefullscreen(const Arg *arg);
+static void togglerealfullscreen(const Arg *arg);
 static void togglegaps(const Arg *arg);
 static void toggletag(const Arg *arg);
 static void toggleview(const Arg *arg);
@@ -356,6 +358,9 @@ static Monitor *xytomon(double x, double y);
 static struct wlr_scene_node *xytonode(double x, double y, struct wlr_surface **psurface,
 		Client **pc, LayerSurface **pl, double *nx, double *ny);
 static void zoom(const Arg *arg);
+static void set_tag_fullscreen_flag(Client *c);
+static void clear_tag_fullscreen_flag(Client *c);
+static void clear_fullscreen_flag(Client *c);
 
 /* variables */
 static const char broken[] = "broken";
@@ -461,6 +466,7 @@ struct Pertag {
 	float mfacts[LENGTH(tags) + 1]; /* mfacts per tag */
 	unsigned int sellts[LENGTH(tags) + 1]; /* selected layouts */
 	const Layout *ltidxs[LENGTH(tags) + 1][2]; /* matrix of tags and layouts indexes  */
+  	Client *fullscreen_client[LENGTH(tags) + 1]; /*记录每个tag中的全屏窗口*/
 };
 
 static pid_t *autostart_pids;
@@ -492,6 +498,28 @@ applybounds(Client *c, struct wlr_box *bbox)
 		c->geom.x = bbox->x;
 	if (c->geom.y + c->geom.height + 2 * c->bw <= bbox->y)
 		c->geom.y = bbox->y;
+}
+
+void set_tag_fullscreen_flag(Client *c) {
+  unsigned int tags, i;
+  unsigned mask = 1;
+
+  for (tags = c->tags, i = 0; tags > 0; i++, tags = tags >> 1) {
+    if (tags & mask) {
+      c->mon->pertag->fullscreen_client[i + 1] = c;
+    }
+  }
+}
+
+void clear_tag_fullscreen_flag(Client *c) {
+  unsigned int tags, i;
+  unsigned mask = 1;
+
+  for (tags = c->tags, i = 0; tags > 0; i++, tags = tags >> 1) {
+    if (tags & mask) {
+      c->mon->pertag->fullscreen_client[i + 1] = NULL;
+    }
+  }
 }
 
 void
@@ -1106,6 +1134,9 @@ createnotify(struct wl_listener *listener, void *data)
 	c = xdg_surface->data = ecalloc(1, sizeof(*c));
 	c->surface.xdg = xdg_surface;
 	c->bw = borderpx;
+	c->isfakefullscreen = 0;
+	c->isrealfullscreen = 0;
+	selmon->sel = c;
 
 	LISTEN(&xdg_surface->events.map, &c->map, mapnotify);
 	LISTEN(&xdg_surface->events.unmap, &c->unmap, unmapnotify);
@@ -1115,7 +1146,28 @@ createnotify(struct wl_listener *listener, void *data)
 			fullscreennotify);
 	LISTEN(&xdg_surface->toplevel->events.request_maximize, &c->maximize,
 			maximizenotify);
+
+  	Client *fc;
+
+  	// 如果当前的tag中有新创建的窗口,就让当前tag中的全屏窗口退出全屏参与平铺
+  	fc = selmon->pertag->fullscreen_client[selmon->pertag->curtag];
+  	if (fc) {
+  	  clear_fullscreen_flag(fc);
+  	}
 }
+
+
+/*清除全屏标志,还原全屏时清0的border*/
+void clear_fullscreen_flag(Client *c) {
+  if (c->isfullscreen || c->isfakefullscreen || c->isfakefullscreen ) {
+    c->isfullscreen = 0;
+    c->isfakefullscreen = 0;
+    c->isfakefullscreen = 0;
+    c->bw = borderpx;
+    clear_tag_fullscreen_flag(c);
+  }
+}
+
 
 void
 createpointer(struct wlr_pointer *pointer)
@@ -2337,7 +2389,7 @@ setfloating(Client *c, int floating)
 void
 setfakefullscreen(Client *c, int fakefullscreen)
 {
-	c->isfullscreen = fakefullscreen;
+	c->isfakefullscreen = fakefullscreen;
 	struct wlr_box  fakefullscreen_box;
 	if (!c->mon)
 		return;
@@ -2354,16 +2406,45 @@ setfakefullscreen(Client *c, int fakefullscreen)
 		fakefullscreen_box.height = c->mon->w.height - 2 * gappov;
 		resize(c, fakefullscreen_box, 0);
 		c->isfakefullscreen = 1;
+		set_tag_fullscreen_flag(c);
 	} else {
 		/* restore previous size instead of arrange for floating windows since
 		 * client positions are set by the user and cannot be recalculated */
-		resize(c, c->prev, 0);
+		// resize(c, c->prev, 0);
 		c->isfakefullscreen = 0;
+		arrange(c->mon);
+		clear_tag_fullscreen_flag(c);
 	}
 	// arrange(c->mon);
 	// printstatus();
 }
 
+
+void
+setrealfullscreen(Client *c, int realfullscreen)
+{
+	c->isrealfullscreen = realfullscreen;
+
+	if (!c->mon)
+		return;
+
+	if (realfullscreen) {
+		c->bw = 0;
+		resize(c, c->mon->m, 0);
+		c->isrealfullscreen = 1;
+		set_tag_fullscreen_flag(c);
+	} else {
+		/* restore previous size instead of arrange for floating windows since
+		 * client positions are set by the user and cannot be recalculated */
+		// resize(c, c->prev, 0);
+		c->bw = borderpx;
+		c->isrealfullscreen = 0;
+		arrange(c->mon);
+		clear_tag_fullscreen_flag(c);
+	}
+	// arrange(c->mon);
+	// printstatus();
+}
 
 void
 setfullscreen(Client *c, int fullscreen)
@@ -2379,12 +2460,14 @@ setfullscreen(Client *c, int fullscreen)
 	if (fullscreen) {
 		c->prev = c->geom;
 		resize(c, c->mon->m, 0);
+		set_tag_fullscreen_flag(c);
 	} else {
 		/* restore previous size instead of arrange for floating windows since
 		 * client positions are set by the user and cannot be recalculated */
 		resize(c, c->prev, 0);
+		arrange(c->mon);
+		clear_tag_fullscreen_flag(c);
 	}
-	arrange(c->mon);
 	printstatus();
 }
 
@@ -2763,7 +2846,7 @@ tile(Monitor *m)
 	i = 0;
 	my = ty = m->gappoh*oe;
 	wl_list_for_each(c, &clients, link) {
-		if (!VISIBLEON(c, m) || c->isfloating || c->isfullscreen)
+		if (!VISIBLEON(c, m) || c->isfloating || c->isfullscreen ||c->isrealfullscreen || c->isfakefullscreen )
 			continue;
 		if (i < m->nmaster) {
 			r = MIN(n, m->nmaster) - i;
@@ -2807,6 +2890,13 @@ togglefakefullscreen(const Arg *arg)
 		setfakefullscreen(sel, !sel->isfakefullscreen);
 }
 
+void
+togglerealfullscreen(const Arg *arg)
+{
+	Client *sel = focustop(selmon);
+	if (sel)
+		setrealfullscreen(sel, !sel->isrealfullscreen);
+}
 
 void
 togglegaps(const Arg *arg)
@@ -2874,6 +2964,7 @@ unmapnotify(struct wl_listener *listener, void *data)
 {
 	/* Called when the surface is unmapped, and should no longer be shown. */
 	Client *c = wl_container_of(listener, c, unmap);
+	clear_tag_fullscreen_flag(c);
 	if (c == grabc) {
 		cursor_mode = CurNormal;
 		grabc = NULL;
@@ -3247,6 +3338,7 @@ createnotifyx11(struct wl_listener *listener, void *data)
 	c->type = xsurface->override_redirect ? X11Unmanaged : X11Managed;
 	c->bw = borderpx;
 	c->isfakefullscreen = 0;
+	c->isrealfullscreen = 0;	
 	selmon->sel = c;
 
 	/* Listen to the various events it can emit */
@@ -3258,6 +3350,14 @@ createnotifyx11(struct wl_listener *listener, void *data)
 	LISTEN(&xsurface->events.set_title, &c->set_title, updatetitle);
 	LISTEN(&xsurface->events.destroy, &c->destroy, destroynotify);
 	LISTEN(&xsurface->events.request_fullscreen, &c->fullscreen, fullscreennotify);
+
+  	Client *fc;
+
+  	// 如果当前的tag中有新创建的窗口,就让当前tag中的全屏窗口退出全屏参与平铺
+  	fc = selmon->pertag->fullscreen_client[selmon->pertag->curtag];
+  	if (fc) {
+  	  clear_fullscreen_flag(fc);
+  	}
 }
 
 Atom
