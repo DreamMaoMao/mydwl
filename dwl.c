@@ -2279,7 +2279,8 @@ requeststartdrag(struct wl_listener *listener, void *data)
 
 void
 resize(Client *c, struct wlr_box geo, int interact)
-{
+{	
+	unsigned int i;
 	// struct wlr_box *bbox = interact ? &sgeom : &c->mon->w;//去掉这个推荐的窗口大小,因为有时推荐的窗口特别大导致平铺异常
 	// client_set_bounds(c, geo.width, geo.height); //去掉这个推荐的窗口大小,因为有时推荐的窗口特别大导致平铺异常
 	c->geom = geo;
@@ -2299,6 +2300,13 @@ resize(Client *c, struct wlr_box geo, int interact)
 	/* this is a no-op if size hasn't changed */
 	c->resize = client_set_size(c, c->geom.width - 2 * c->bw,
 			c->geom.height - 2 * c->bw);
+	if(c->isfakefullscreen){
+		for (i = 0; i < 4; i++)
+		wlr_scene_rect_set_color(c->border[i], fakefullscreencolor);
+	} else if(c == selmon->sel) {
+		for (i = 0; i < 4; i++)
+		wlr_scene_rect_set_color(c->border[i], focuscolor);
+	}
 }
 
 void
