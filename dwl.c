@@ -2220,9 +2220,9 @@ void
 resize(Client *c, struct wlr_box geo, int interact)
 {
 	struct wlr_box *bbox = interact ? &sgeom : &c->mon->w;
-	client_set_bounds(c, geo.width, geo.height);
+	// client_set_bounds(c, geo.width, geo.height); //去掉这个推荐的窗口大小,因为有时推荐的窗口特别大导致平铺异常
 	c->geom = geo;
-	applybounds(c, bbox);
+	// applybounds(c, bbox);//去掉这个推荐的窗口大小,因为有时推荐的窗口特别大导致平铺异常
 
 	/* Update scene-graph, including borders */
 	wlr_scene_node_set_position(&c->scene->node, c->geom.x, c->geom.y);
