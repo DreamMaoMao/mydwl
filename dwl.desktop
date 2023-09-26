@@ -1,5 +1,7 @@
 [Desktop Entry]
+Encoding=UTF-8
 Name=dwl
-Comment=dwm for Wayland
-Exec=dwl
+Comment=Dynamic window manager for wayland
+Exec=env DWL=/home/wrq/_install/dwl dwl -s  /home/wrq/_install/dwl/autostart.sh
+Icon=dwl
 Type=Application

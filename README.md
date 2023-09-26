@@ -1,7 +1,6 @@
 # dwl - dwm for Wayland
 
-Join us on our IRC channel: [#dwl on Libera Chat]  
-Or on our [Discord server].
+Join us on our [Discord server] or at [#dwl] on irc.libera.chat.
 
 dwl is a compact, hackable compositor for [Wayland] based on [wlroots]. It is
 intended to fill the same space in the Wayland world that dwm does in X11,
@@ -53,11 +52,15 @@ Feature *non-goals* for the main codebase include:
 dwl has only two dependencies: `wlroots` and `wayland-protocols`. 
 
 Simply install these (and their `-devel` versions if your distro has separate
-development packages) and run `make`.  If you wish to build against a Git
-version of wlroots, check out the [wlroots-next branch].
+development packages) and run
+```
+cp config.def.h config.h
+meson setup build
+meson compile -C build
+```
+If you wish to build against a Git version of wlroots, check out the [wlroots-next branch].
 
-To enable XWayland, you should also install xorg-xwayland and uncomment its flag
-in `config.mk`.
+To enable XWayland, you should also install xorg-xwayland and build with `meson setup build -Dxwayland=enabled`.
 
 ## Configuration
 
@@ -144,7 +147,7 @@ inspiration, and to the various contributors to the project, including:
 
 
 [Discord server]: https://discord.gg/jJxZnrGPWN
-[#dwl on Libera Chat]: https://web.libera.chat/?channels=#dwl
+[#dwl]: https://web.libera.chat/?channels=#dwl
 [Wayland]: https://wayland.freedesktop.org/
 [wlroots]: https://gitlab.freedesktop.org/wlroots/wlroots/
 [wlroots-next branch]: https://github.com/djpohly/dwl/tree/wlroots-next
