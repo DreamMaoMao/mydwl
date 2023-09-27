@@ -507,7 +507,7 @@ static size_t autostart_len;
 void
 applybounds(Client *c, struct wlr_box *bbox)
 {
-	if (!c->isfullscreen) {
+	if (c->isfloating) { //只设置悬浮窗口
 		struct wlr_box min = {0}, max = {0};
 		client_get_size_hints(c, &max, &min);
 		/* try to set size hints */
@@ -2484,10 +2484,10 @@ void setborder_color(Client *c){
 void
 resize(Client *c, struct wlr_box geo, int interact)
 {	
-	// struct wlr_box *bbox = interact ? &sgeom : &c->mon->w;//去掉这个推荐的窗口大小,因为有时推荐的窗口特别大导致平铺异常
-	// client_set_bounds(c, geo.width, geo.height); //去掉这个推荐的窗口大小,因为有时推荐的窗口特别大导致平铺异常
+	struct wlr_box *bbox = interact ? &sgeom : &c->mon->w;//去掉这个推荐的窗口大小,因为有时推荐的窗口特别大导致平铺异常
+	client_set_bounds(c, geo.width, geo.height); //去掉这个推荐的窗口大小,因为有时推荐的窗口特别大导致平铺异常
 	c->geom = geo;
-	// applybounds(c, bbox);//去掉这个推荐的窗口大小,因为有时推荐的窗口特别大导致平铺异常
+	applybounds(c, bbox);//去掉这个推荐的窗口大小,因为有时推荐的窗口特别大导致平铺异常
 
 	/* Update scene-graph, including borders */
 	wlr_scene_node_set_position(&c->scene->node, c->geom.x, c->geom.y);
