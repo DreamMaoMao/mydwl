@@ -3,6 +3,7 @@
 
 
 /usr/libexec/xdg-desktop-portal-wlr &
+wlsunset -T 3501 -t 3500 &
 swaybg -i $DWL/wallpaper/caoyuan.jpg & # 壁纸
 waybar -c $DWL/waybar/config -s $DWL/waybar/style.css &
 echo "Xft.dpi: 140" | xrdb -merge                      #dpi缩放
@@ -25,4 +26,3 @@ nm-applet &
 [ -e /dev/sda1 ] && udisksctl mount -b /dev/sda4
 python3 ~/tool/sign.py &
 eww daemon &
-wlsunset -T 3501 -t 3500 &
