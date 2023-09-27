@@ -214,6 +214,7 @@ struct Monitor {
 	double mfact;
 	int nmaster;
 	int isoverview;
+	int is_in_hotarea;
 };
 
 typedef struct {
@@ -260,6 +261,7 @@ static void cleanup(void);
 static void cleanupkeyboard(struct wl_listener *listener, void *data);
 static void cleanupmon(struct wl_listener *listener, void *data);
 static void closemon(Monitor *m);
+static void toggle_hotarea(int x_root, int y_root);
 static void commitlayersurfacenotify(struct wl_listener *listener, void *data);
 static void commitnotify(struct wl_listener *listener, void *data);
 static void createdecoration(struct wl_listener *listener, void *data);
@@ -519,6 +521,24 @@ applybounds(Client *c, struct wlr_box *bbox)
 		c->geom.x = bbox->x;
 	if (c->geom.y + c->geom.height + 2 * c->bw <= bbox->y)
 		c->geom.y = bbox->y;
+}
+
+void toggle_hotarea(int x_root, int y_root) {
+  // 左下角热区坐标计算,兼容多显示屏
+  Arg arg = {0};
+  unsigned hx = selmon->m.x + hotarea_size;
+  unsigned hy = selmon->m.y + selmon->m.height - hotarea_size;
+
+  if (enable_hotarea == 1 && selmon->is_in_hotarea == 0 && y_root > hy &&
+      x_root < hx && x_root >= selmon->m.x &&
+      y_root <= (selmon->m.y + selmon->m.height)) {
+    toggleoverview(&arg);
+    selmon->is_in_hotarea = 1;
+  } else if (enable_hotarea == 1 && selmon->is_in_hotarea == 1 &&
+             (y_root <= hy || x_root >= hx || x_root < selmon->m.x ||
+              y_root > (selmon->m.y + selmon->m.height))) {
+    selmon->is_in_hotarea = 0;
+  }
 }
 
 /* function implementations */
@@ -1177,6 +1197,7 @@ createmon(struct wl_listener *listener, void *data)
 	m->gappoh = gappoh;
 	m->gappov = gappov;
 	m->isoverview = 0;
+	m->is_in_hotarea = 0;
 	m->tagset[0] = m->tagset[1] = 1;
 	for (r = monrules; r < END(monrules); r++) {
 		if (!r->name || strstr(wlr_output->name, r->name)) {
@@ -2210,6 +2231,7 @@ motionrelative(struct wl_listener *listener, void *data)
 	 * the cursor around without any input. */
 	wlr_cursor_move(cursor, &event->pointer->base, event->delta_x, event->delta_y);
 	motionnotify(event->time_msec);
+	toggle_hotarea(cursor->x,cursor->y);
 	// lognumtofile(cursor->x); //这里可以根据鼠标位置设置热区
 	
 }
@@ -3066,14 +3088,13 @@ void toggleoverview(const Arg *arg) {
     //                                                         : selmon->seltags;
   selmon->isoverview ^= 1;
   unsigned int target,i;
-  unsigned int tag ;
+  unsigned int tag = selmon->sel->tags  ;
   if(selmon->isoverview){
 	target = ~0;
   }else {
 	for(i=0;!(tag & 1);i++){
 		tag = selmon->sel->tags >> i;
 	}
-	lognumtofile(i);
 	target = 1 << (i-1);
   }
 //   Client *c;

@@ -1,6 +1,8 @@
 /* speedie's dwl config */
 
 /* appearance */
+static const unsigned int hotarea_size              = 10;
+static const unsigned int enable_hotarea            = 1;
 static int smartgaps                 = 0;  /* 1 means no outer gap when there is only one window */
 static int sloppyfocus               = 1;  /* focus follows mouse */
 static unsigned int gappih           = 5; /* horiz inner gap between windows */
