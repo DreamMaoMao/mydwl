@@ -53,6 +53,9 @@ static const Rule rules[] = {
 	{ "Google-chrome",  NULL,       1 << 3,       0,           -1 },
 	{ "Clash for Windows",  NULL,       0,       1,           -1 },
 	{ "electron-netease-cloud-music",  NULL,       0,       1,           -1 },
+	{ NULL,  "图片查看器",       0,       1,           -1 },
+	{ NULL,  "图片查看",       0,       1,           -1 },
+
 };
 
 /* layout(s) */
