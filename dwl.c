@@ -1530,7 +1530,7 @@ focusclient(Client *c, int lift)
 
 	/* Raise client in stacking order if requested */
 	if (c && lift)
-		wlr_scene_node_raise_to_top(&c->scene->node);
+		wlr_scene_node_raise_to_top(&c->scene->node); //将视图提升到顶层
 
 	if (c && client_surface(c) == old)
 		return;

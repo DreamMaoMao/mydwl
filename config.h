@@ -12,10 +12,12 @@ static unsigned int borderpx         = 5;  /* border pixel of windows */
 static const float rootcolor[]             = { 0.3, 0.3, 0.3, 1.0 };
 static const float bordercolor[]           = { 0, 0, 0, 0 };
 static const float focuscolor[]            = { 0.6, 0.4, 0.1, 1 };
+static const float fakefullscreencolor[]   = { 0.1, 0.5, 0.2, 1 };
+
 /* To conform the xdg-protocol, set the alpha to zero to restore the old behavior */
 static const float fullscreen_bg[]         = {0.1, 0.1, 0.1, 1.0};
 
-static int warpcursor = 1; /* Warp cursor to focused client */
+static int warpcursor = 0; /* Warp cursor to focused client */
 
 /* Autostart */
 static const char *const autostart[] = {
