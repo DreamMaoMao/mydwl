@@ -297,6 +297,7 @@ static void dwl_ipc_output_release(struct wl_client *client, struct wl_resource 
 static void focusclient(Client *c, int lift);
 static void focusmon(const Arg *arg);
 static void focusstack(const Arg *arg);
+static void setborder_color(Client *c);
 static Client *focustop(Monitor *m);
 static void fullscreennotify(struct wl_listener *listener, void *data);
 static void incnmaster(const Arg *arg);
@@ -866,6 +867,11 @@ buttonpress(struct wl_listener *listener, void *data)
 					event->button == b->button && b->func && (selmon->isoverview == 1 || b->button == BTN_MIDDLE )) {
 				b->func(&b->arg);
 				return;
+			} else if (CLEANMASK(mods) == CLEANMASK(b->mod) &&
+					event->button == b->button && b->func && CLEANMASK(b->mod) != 0 ) {
+				b->func(&b->arg);
+				return;
+
 			}
 		}
 		break;
@@ -1711,9 +1717,7 @@ focusclient(Client *c, int lift)
 
 		/* Don't change border color if there is an exclusive focus or we are
 		 * handling a drag operation */
-		if (!exclusive_focus && !seat->drag)
-			for (i = 0; i < 4; i++)
-				wlr_scene_rect_set_color(c->border[i], focuscolor);
+		setborder_color(c);
 	}
 
 	/* Deactivate old client if focus is changing */
@@ -1732,8 +1736,7 @@ focusclient(Client *c, int lift)
 		/* Don't deactivate old client if the new one wants focus, as this causes issues with winecfg
 		 * and probably other clients */
 		} else if (w && !client_is_unmanaged(w) && (!c || !client_wants_focus(c))) {
-			for (i = 0; i < 4; i++)
-				wlr_scene_rect_set_color(w->border[i], bordercolor);
+				setborder_color(w);
 
 			client_activate_surface(old, 0);
 		}
@@ -2459,10 +2462,23 @@ resizeclient(Client *c,int x,int y,int w,int h, int interact)
 }
 
 
+void setborder_color(Client *c){
+	unsigned int i;
+	if(c->isfakefullscreen){
+		for (i = 0; i < 4; i++)
+		wlr_scene_rect_set_color(c->border[i], fakefullscreencolor);
+	} else if(c == selmon->sel) {
+		for (i = 0; i < 4; i++)
+		wlr_scene_rect_set_color(c->border[i], focuscolor);
+	} else {
+		for (i = 0; i < 4; i++)
+		wlr_scene_rect_set_color(c->border[i], bordercolor);		
+	}
+}
+
 void
 resize(Client *c, struct wlr_box geo, int interact)
 {	
-	unsigned int i;
 	// struct wlr_box *bbox = interact ? &sgeom : &c->mon->w;//去掉这个推荐的窗口大小,因为有时推荐的窗口特别大导致平铺异常
 	// client_set_bounds(c, geo.width, geo.height); //去掉这个推荐的窗口大小,因为有时推荐的窗口特别大导致平铺异常
 	c->geom = geo;
@@ -2482,13 +2498,8 @@ resize(Client *c, struct wlr_box geo, int interact)
 	/* this is a no-op if size hasn't changed */
 	c->resize = client_set_size(c, c->geom.width - 2 * c->bw,
 			c->geom.height - 2 * c->bw);
-	if(c->isfakefullscreen){
-		for (i = 0; i < 4; i++)
-		wlr_scene_rect_set_color(c->border[i], fakefullscreencolor);
-	} else if(c == selmon->sel) {
-		for (i = 0; i < 4; i++)
-		wlr_scene_rect_set_color(c->border[i], focuscolor);
-	}
+	setborder_color(c);
+
 }
 
 void
