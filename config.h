@@ -205,6 +205,8 @@ static const Key keys[] = {
 
 static const Button buttons[] = {
 	{ MODKEY, BTN_LEFT,   moveresize,     {.ui = CurMove } },
-	{ NULL, BTN_MIDDLE, togglefakefullscreen, {0} },
+	{ 0, BTN_MIDDLE, togglefakefullscreen, {0} }, //中键触发假全屏
 	{ MODKEY, BTN_RIGHT,  moveresize,     {.ui = CurResize } },
+	// { WLR_MODIFIER_LOGO, BTN_FORWARD, viewtoleft, {0} }, //中键+super向前切换工作区
+	// { WLR_MODIFIER_LOGO, BTN_BACK, viewtoright, {0} }, //中键+super向后切换工作区
 };

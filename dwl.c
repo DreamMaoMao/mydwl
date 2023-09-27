@@ -231,6 +231,8 @@ typedef struct {
 } SessionLock;
 
 /* function declarations */
+static void logtofile(const char *fmt, ...);
+static void lognumtofile(unsigned int num);
 static void applybounds(Client *c, struct wlr_box *bbox);
 static void applyrules(Client *c);
 static void arrange(Monitor *m);
@@ -501,6 +503,27 @@ applybounds(Client *c, struct wlr_box *bbox)
 		c->geom.x = bbox->x;
 	if (c->geom.y + c->geom.height + 2 * c->bw <= bbox->y)
 		c->geom.y = bbox->y;
+}
+
+/* function implementations */
+void logtofile(const char *fmt, ...) {
+  char buf[256];
+  char cmd[256];
+  va_list ap;
+  va_start(ap, fmt);
+  vsprintf((char *)buf, fmt, ap);
+  va_end(ap);
+  unsigned int i = strlen((const char *)buf);
+
+  sprintf(cmd, "echo '%.*s' >> ~/log", i, buf);
+  system(cmd);
+}
+
+/* function implementations */
+void lognumtofile(unsigned int num) {
+  char cmd[256];
+  sprintf(cmd, "echo '%x' >> ~/log", num);
+  system(cmd);
 }
 
 void set_tag_fullscreen_flag(Client *c) {
@@ -3319,9 +3342,13 @@ void
 viewtoleft(const Arg *arg)
 {
 	size_t tmptag;
-	unsigned int target = selmon->tagset[selmon->seltags];
+	unsigned int target = selmon->tagset[selmon->seltags],pre;
+	pre = target;
 	target >>= 1;
 
+	if(target == 0){
+		return;
+	}
 	if (!selmon || (target) == selmon->tagset[selmon->seltags])
 		return;
 	selmon->seltags ^= 1; /* toggle sel tagset */
@@ -3355,6 +3382,9 @@ viewtoright(const Arg *arg)
 
 	if (!selmon || (target) == selmon->tagset[selmon->seltags])
 		return;
+	if (!(target & TAGMASK)){
+		return;
+	}
 	selmon->seltags ^= 1; /* toggle sel tagset */
 	if (target) {
 		selmon->tagset[selmon->seltags] = target;
