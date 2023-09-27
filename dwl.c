@@ -213,6 +213,7 @@ struct Monitor {
 	Client *sel;
 	double mfact;
 	int nmaster;
+	int isoverview;
 };
 
 typedef struct {
@@ -329,6 +330,7 @@ static void quitsignal(int signo);
 static void rendermon(struct wl_listener *listener, void *data);
 static void requeststartdrag(struct wl_listener *listener, void *data);
 static void resize(Client *c, struct wlr_box geo, int interact);
+static void resizeclient(Client *c,int x,int y,int w,int h, int interact);
 static void run(char *startup_cmd);
 static void setcursor(struct wl_listener *listener, void *data);
 static void setfloating(Client *c, int floating);
@@ -348,6 +350,8 @@ static void startdrag(struct wl_listener *listener, void *data);
 static void tag(const Arg *arg);
 static void tagmon(const Arg *arg);
 static void tile(Monitor *m);
+static void overview(Monitor *m);
+static void grid(Monitor *m, unsigned int gappo, unsigned int uappi);
 static void togglefloating(const Arg *arg);
 static void togglefullscreen(const Arg *arg);
 static void togglefakefullscreen(const Arg *arg);
@@ -377,6 +381,7 @@ static void clear_tag_fullscreen_flag(Client *c);
 static void clear_fullscreen_flag(Client *c);
 static Client *direction_select(const Arg *arg);
 static void focusdir(const Arg *arg);
+static void toggleoverview(const Arg *arg);
 
 /* variables */
 static const char broken[] = "broken";
@@ -600,8 +605,11 @@ arrange(Monitor *m)
 	wlr_scene_node_set_enabled(&m->fullscreen_bg->node,
 			(c = focustop(m)) && c->isfullscreen);
 
-	if (m && m->lt[m->sellt]->arrange)
+	if(m->isoverview){
+		overviewlayout.arrange(m);
+	}else if (m && m->lt[m->sellt]->arrange){
 		m->lt[m->sellt]->arrange(m);
+	}
 	motionnotify(0);
 	checkidleinhibitor(NULL);
 
@@ -796,7 +804,7 @@ Client *direction_select(const Arg *arg) {
 void focusdir(const Arg *arg) {
 	Client *c;
 	c = direction_select(arg);
-	focusclient(c,0);
+	focusclient(c,1);
 }
 
 void
@@ -1250,6 +1258,7 @@ createmon(struct wl_listener *listener, void *data)
 	m->gappiv = gappiv;
 	m->gappoh = gappoh;
 	m->gappov = gappov;
+	m->isoverview = 0;
 	m->tagset[0] = m->tagset[1] = 1;
 	for (r = monrules; r < END(monrules); r++) {
 		if (!r->name || strstr(wlr_output->name, r->name)) {
@@ -2283,6 +2292,8 @@ motionrelative(struct wl_listener *listener, void *data)
 	 * the cursor around without any input. */
 	wlr_cursor_move(cursor, &event->pointer->base, event->delta_x, event->delta_y);
 	motionnotify(event->time_msec);
+	// lognumtofile(cursor->x); //这里可以根据鼠标位置设置热区
+	
 }
 
 void
@@ -2392,7 +2403,7 @@ pointerfocus(Client *c, struct wlr_surface *surface, double sx, double sy,
 	int internal_call = !time;
 
 	if (sloppyfocus && !internal_call && c && !client_is_unmanaged(c))
-		focusclient(c, 0);
+		focusclient(c, 1);
 
 	/* If surface is NULL, clear pointer focus */
 	if (!surface) {
@@ -2494,6 +2505,19 @@ requeststartdrag(struct wl_listener *listener, void *data)
 	else
 		wlr_data_source_destroy(event->drag->source);
 }
+
+void 
+resizeclient(Client *c,int x,int y,int w,int h, int interact)
+{
+	struct wlr_box tmp_box;
+	c->prev = c->geom;
+	tmp_box.x = x;
+	tmp_box.y = y;
+	tmp_box.width = w;
+	tmp_box.height = h;
+	resize(c, tmp_box, interact);
+}
+
 
 void
 resize(Client *c, struct wlr_box geo, int interact)
@@ -3052,6 +3076,92 @@ tagmon(const Arg *arg)
 	Client *sel = focustop(selmon);
 	if (sel)
 		setmon(sel, dirtomon(arg->i), 0);
+}
+
+void 
+overview(Monitor *m) {
+	grid(m, overviewgappo, overviewgappi); 
+}
+
+// 网格布局窗口大小和位置计算
+void grid(Monitor *m, unsigned int gappo, unsigned int gappi) {
+  unsigned int i, n;
+  unsigned int cx, cy, cw, ch;
+  unsigned int dx;
+  unsigned int cols, rows, overcols;
+  Client *c;
+  Client *tempClients[100];
+  n = 0;
+  wl_list_for_each(c, &clients, link)
+  	if (VISIBLEON(c, c->mon) ){
+			tempClients[n] = c;
+    		n++;
+  	}
+  tempClients[n] = NULL;
+  if (n == 0)
+    return;
+  if (n == 1) {
+    c = tempClients[0];
+    cw = (m->w.width - 2 * gappo) * 0.7;
+    ch = (m->w.height- 2 * gappo) * 0.8;
+    resizeclient(c, m->w.x + (m->m.width - cw) / 2, m->w.y + (m->w.height- ch) / 2,
+           cw - 2 * c->bw, ch - 2 * c->bw, 0);
+    return;
+  }
+  if (n == 2) {
+    c = tempClients[0];
+    cw = (m->w.width - 2 * gappo - gappi) / 2;
+    ch = (m->w.height- 2 * gappo) * 0.65;
+    resizeclient(c, m->m.x + cw + gappo + gappi, m->m.y + (m->m.height - ch) / 2 + gappo,
+           cw - 2 * c->bw, ch - 2 * c->bw, 0);
+    resizeclient(tempClients[1], m->m.x + gappo, m->m.y + (m->m.height - ch) / 2 + gappo,
+           cw - 2 * c->bw, ch - 2 * c->bw, 0);
+
+    return;
+  }
+
+  for (cols = 0; cols <= n / 2; cols++)
+    if (cols * cols >= n)
+      break;
+  rows = (cols && (cols - 1) * cols >= n) ? cols - 1 : cols;
+  ch = (m->w.height- 2 * gappo - (rows - 1) * gappi) / rows;
+  cw = (m->w.width - 2 * gappo - (cols - 1) * gappi) / cols;
+
+  overcols = n % cols;
+  if (overcols)
+    dx = (m->w.width - overcols * cw - (overcols - 1) * gappi) / 2 - gappo;
+  for (i = 0, c = tempClients[0]; c; c = tempClients[i+1], i++) {
+    cx = m->w.x + (i % cols) * (cw + gappi);
+    cy = m->w.y + (i / cols) * (ch + gappi);
+    if (overcols && i >= n - overcols) {
+      cx += dx;
+    }
+    resizeclient(c, cx + gappo, cy + gappo, cw - 2 * c->bw, ch - 2 * c->bw, 0);
+  }
+}
+
+
+// 显示所有tag 或 跳转到聚焦窗口的tag
+void toggleoverview(const Arg *arg) {
+
+  	unsigned int target = selmon->sel && selmon->sel->tags != TAGMASK ? selmon->sel->tags
+                                                            : selmon->seltags;
+  selmon->isoverview ^= 1;
+//   Client *c;
+//   // 正常视图到overview,退出所有窗口的浮动和全屏状态参与平铺,
+//   // overview到正常视图,还原之前退出的浮动和全屏窗口状态
+//   if (selmon->isoverview) {
+//     for (c = selmon->clients; c; c = c->next) {
+//       overview_backup(c);
+//     }
+//   } else {
+//     for (c = selmon->clients; c; c = c->next) {
+//       overview_restore(c, &(Arg){.ui = target});
+//     }
+//   }
+  logtofile("hello");
+  view(&(Arg){.ui = target});
+  // pointerfocuswin(selmon->sel); //我不需要自动鼠标跳转窗口
 }
 
 void
