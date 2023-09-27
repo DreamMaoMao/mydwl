@@ -863,7 +863,7 @@ buttonpress(struct wl_listener *listener, void *data)
 		mods = keyboard ? wlr_keyboard_get_modifiers(keyboard) : 0;
 		for (b = buttons; b < END(buttons); b++) {
 			if (CLEANMASK(mods) == CLEANMASK(b->mod) &&
-					event->button == b->button && b->func) {
+					event->button == b->button && b->func && (selmon->isoverview == 1 || b->button == BTN_MIDDLE )) {
 				b->func(&b->arg);
 				return;
 			}

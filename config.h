@@ -215,6 +215,8 @@ static const Button buttons[] = {
 	{ MODKEY, BTN_LEFT,   moveresize,     {.ui = CurMove } },
 	{ 0, BTN_MIDDLE, togglefakefullscreen, {0} }, //中键触发假全屏
 	{ MODKEY, BTN_RIGHT,  moveresize,     {.ui = CurResize } },
+	{ 0, BTN_LEFT,  toggleoverview,     {0} },
+	{ 0, BTN_RIGHT,  killclient,     {0} },
 };
 
 static const Wheel wheels[] = {
