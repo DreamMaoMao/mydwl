@@ -3099,7 +3099,7 @@ void toggleoverview(const Arg *arg) {
     //                                                         : selmon->seltags;
   selmon->isoverview ^= 1;
   unsigned int target,i;
-  unsigned int tag = selmon->sel->tags  ;
+  unsigned int tag = 0 ;
   if(selmon->isoverview){
 	target = ~0;
   }else {
