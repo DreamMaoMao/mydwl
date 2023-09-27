@@ -641,23 +641,18 @@ arrangelayer(Monitor *m, struct wl_list *list, struct wlr_box *usable_area, int 
 }
 
 Client *direction_select(const Arg *arg) {
-	Client *tempClients[100];
-	Client *c = NULL, *tc = selmon->sel;
+	Client *c,*tempClients[100];
+	Client *tc = selmon->sel;
 	int last = -1;
 	if (tc &&
 	    (tc->isfullscreen || tc->isfakefullscreen || tc->isrealfullscreen )) /* no support for focusstack with fullscreen windows */
 	  return NULL;
-	// if (!tc)
-	//   tc = &clients;
-	// if (!tc)
-	//   return NULL;
 
 	wl_list_for_each(c, &clients, link)
-		if (VISIBLEON(c, c->mon)){
-	  		last++;
+		if (c && VISIBLEON(c, c->mon)){
+			last++;
 	  		tempClients[last] = c;
 		}
-
   	if (last < 0)
   	  return NULL;
   	int sel_x = tc->geom.x;
@@ -669,7 +664,7 @@ Client *direction_select(const Arg *arg) {
   	switch (arg->i) {
   	case UP:
   	  for (int _i = 0; _i <= last; _i++) {
-  	    if (tempClients[_i]->geom.y < sel_y && tempClients[_i]->geom.x == sel_x) {
+  	    if (tempClients[_i]->geom.y < sel_y ) {
   	      int dis_x = tempClients[_i]->geom.x - sel_x;
   	      int dis_y = tempClients[_i]->geom.y - sel_y;
   	      long long int tmp_distance = dis_x * dis_x + dis_y * dis_y; // 计算距离
@@ -678,30 +673,11 @@ Client *direction_select(const Arg *arg) {
   	        tempFocusClients = tempClients[_i];
   	      }
   	    }
-  	  }
-  	  if (!tempFocusClients) {
-  	    distance = LLONG_MAX;
-  	    for (int _i = 0; _i <= last; _i++) {
-  	      if (tempClients[_i]->geom.y < sel_y) {
-  	        int dis_x = tempClients[_i]->geom.x - sel_x;
-  	        int dis_y = tempClients[_i]->geom.y - sel_y;
-  	        long long int tmp_distance =
-  	            dis_x * dis_x + dis_y * dis_y; // 计算距离
-  	        if (tmp_distance < distance) {
-  	          distance = tmp_distance;
-  	          tempFocusClients = tempClients[_i];
-  	        }
-  	      }
-  	    }
-  	  }
-  	  if (tempFocusClients && tempFocusClients->geom.x <= 16384 &&
-  	      tempFocusClients->geom.y <= 16384) {
-  	    c = tempFocusClients;
   	  }
   	  break;
   	case DOWN:
   	  for (int _i = 0; _i <= last; _i++) {
-  	    if (tempClients[_i]->geom.y > sel_y && tempClients[_i]->geom.x == sel_x) {
+  	    if (tempClients[_i]->geom.y > sel_y ) {
   	      int dis_x = tempClients[_i]->geom.x - sel_x;
   	      int dis_y = tempClients[_i]->geom.y - sel_y;
   	      long long int tmp_distance = dis_x * dis_x + dis_y * dis_y; // 计算距离
@@ -710,30 +686,11 @@ Client *direction_select(const Arg *arg) {
   	        tempFocusClients = tempClients[_i];
   	      }
   	    }
-  	  }
-  	  if (!tempFocusClients) {
-  	    distance = LLONG_MAX;
-  	    for (int _i = 0; _i <= last; _i++) {
-  	      if (tempClients[_i]->geom.y > sel_y) {
-  	        int dis_x = tempClients[_i]->geom.x - sel_x;
-  	        int dis_y = tempClients[_i]->geom.y - sel_y;
-  	        long long int tmp_distance =
-  	            dis_x * dis_x + dis_y * dis_y; // 计算距离
-  	        if (tmp_distance < distance) {
-  	          distance = tmp_distance;
-  	          tempFocusClients = tempClients[_i];
-  	        }
-  	      }
-  	    }
-  	  }
-  	  if (tempFocusClients && tempFocusClients->geom.x <= 16384 &&
-  	      tempFocusClients->geom.y <= 16384) {
-  	    c = tempFocusClients;
   	  }
   	  break;
   	case LEFT:
   	  for (int _i = 0; _i <= last; _i++) {
-  	    if (tempClients[_i]->geom.x < sel_x && tempClients[_i]->geom.y == sel_y) {
+  	    if (tempClients[_i]->geom.x < sel_x ) {
   	      int dis_x = tempClients[_i]->geom.x - sel_x;
   	      int dis_y = tempClients[_i]->geom.y - sel_y;
   	      long long int tmp_distance = dis_x * dis_x + dis_y * dis_y; // 计算距离
@@ -742,31 +699,11 @@ Client *direction_select(const Arg *arg) {
   	        tempFocusClients = tempClients[_i];
   	      }
   	    }
-  	  }
-  	  if (!tempFocusClients) {
-  	    distance = LLONG_MAX;
-  	    for (int _i = 0; _i <= last; _i++) {
-  	      if (tempClients[_i]->geom.x < sel_x) {
-  	        int dis_x = tempClients[_i]->geom.x - sel_x;
-  	        int dis_y = tempClients[_i]->geom.y - sel_y;
-  	        long long int tmp_distance =
-  	            dis_x * dis_x + dis_y * dis_y; // 计算距离
-  	        if (tmp_distance < distance) {
-  	          distance = tmp_distance;
-  	          tempFocusClients = tempClients[_i];
-  	        }
-  	      }
-  	    }
-  	  }
-  	  if (tempFocusClients && tempFocusClients->geom.x <= 16384 &&
-  	      tempFocusClients->geom.y <= 16384) {
-  	    c = tempFocusClients;
   	  }
   	  break;
   	case RIGHT:
   	  for (int _i = 0; _i <= last; _i++) {
-  	    // 第一步先筛选出右边的窗口 优先选择同一层次的
-  	    if (tempClients[_i]->geom.x > sel_x && tempClients[_i]->geom.y == sel_y) {
+  	    if (tempClients[_i]->geom.x > sel_x ) {
   	      int dis_x = tempClients[_i]->geom.x - sel_x;
   	      int dis_y = tempClients[_i]->geom.y - sel_y;
   	      long long int tmp_distance = dis_x * dis_x + dis_y * dis_y; // 计算距离
@@ -776,35 +713,16 @@ Client *direction_select(const Arg *arg) {
   	      }
   	    }
   	  }
-  	  // 没筛选到,再去除同一层次的要求,重新筛选
-  	  if (!tempFocusClients) {
-  	    distance = LLONG_MAX;
-  	    for (int _i = 0; _i <= last; _i++) {
-  	      if (tempClients[_i]->geom.x > sel_x) {
-  	        int dis_x = tempClients[_i]->geom.x - sel_x;
-  	        int dis_y = tempClients[_i]->geom.y - sel_y;
-  	        long long int tmp_distance =
-  	            dis_x * dis_x + dis_y * dis_y; // 计算距离
-  	        if (tmp_distance < distance) {
-  	          distance = tmp_distance;
-  	          tempFocusClients = tempClients[_i];
-  	        }
-  	      }
-  	    }
-  	  }
-  	  // 确认选择
-  	  if (tempFocusClients && tempFocusClients->geom.x <= 16384 &&
-  	      tempFocusClients->geom.y <= 16384) {
-  	    c = tempFocusClients;
-  	  }
+  	  break;
   	}
-  	return c;
+  	return tempFocusClients;
 }
 
 void focusdir(const Arg *arg) {
 	Client *c;
 	c = direction_select(arg);
-	focusclient(c,1);
+	if(c)
+		focusclient(c,1);
 }
 
 void
@@ -3144,9 +3062,20 @@ void grid(Monitor *m, unsigned int gappo, unsigned int gappi) {
 // 显示所有tag 或 跳转到聚焦窗口的tag
 void toggleoverview(const Arg *arg) {
 
-  	unsigned int target = selmon->sel && selmon->sel->tags != TAGMASK ? selmon->sel->tags
-                                                            : selmon->seltags;
+  	// unsigned int target = selmon->sel && selmon->sel->tags != TAGMASK ? selmon->sel->tags
+    //                                                         : selmon->seltags;
   selmon->isoverview ^= 1;
+  unsigned int target,i;
+  unsigned int tag ;
+  if(selmon->isoverview){
+	target = ~0;
+  }else {
+	for(i=0;!(tag & 1);i++){
+		tag = selmon->sel->tags >> i;
+	}
+	lognumtofile(i);
+	target = 1 << (i-1);
+  }
 //   Client *c;
 //   // 正常视图到overview,退出所有窗口的浮动和全屏状态参与平铺,
 //   // overview到正常视图,还原之前退出的浮动和全屏窗口状态
@@ -3159,7 +3088,7 @@ void toggleoverview(const Arg *arg) {
 //       overview_restore(c, &(Arg){.ui = target});
 //     }
 //   }
-  logtofile("hello");
+//   logtofile("hello");
   view(&(Arg){.ui = target});
   // pointerfocuswin(selmon->sel); //我不需要自动鼠标跳转窗口
 }
@@ -3476,6 +3405,9 @@ view(const Arg *arg)
 void
 viewtoleft(const Arg *arg)
 {
+	if(selmon->isoverview || selmon->pertag->curtag == 0){
+		return;
+	}
 	size_t tmptag;
 	unsigned int target = selmon->tagset[selmon->seltags];
 	target >>= 1;
@@ -3510,6 +3442,9 @@ viewtoleft(const Arg *arg)
 void
 viewtoright(const Arg *arg)
 {
+	if(selmon->isoverview || selmon->pertag->curtag == 0){
+		return;
+	}
 	size_t tmptag;
 	unsigned int target = selmon->tagset[selmon->seltags];
 	target <<= 1;

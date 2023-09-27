@@ -14,6 +14,9 @@ static const float bordercolor[]           = { 0, 0, 0, 0 };
 static const float focuscolor[]            = { 0.6, 0.4, 0.1, 1 };
 static const float fakefullscreencolor[]   = { 0.1, 0.5, 0.2, 1 };
 
+static const int overviewgappi = 24; /* overview时 窗口与边缘 缝隙大小 */
+static const int overviewgappo = 60; /* overview时 窗口与窗口 缝隙大小 */
+
 /* To conform the xdg-protocol, set the alpha to zero to restore the old behavior */
 static const float fullscreen_bg[]         = {0.1, 0.1, 0.1, 1.0};
 
@@ -49,6 +52,8 @@ static const Rule rules[] = {
 };
 
 /* layout(s) */
+static const Layout overviewlayout = { "󰃇",  overview };
+
 static const Layout layouts[] = {
 	/* symbol     arrange function */
 	{ "[]=",      tile },
@@ -164,6 +169,7 @@ static const Key keys[] = {
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_L,          setmfact,       {.f = +0.05} },
 	{ MODKEY,                    XKB_KEY_s,          zoom,           {0} },
 	{ MODKEY,                    XKB_KEY_Tab,        view,           {0} },
+	{ WLR_MODIFIER_LOGO,                    XKB_KEY_a,          toggleoverview,           {0} },
 	{ WLR_MODIFIER_CTRL,                    XKB_KEY_Left,        viewtoleft,           {0} },
 	{ WLR_MODIFIER_CTRL,                    XKB_KEY_Right,        viewtoright,           {0} },
     { WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO,    XKB_KEY_Left,         tagtoleft,        {0} },                     /* ctrl alt left      |  将本窗口移动到左边tag */
@@ -176,8 +182,8 @@ static const Key keys[] = {
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_space,      togglefloating, {0} },
 	{ MODKEY,                    XKB_KEY_a,          togglefakefullscreen, {0} },
 	{ MODKEY,                    XKB_KEY_f,          togglerealfullscreen, {0} },
-	{ MODKEY,                    XKB_KEY_0,          view,           {.ui = ~0} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_parenright, tag,            {.ui = ~0} },
+	{ WLR_MODIFIER_CTRL,                    XKB_KEY_KP_0,          view,           {.ui = ~0} },
+	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO, XKB_KEY_KP_0, tag,            {.ui = ~0} },
 	{ MODKEY,                    XKB_KEY_comma,      focusmon,       {.i = WLR_DIRECTION_LEFT} },
 	{ MODKEY,                    XKB_KEY_period,     focusmon,       {.i = WLR_DIRECTION_RIGHT} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_less,       tagmon,         {.i = WLR_DIRECTION_LEFT} },
