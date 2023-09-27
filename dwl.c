@@ -570,7 +570,7 @@ arrange(Monitor *m)
 
     c = focustop(selmon);
 
-	if (c)
+	if (c && warpcursor) //布局后将光标移动到client中间
 		warp_cursor(c);
 }
 
