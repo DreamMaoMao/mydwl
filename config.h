@@ -145,13 +145,19 @@ static const Key keys[] = {
     { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_W,          spawn,          {.v = webcmd } },
     { WLR_MODIFIER_LOGO,         XKB_KEY_Return, 		 spawn, SHCMD("google-chrome") },
     { WLR_MODIFIER_CTRL,         XKB_KEY_Return, 		 spawn, SHCMD("bash ~/tool/clash.sh") },  
-    { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,         XKB_KEY_a, 		 spawn, SHCMD("grim -g \"$(slurp)\" - | swappy -f -") },  
-	{ MODKEY,                    XKB_KEY_j,          focusstack,     {.i = +1} },
-	{ MODKEY,                    XKB_KEY_k,          focusstack,     {.i = -1} },
-	{ MODKEY,                    XKB_KEY_Right,          focusstack,     {.i = +1} },
-	{ MODKEY,                    XKB_KEY_Up,          focusstack,     {.i = -1} },
-	{ MODKEY,                    XKB_KEY_Down,          focusstack,     {.i = +1} },
-	{ MODKEY,                    XKB_KEY_Left,          focusstack,     {.i = -1} },
+    { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,         XKB_KEY_a, 		 spawn, SHCMD("grim -g \"$(slurp)\" - | swappy -f -") }, 
+
+	{ WLR_MODIFIER_LOGO,                    	XKB_KEY_Tab,          focusstack,     {.i = +1} },
+	{ WLR_MODIFIER_LOGO|WLR_MODIFIER_SHIFT,   	XKB_KEY_Tab,          focusstack,     {.i = -1} },
+  	{ WLR_MODIFIER_ALT,                  XKB_KEY_k,            focusdir,         {.i = UP } },              /* alt k              | 二维聚焦窗口 */
+  	{ WLR_MODIFIER_ALT,                  XKB_KEY_j,            focusdir,         {.i = DOWN } },            /* alt j              | 二维聚焦窗口 */
+  	{ WLR_MODIFIER_ALT,                  XKB_KEY_h,            focusdir,         {.i = LEFT } },            /* alt h              | 二维聚焦窗口 */
+  	{ WLR_MODIFIER_ALT,                  XKB_KEY_l,            focusdir,         {.i = RIGHT } },           /* alt l              | 二维聚焦窗口 */
+    { WLR_MODIFIER_ALT,                  XKB_KEY_Left,         focusdir,         {.i = LEFT } },            /* alt left           |  本tag内切换聚焦窗口 */
+    { WLR_MODIFIER_ALT,                  XKB_KEY_Right,        focusdir,         {.i = RIGHT } },           /* alt right          |  本tag内切换聚焦窗口 */
+    { WLR_MODIFIER_ALT,                  XKB_KEY_Up,           focusdir,         {.i = UP } },              /* alt up             |  本tag内切换聚焦窗口 */
+    { WLR_MODIFIER_ALT,                  XKB_KEY_Down,         focusdir,         {.i = DOWN } },    
+
 	{ MODKEY,                    XKB_KEY_i,          incnmaster,     {.i = +1} },
 	{ MODKEY,                    XKB_KEY_n,          incnmaster,     {.i = -1} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_H,          setmfact,       {.f = -0.05} },

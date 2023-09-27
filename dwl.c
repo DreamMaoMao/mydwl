@@ -80,6 +80,7 @@ enum { LyrBg, LyrBottom, LyrTop, LyrOverlay, LyrTile, LyrFloat, LyrFS, LyrDragIc
 enum { NetWMWindowTypeDialog, NetWMWindowTypeSplash, NetWMWindowTypeToolbar,
 	NetWMWindowTypeUtility, NetLast }; /* EWMH atoms */
 #endif
+enum { UP, DOWN, LEFT, RIGHT };                  /* movewin */
 
 typedef union {
 	int i;
@@ -361,6 +362,8 @@ static void zoom(const Arg *arg);
 static void set_tag_fullscreen_flag(Client *c);
 static void clear_tag_fullscreen_flag(Client *c);
 static void clear_fullscreen_flag(Client *c);
+static Client *direction_select(const Arg *arg);
+static void focusdir(const Arg *arg);
 
 /* variables */
 static const char broken[] = "broken";
@@ -593,6 +596,173 @@ arrangelayer(Monitor *m, struct wl_list *list, struct wlr_box *usable_area, int 
 		layersurface->geom.x = layersurface->scene->node.x;
 		layersurface->geom.y = layersurface->scene->node.y;
 	}
+}
+
+Client *direction_select(const Arg *arg) {
+	Client *tempClients[100];
+	Client *c = NULL, *tc = selmon->sel;
+	int last = -1;
+	if (tc &&
+	    (tc->isfullscreen || tc->isfakefullscreen || tc->isrealfullscreen )) /* no support for focusstack with fullscreen windows */
+	  return NULL;
+	// if (!tc)
+	//   tc = &clients;
+	// if (!tc)
+	//   return NULL;
+
+	wl_list_for_each(c, &clients, link)
+		if (VISIBLEON(c, c->mon)){
+	  		last++;
+	  		tempClients[last] = c;
+		}
+
+  	if (last < 0)
+  	  return NULL;
+  	int sel_x = tc->geom.x;
+  	int sel_y = tc->geom.y;
+  	long long int distance = LLONG_MAX;
+  	// int temp_focus = 0;
+  	Client *tempFocusClients = NULL;
+
+  	switch (arg->i) {
+  	case UP:
+  	  for (int _i = 0; _i <= last; _i++) {
+  	    if (tempClients[_i]->geom.y < sel_y && tempClients[_i]->geom.x == sel_x) {
+  	      int dis_x = tempClients[_i]->geom.x - sel_x;
+  	      int dis_y = tempClients[_i]->geom.y - sel_y;
+  	      long long int tmp_distance = dis_x * dis_x + dis_y * dis_y; // 计算距离
+  	      if (tmp_distance < distance) {
+  	        distance = tmp_distance;
+  	        tempFocusClients = tempClients[_i];
+  	      }
+  	    }
+  	  }
+  	  if (!tempFocusClients) {
+  	    distance = LLONG_MAX;
+  	    for (int _i = 0; _i <= last; _i++) {
+  	      if (tempClients[_i]->geom.y < sel_y) {
+  	        int dis_x = tempClients[_i]->geom.x - sel_x;
+  	        int dis_y = tempClients[_i]->geom.y - sel_y;
+  	        long long int tmp_distance =
+  	            dis_x * dis_x + dis_y * dis_y; // 计算距离
+  	        if (tmp_distance < distance) {
+  	          distance = tmp_distance;
+  	          tempFocusClients = tempClients[_i];
+  	        }
+  	      }
+  	    }
+  	  }
+  	  if (tempFocusClients && tempFocusClients->geom.x <= 16384 &&
+  	      tempFocusClients->geom.y <= 16384) {
+  	    c = tempFocusClients;
+  	  }
+  	  break;
+  	case DOWN:
+  	  for (int _i = 0; _i <= last; _i++) {
+  	    if (tempClients[_i]->geom.y > sel_y && tempClients[_i]->geom.x == sel_x) {
+  	      int dis_x = tempClients[_i]->geom.x - sel_x;
+  	      int dis_y = tempClients[_i]->geom.y - sel_y;
+  	      long long int tmp_distance = dis_x * dis_x + dis_y * dis_y; // 计算距离
+  	      if (tmp_distance < distance) {
+  	        distance = tmp_distance;
+  	        tempFocusClients = tempClients[_i];
+  	      }
+  	    }
+  	  }
+  	  if (!tempFocusClients) {
+  	    distance = LLONG_MAX;
+  	    for (int _i = 0; _i <= last; _i++) {
+  	      if (tempClients[_i]->geom.y > sel_y) {
+  	        int dis_x = tempClients[_i]->geom.x - sel_x;
+  	        int dis_y = tempClients[_i]->geom.y - sel_y;
+  	        long long int tmp_distance =
+  	            dis_x * dis_x + dis_y * dis_y; // 计算距离
+  	        if (tmp_distance < distance) {
+  	          distance = tmp_distance;
+  	          tempFocusClients = tempClients[_i];
+  	        }
+  	      }
+  	    }
+  	  }
+  	  if (tempFocusClients && tempFocusClients->geom.x <= 16384 &&
+  	      tempFocusClients->geom.y <= 16384) {
+  	    c = tempFocusClients;
+  	  }
+  	  break;
+  	case LEFT:
+  	  for (int _i = 0; _i <= last; _i++) {
+  	    if (tempClients[_i]->geom.x < sel_x && tempClients[_i]->geom.y == sel_y) {
+  	      int dis_x = tempClients[_i]->geom.x - sel_x;
+  	      int dis_y = tempClients[_i]->geom.y - sel_y;
+  	      long long int tmp_distance = dis_x * dis_x + dis_y * dis_y; // 计算距离
+  	      if (tmp_distance < distance) {
+  	        distance = tmp_distance;
+  	        tempFocusClients = tempClients[_i];
+  	      }
+  	    }
+  	  }
+  	  if (!tempFocusClients) {
+  	    distance = LLONG_MAX;
+  	    for (int _i = 0; _i <= last; _i++) {
+  	      if (tempClients[_i]->geom.x < sel_x) {
+  	        int dis_x = tempClients[_i]->geom.x - sel_x;
+  	        int dis_y = tempClients[_i]->geom.y - sel_y;
+  	        long long int tmp_distance =
+  	            dis_x * dis_x + dis_y * dis_y; // 计算距离
+  	        if (tmp_distance < distance) {
+  	          distance = tmp_distance;
+  	          tempFocusClients = tempClients[_i];
+  	        }
+  	      }
+  	    }
+  	  }
+  	  if (tempFocusClients && tempFocusClients->geom.x <= 16384 &&
+  	      tempFocusClients->geom.y <= 16384) {
+  	    c = tempFocusClients;
+  	  }
+  	  break;
+  	case RIGHT:
+  	  for (int _i = 0; _i <= last; _i++) {
+  	    // 第一步先筛选出右边的窗口 优先选择同一层次的
+  	    if (tempClients[_i]->geom.x > sel_x && tempClients[_i]->geom.y == sel_y) {
+  	      int dis_x = tempClients[_i]->geom.x - sel_x;
+  	      int dis_y = tempClients[_i]->geom.y - sel_y;
+  	      long long int tmp_distance = dis_x * dis_x + dis_y * dis_y; // 计算距离
+  	      if (tmp_distance < distance) {
+  	        distance = tmp_distance;
+  	        tempFocusClients = tempClients[_i];
+  	      }
+  	    }
+  	  }
+  	  // 没筛选到,再去除同一层次的要求,重新筛选
+  	  if (!tempFocusClients) {
+  	    distance = LLONG_MAX;
+  	    for (int _i = 0; _i <= last; _i++) {
+  	      if (tempClients[_i]->geom.x > sel_x) {
+  	        int dis_x = tempClients[_i]->geom.x - sel_x;
+  	        int dis_y = tempClients[_i]->geom.y - sel_y;
+  	        long long int tmp_distance =
+  	            dis_x * dis_x + dis_y * dis_y; // 计算距离
+  	        if (tmp_distance < distance) {
+  	          distance = tmp_distance;
+  	          tempFocusClients = tempClients[_i];
+  	        }
+  	      }
+  	    }
+  	  }
+  	  // 确认选择
+  	  if (tempFocusClients && tempFocusClients->geom.x <= 16384 &&
+  	      tempFocusClients->geom.y <= 16384) {
+  	    c = tempFocusClients;
+  	  }
+  	}
+  	return c;
+}
+
+void focusdir(const Arg *arg) {
+	Client *c;
+	c = direction_select(arg);
+	focusclient(c,0);
 }
 
 void
