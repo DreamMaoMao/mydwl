@@ -61,6 +61,10 @@
 #include "dwl-ipc-unstable-v2-protocol.h"
 #include "util.h"
 
+
+#define WheelUp			0xfffffff1
+#define WheelDown		0x0000000f
+
 /* macros */
 #define MAX(A, B)               ((A) > (B) ? (A) : (B))
 #define MIN(A, B)               ((A) < (B) ? (A) : (B))
@@ -94,7 +98,14 @@ typedef struct {
 	unsigned int button;
 	void (*func)(const Arg *);
 	const Arg arg;
-} Button;
+} Button; //鼠标按键
+
+typedef struct {
+	unsigned int mod;
+	double wheel;
+	void (*func)(const Arg *);
+	const Arg arg;
+} Wheel;  //滚轮
 
 typedef struct Pertag Pertag;
 typedef struct Monitor Monitor;
@@ -851,13 +862,28 @@ autostartexec(void) {
 	}
 }
 
-void
+void //鼠标滚轮事件
 axisnotify(struct wl_listener *listener, void *data)
 {
+
+
 	/* This event is forwarded by the cursor when a pointer emits an axis event,
 	 * for example when you move the scroll wheel. */
 	struct wlr_pointer_axis_event *event = data;
+	struct wlr_keyboard *keyboard;
+	uint32_t mods;
+	const Wheel *w;
 	IDLE_NOTIFY_ACTIVITY;
+	
+	keyboard = wlr_seat_get_keyboard(seat);
+	mods = keyboard ? wlr_keyboard_get_modifiers(keyboard) : 0;
+	for (w = wheels; w < END(wheels); w++) {
+		if (CLEANMASK(mods) == CLEANMASK(w->mod) &&
+				(unsigned int)event->delta == w->wheel && w->func) {
+			w->func(&w->arg);
+			return;
+		}
+	}
 	/* TODO: allow usage of scroll whell for mousebindings, it can be implemented
 	 * checking the event's orientation and the delta of the event */
 	/* Notify the client with pointer focus of the axis event. */
@@ -866,7 +892,7 @@ axisnotify(struct wl_listener *listener, void *data)
 			event->delta_discrete, event->source);
 }
 
-void
+void //鼠标按键事件
 buttonpress(struct wl_listener *listener, void *data)
 {
 	struct wlr_pointer_button_event *event = data;
@@ -874,7 +900,6 @@ buttonpress(struct wl_listener *listener, void *data)
 	uint32_t mods;
 	Client *c;
 	const Button *b;
-
 	IDLE_NOTIFY_ACTIVITY;
 
 	switch (event->state) {
@@ -3342,8 +3367,7 @@ void
 viewtoleft(const Arg *arg)
 {
 	size_t tmptag;
-	unsigned int target = selmon->tagset[selmon->seltags],pre;
-	pre = target;
+	unsigned int target = selmon->tagset[selmon->seltags];
 	target >>= 1;
 
 	if(target == 0){

@@ -207,6 +207,9 @@ static const Button buttons[] = {
 	{ MODKEY, BTN_LEFT,   moveresize,     {.ui = CurMove } },
 	{ 0, BTN_MIDDLE, togglefakefullscreen, {0} }, //中键触发假全屏
 	{ MODKEY, BTN_RIGHT,  moveresize,     {.ui = CurResize } },
-	// { WLR_MODIFIER_LOGO, BTN_FORWARD, viewtoleft, {0} }, //中键+super向前切换工作区
-	// { WLR_MODIFIER_LOGO, BTN_BACK, viewtoright, {0} }, //中键+super向后切换工作区
+};
+
+static const Wheel wheels[] = {
+	{ WLR_MODIFIER_LOGO, WheelUp, viewtoleft, {0} }, //中键+super向前切换工作区
+	{ WLR_MODIFIER_LOGO, WheelDown, viewtoright, {0} }, //中键+super向后切换工作区
 };
