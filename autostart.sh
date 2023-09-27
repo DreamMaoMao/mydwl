@@ -2,7 +2,7 @@
 # DWL自启动脚本 仅作参考
 
 
-
+/usr/libexec/xdg-desktop-portal-wlr &
 swaybg -i $DWL/wallpaper/caoyuan.jpg & # 壁纸
 waybar -c $DWL/waybar/config -s $DWL/waybar/style.css &
 echo "Xft.dpi: 140" | xrdb -merge                      #dpi缩放
@@ -12,12 +12,10 @@ cp ~/.config/fcitx/dwm_profile ~/.config/fcitx/profile -f
 fcitx &
 systemctl --user mask xdg-desktop-portal-gnome
 systemctl --user mask xdg-desktop-portal-hyprland
-/usr/libexec/xdg-desktop-portal &
-/usr/libexec/xdg-desktop-portal-wlr &
+# /usr/libexec/xdg-desktop-portal &
 
-wlsunset -T 3501 -t 3500 &
 
-dunst -config ~/.config/dunst/dwl_dunstrc & # 开启通知server
+mako & # 开启通知server
 wl-clip-persist --clipboard regular &
 wl-paste -t text --watch clipman store --no-persist &
 blueman-applet &
@@ -27,4 +25,4 @@ nm-applet &
 [ -e /dev/sda1 ] && udisksctl mount -b /dev/sda4
 python3 ~/tool/sign.py &
 eww daemon &
-
+wlsunset -T 3501 -t 3500 &
