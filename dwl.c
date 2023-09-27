@@ -140,6 +140,11 @@ typedef struct {
 	unsigned int tags;
 	int isfloating, isurgent, isfullscreen;
 	int isfakefullscreen,isrealfullscreen;
+  	int overview_backup_x, overview_backup_y, overview_backup_w,
+  	    overview_backup_h, overview_backup_bw;
+  	int fullscreen_backup_x, fullscreen_backup_y, fullscreen_backup_w,
+  	    fullscreen_backup_h;
+	int overview_isfullscreenbak,overview_isfakefullscreenbak,overview_isrealfullscreenbak,overview_isfloatingbak;
 	uint32_t resize; /* configure serial of a pending resize */
 } Client;
 
@@ -385,6 +390,8 @@ static void clear_fullscreen_flag(Client *c);
 static Client *direction_select(const Arg *arg);
 static void focusdir(const Arg *arg);
 static void toggleoverview(const Arg *arg);
+static void overview_restore(Client *c, const Arg *arg);
+static void overview_backup(Client *c);
 
 /* variables */
 static const char broken[] = "broken";
@@ -1687,8 +1694,6 @@ void
 focusclient(Client *c, int lift)
 {
 	struct wlr_surface *old = seat->keyboard_state.focused_surface;
-	int i;
-
 	if (locked)
 		return;
 
@@ -3091,6 +3096,57 @@ void grid(Monitor *m, unsigned int gappo, unsigned int gappi) {
   }
 }
 
+// 普通视图切换到overview时保存窗口的旧状态
+void overview_backup(Client *c) {
+  c->overview_isfloatingbak = c->isfloating;
+  c->overview_isfullscreenbak = c->isfullscreen;
+  c->overview_isfakefullscreenbak = c->isfakefullscreen;
+  c->overview_isrealfullscreenbak = c->isrealfullscreen;
+  c->overview_backup_x = c->geom.x;
+  c->overview_backup_y = c->geom.y;
+  c->overview_backup_w = c->geom.width;
+  c->overview_backup_h = c->geom.height;
+  c->overview_backup_bw = c->bw;
+  if (c->isfloating) {
+    c->isfloating = 0;
+  }
+  if (c->isfullscreen || c->isfakefullscreen ||c->isrealfullscreen ) {
+    // if (c->bw == 0) { // 真全屏窗口清除x11全屏属性
+    //   XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
+    //                   PropModeReplace, (unsigned char *)0, 0);
+    // }
+    c->isfullscreen = 0; // 清除窗口全屏标志
+	c->isfakefullscreen = 0;
+	c->isrealfullscreen = 0;
+  }
+  c->bw = borderpx; // 恢复非全屏的border
+}
+
+// overview切回到普通视图还原窗口的状态
+void overview_restore(Client *c, const Arg *arg) {
+  c->isfloating = c->overview_isfloatingbak;
+  c->isfullscreen = c->overview_isfullscreenbak;
+  c->isfakefullscreen = c->overview_isfakefullscreenbak;
+  c->isrealfullscreen = c->overview_isrealfullscreenbak;
+  c->overview_isfloatingbak = 0;
+  c->overview_isfullscreenbak = 0;
+  c->overview_isfakefullscreenbak = 0;
+  c->overview_isrealfullscreenbak = 0;
+  c->bw = c->overview_backup_bw;
+  if (c->isfloating) {
+    // XRaiseWindow(dpy, c->win); // 提升悬浮窗口到顶层
+    resizeclient(c, c->overview_backup_x, c->overview_backup_y, c->overview_backup_w,
+           c->overview_backup_h, 1);
+  }
+  if (c->isfullscreen ||c->isfakefullscreen ||c->isrealfullscreen) {
+
+    resizeclient(c, c->overview_backup_x, c->overview_backup_y,
+                 c->overview_backup_w, c->overview_backup_h,1);
+
+    set_tag_fullscreen_flag(c);
+  }
+}
+
 
 // 显示所有tag 或 跳转到聚焦窗口的tag
 void toggleoverview(const Arg *arg) {
@@ -3108,18 +3164,16 @@ void toggleoverview(const Arg *arg) {
 	}
 	target = 1 << (i-1);
   }
-//   Client *c;
-//   // 正常视图到overview,退出所有窗口的浮动和全屏状态参与平铺,
-//   // overview到正常视图,还原之前退出的浮动和全屏窗口状态
-//   if (selmon->isoverview) {
-//     for (c = selmon->clients; c; c = c->next) {
-//       overview_backup(c);
-//     }
-//   } else {
-//     for (c = selmon->clients; c; c = c->next) {
-//       overview_restore(c, &(Arg){.ui = target});
-//     }
-//   }
+  Client *c;
+  // 正常视图到overview,退出所有窗口的浮动和全屏状态参与平铺,
+  // overview到正常视图,还原之前退出的浮动和全屏窗口状态
+  if (selmon->isoverview) {
+    wl_list_for_each(c, &clients, link)
+      overview_backup(c);
+  } else {
+	wl_list_for_each(c, &clients, link)
+      overview_restore(c, &(Arg){.ui = target});
+  }
 //   logtofile("hello");
   view(&(Arg){.ui = target});
   // pointerfocuswin(selmon->sel); //我不需要自动鼠标跳转窗口
