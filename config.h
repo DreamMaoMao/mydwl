@@ -50,7 +50,9 @@ static const Rule rules[] = {
 	/* examples:
 	{ "Gimp",     NULL,       0,            1,           -1 },
 	*/
-	{ "firefox",  NULL,       1 << 8,       0,           -1 },
+	{ "Google-chrome",  NULL,       1 << 3,       0,           -1 },
+	{ "Clash for Windows",  NULL,       0,       1,           -1 },
+	{ "electron-netease-cloud-music",  NULL,       0,       1,           -1 },
 };
 
 /* layout(s) */
@@ -181,7 +183,7 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_e,          setlayout,      {.v = &layouts[1]} },
 	{ MODKEY,                    XKB_KEY_m,          setlayout,      {.v = &layouts[2]} },
 	{ MODKEY,                    XKB_KEY_space,      setlayout,      {0} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_space,      togglefloating, {0} },
+	{ WLR_MODIFIER_ALT, XKB_KEY_backslash,      togglefloating, {0} },
 	{ MODKEY,                    XKB_KEY_a,          togglefakefullscreen, {0} },
 	{ MODKEY,                    XKB_KEY_f,          togglerealfullscreen, {0} },
 	{ WLR_MODIFIER_CTRL,                    XKB_KEY_KP_0,          view,           {.ui = ~0} },
@@ -212,9 +214,9 @@ static const Key keys[] = {
 };
 
 static const Button buttons[] = {
-	{ MODKEY, BTN_LEFT,   moveresize,     {.ui = CurMove } },
+	{ WLR_MODIFIER_LOGO, BTN_LEFT,   moveresize,     {.ui = CurMove } },
 	{ 0, BTN_MIDDLE, togglefakefullscreen, {0} }, //中键触发假全屏
-	{ MODKEY, BTN_RIGHT,  moveresize,     {.ui = CurResize } },
+	{ WLR_MODIFIER_LOGO, BTN_RIGHT,  moveresize,     {.ui = CurResize } },
 	{ 0, BTN_LEFT,  toggleoverview,     {0} },
 	{ 0, BTN_RIGHT,  killclient,     {0} },
 };

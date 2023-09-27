@@ -112,7 +112,7 @@ typedef struct Monitor Monitor;
 typedef struct {
 	/* Must keep these three elements in this order */
 	unsigned int type; /* XDGShell or X11* */
-	struct wlr_box geom;  /* layout-relative, includes border */
+	struct wlr_box geom,oldgeom;  /* layout-relative, includes border */
 	Monitor *mon;
 	struct wlr_scene_tree *scene;
 	struct wlr_scene_rect *border[4]; /* top, bottom, left, right */
@@ -2587,6 +2587,11 @@ void
 setfloating(Client *c, int floating)
 {
 	c->isfloating = floating;
+	if(c->isfloating){
+		resize(c,c->oldgeom,1);
+	}else{
+		c->oldgeom = c->geom;
+	}
 	wlr_scene_node_reparent(&c->scene->node, layers[c->isfloating ? LyrFloat : LyrTile]);
 	arrange(c->mon);
 	printstatus();
