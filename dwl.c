@@ -1159,10 +1159,10 @@ createnotify(struct wl_listener *listener, void *data)
 
 /*清除全屏标志,还原全屏时清0的border*/
 void clear_fullscreen_flag(Client *c) {
-  if (c->isfullscreen || c->isfakefullscreen || c->isfakefullscreen ) {
+  if (c->isfullscreen || c->isfakefullscreen || c->isrealfullscreen ) {
     c->isfullscreen = 0;
     c->isfakefullscreen = 0;
-    c->isfakefullscreen = 0;
+    c->isrealfullscreen = 0;
     c->bw = borderpx;
     clear_tag_fullscreen_flag(c);
   }
