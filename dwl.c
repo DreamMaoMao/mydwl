@@ -620,6 +620,9 @@ applyrules(Client *c)
 	}
 	wlr_scene_node_reparent(&c->scene->node, layers[c->isfloating ? LyrFloat : LyrTile]);
 	setmon(c, mon, newtags);
+	if(!(c->tags & ( 1 << (selmon->pertag->curtag - 1) ))){
+		view(&(Arg){.ui = c->tags});
+	}
 }
 
 void
