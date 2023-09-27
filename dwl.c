@@ -1315,6 +1315,10 @@ createnotify(struct wl_listener *listener, void *data)
 	c->bw = borderpx;
 	c->isfakefullscreen = 0;
 	c->isrealfullscreen = 0;
+	c->oldgeom.width = 800;
+	c->oldgeom.height = 600;
+	c->oldgeom.x = selmon->w.x + (selmon->w.width - c->oldgeom.width) / 2;
+	c->oldgeom.y = selmon->w.y + (selmon->w.height - c->oldgeom.height) / 2;
 	selmon->sel = c;
 
 	LISTEN(&xdg_surface->events.map, &c->map, mapnotify);
@@ -2254,7 +2258,8 @@ moveresize(const Arg *arg)
 		return;
 
 	/* Float the window and tell motionnotify to grab it */
-	setfloating(grabc, 1);
+	if(!grabc->isfloating)
+		setfloating(grabc, 1);
 	switch (cursor_mode = arg->ui) {
 	case CurMove:
 		grabcx = cursor->x - grabc->geom.x;
@@ -3717,6 +3722,10 @@ createnotifyx11(struct wl_listener *listener, void *data)
 	c->bw = borderpx;
 	c->isfakefullscreen = 0;
 	c->isrealfullscreen = 0;	
+	c->oldgeom.width = 800;
+	c->oldgeom.height = 600;
+	c->oldgeom.x = selmon->w.x + (selmon->w.width - c->oldgeom.width) / 2;
+	c->oldgeom.y = selmon->w.y + (selmon->w.height - c->oldgeom.height) / 2;
 	selmon->sel = c;
 
 	/* Listen to the various events it can emit */
