@@ -2247,9 +2247,7 @@ motionrelative(struct wl_listener *listener, void *data)
 	 * the cursor around without any input. */
 	wlr_cursor_move(cursor, &event->pointer->base, event->delta_x, event->delta_y);
 	motionnotify(event->time_msec);
-	toggle_hotarea(cursor->x,cursor->y);
-	// lognumtofile(cursor->x); //这里可以根据鼠标位置设置热区
-	
+	toggle_hotarea(cursor->x,cursor->y);	
 }
 
 void
@@ -3188,9 +3186,7 @@ void toggleoverview(const Arg *arg) {
 	wl_list_for_each(c, &clients, link)
       overview_restore(c, &(Arg){.ui = target});
   }
-//   logtofile("hello");
   view(&(Arg){.ui = target});
-  // pointerfocuswin(selmon->sel); //我不需要自动鼠标跳转窗口
 }
 
 void
@@ -3471,13 +3467,7 @@ view(const Arg *arg)
 {
 	size_t i, tmptag;
 
-
-
-	if (!selmon || (arg->ui & TAGMASK) == selmon->tagset[selmon->seltags])
-		return;
-
-	if(arg->ui != ~0 && selmon->isoverview){
-		lognumtofile(selmon->isoverview);
+	if(!selmon || (arg->ui != ~0 && selmon->isoverview)){
 		return;
 	}
 
