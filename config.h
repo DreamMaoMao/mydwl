@@ -156,7 +156,8 @@ static const Key keys[] = {
 	{ MODKEY, 					 XKB_KEY_Return,     spawn,          {.v = termcmd } },
     { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_W,          spawn,          {.v = webcmd } },
     { WLR_MODIFIER_LOGO,         XKB_KEY_Return, 		 spawn, SHCMD("google-chrome") },
-    { WLR_MODIFIER_CTRL,         XKB_KEY_Return, 		 spawn, SHCMD("bash ~/tool/clash.sh") },  
+	{ WLR_MODIFIER_CTRL,         XKB_KEY_Return,          spawn, SHCMD("bash ~/tool/clash.sh") }, 
+    { WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO,         XKB_KEY_Return, 		 spawn, SHCMD("konsole -e /usr/local/bin/yazi") },  
     { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,         XKB_KEY_a, 		 spawn, SHCMD("grim -g \"$(slurp)\" - | swappy -f -") }, 
 
 	{ WLR_MODIFIER_LOGO,                    	XKB_KEY_Tab,          focusstack,     {.i = +1} },

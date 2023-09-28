@@ -1318,6 +1318,7 @@ createnotify(struct wl_listener *listener, void *data)
 	c->bw = borderpx;
 	c->isfakefullscreen = 0;
 	c->isrealfullscreen = 0;
+	c->overview_backup_bw = borderpx;
 	c->oldgeom.width = 800;
 	c->oldgeom.height = 600;
 	c->oldgeom.x = selmon->w.x + (selmon->w.width - c->oldgeom.width) / 2;
@@ -3470,8 +3471,16 @@ view(const Arg *arg)
 {
 	size_t i, tmptag;
 
+
+
 	if (!selmon || (arg->ui & TAGMASK) == selmon->tagset[selmon->seltags])
 		return;
+
+	if(arg->ui != ~0 && selmon->isoverview){
+		lognumtofile(selmon->isoverview);
+		return;
+	}
+
 	selmon->seltags ^= 1; /* toggle sel tagset */
 	if (arg->ui & TAGMASK) {
 		selmon->tagset[selmon->seltags] = arg->ui & TAGMASK;
