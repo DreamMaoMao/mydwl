@@ -1,6 +1,7 @@
 /* speedie's dwl config */
 
 /* appearance */
+static const unsigned int numlockon = 1; //是否打开右边小键盘
 static const unsigned int hotarea_size              = 10;
 static const unsigned int enable_hotarea            = 1;
 static int smartgaps                 = 0;  /* 1 means no outer gap when there is only one window */
