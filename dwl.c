@@ -844,9 +844,14 @@ axisnotify(struct wl_listener *listener, void *data)
 	/* TODO: allow usage of scroll whell for mousebindings, it can be implemented
 	 * checking the event's orientation and the delta of the event */
 	/* Notify the client with pointer focus of the axis event. */
-	wlr_seat_pointer_notify_axis(seat,
+	// wlr_seat_pointer_send_axis(seat, //滚轮
+	// 		event->time_msec, event->orientation, event->delta,
+	// 		event->delta_discrete, event->source);
+	wlr_seat_pointer_notify_axis(seat, //滚轮
 			event->time_msec, event->orientation, event->delta,
 			event->delta_discrete, event->source);
+	// wlr_seat_pointer_notify_frame(seat);  //试下能不能把滚轮的合成一帧
+
 
 }
 
@@ -1214,6 +1219,7 @@ createmon(struct wl_listener *listener, void *data)
 	m->gappoh = gappoh;
 	m->gappov = gappov;
 	m->isoverview = 0;
+	m->sel = NULL;
 	m->is_in_hotarea = 0;
 	m->tagset[0] = m->tagset[1] = 1;
 	for (r = monrules; r < END(monrules); r++) {
@@ -1400,6 +1406,8 @@ cursorframe(struct wl_listener *listener, void *data)
 	 * multiple events together. For instance, two axis events may happen at the
 	 * same time, in which case a frame event won't be sent in between. */
 	/* Notify the client with pointer focus of the frame event. */
+	//应该是这里没有处理好 导致鼠标移动事件和滚轮事件不能同时触发
+
 	wlr_seat_pointer_notify_frame(seat);
 }
 
@@ -2249,6 +2257,7 @@ motionrelative(struct wl_listener *listener, void *data)
 	 * generated the event. You can pass NULL for the device if you want to move
 	 * the cursor around without any input. */
 	wlr_cursor_move(cursor, &event->pointer->base, event->delta_x, event->delta_y);
+	// wlr_seat_pointer_notify_motion(seat, event->time_msec, event->delta_x, event->delta_y); //这个造成了鼠标移动的时候滚轮不起作用
 	motionnotify(event->time_msec);  //滚轮异常
 	toggle_hotarea(cursor->x,cursor->y);	
 }
@@ -2377,9 +2386,11 @@ pointerfocus(Client *c, struct wlr_surface *surface, double sx, double sy,
 	/* Let the client know that the mouse cursor has entered one
 	 * of its surfaces, and make keyboard focus follow if desired.
 	 * wlroots makes this a no-op if surface is already focused */
-
 	wlr_seat_pointer_notify_enter(seat, surface, sx, sy);
+	// wlr_seat_pointer_send_motion(seat, time, sx, sy); //这个造成了鼠标移动的时候滚轮不起作用
 	wlr_seat_pointer_notify_motion(seat, time, sx, sy); //这个造成了鼠标移动的时候滚轮不起作用
+
+	// wlr_seat_pointer_notify_frame(seat);  //试下能不能把滚轮的合成一帧
 	
 }
 
@@ -3170,16 +3181,22 @@ void toggleoverview(const Arg *arg) {
 
   	// unsigned int target = selmon->sel && selmon->sel->tags != TAGMASK ? selmon->sel->tags
     //                                                         : selmon->seltags;
+ 
+
   selmon->isoverview ^= 1;
   unsigned int target,i;
   unsigned int tag = 0 ;
   if(selmon->isoverview){
 	target = ~0;
-  }else {
+  }else if(!selmon->isoverview && selmon->sel) {
 	for(i=0;!(tag & 1);i++){
 		tag = selmon->sel->tags >> i;
 	}
 	target = 1 << (i-1);
+  } else if (!selmon->isoverview && !selmon->sel) {
+	target = (1 << (selmon->pertag->curtag -1));
+	view(&(Arg){.ui = target});
+	return;
   }
   Client *c;
   // 正常视图到overview,退出所有窗口的浮动和全屏状态参与平铺,
@@ -3508,16 +3525,19 @@ view(const Arg *arg)
 void
 viewtoleft(const Arg *arg)
 {
+	size_t tmptag;
+	unsigned int target = selmon->tagset[selmon->seltags];
+
 	if(selmon->isoverview || selmon->pertag->curtag == 0){
 		return;
 	}
-	size_t tmptag;
-	unsigned int target = selmon->tagset[selmon->seltags];
+
 	target >>= 1;
 
 	if(target == 0){
 		return;
 	}
+
 	if (!selmon || (target) == selmon->tagset[selmon->seltags])
 		return;
 	selmon->seltags ^= 1; /* toggle sel tagset */
