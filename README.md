@@ -1,5 +1,5 @@
 
-![image](https://github.com/DreamMaoMao/dwl/assets/30348075/af974dcc-df17-42cd-83bc-9d80498db29c)
+![image](https://github.com/DreamMaoMao/superdwl/assets/30348075/037ffa8a-2d67-43ec-b5f3-ae68f2c638c7)
 
 
 # dwl - dwm for Wayland
