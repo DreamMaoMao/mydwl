@@ -507,19 +507,20 @@ static size_t autostart_len;
 void
 applybounds(Client *c, struct wlr_box *bbox)
 {
-	if (c->isfloating) { //只设置悬浮窗口
-		struct wlr_box min = {0}, max = {0};
-		client_get_size_hints(c, &max, &min);
-		/* try to set size hints */
-		c->geom.width = MAX(min.width + (2 * (int)c->bw), c->geom.width);
-		c->geom.height = MAX(min.height + (2 * (int)c->bw), c->geom.height);
-		/* Some clients set them max size to INT_MAX, which does not violates
-		 * the protocol but its innecesary, they can set them max size to zero. */
-		if (max.width > 0 && !(2 * c->bw > INT_MAX - max.width)) /* Checks for overflow */
-			c->geom.width = MIN(max.width + (2 * c->bw), c->geom.width);
-		if (max.height > 0 && !(2 * c->bw > INT_MAX - max.height)) /* Checks for overflow */
-			c->geom.height = MIN(max.height + (2 * c->bw), c->geom.height);
+	if (!c->isfloating) { //只设置悬浮窗口
+		return;
 	}
+	struct wlr_box min = {0}, max = {0};
+	client_get_size_hints(c, &max, &min);
+	/* try to set size hints */
+	c->geom.width = MAX(min.width + (2 * (int)c->bw), c->geom.width);
+	c->geom.height = MAX(min.height + (2 * (int)c->bw), c->geom.height);
+	/* Some clients set them max size to INT_MAX, which does not violates
+	 * the protocol but its innecesary, they can set them max size to zero. */
+	if (max.width > 0 && !(2 * c->bw > INT_MAX - max.width)) /* Checks for overflow */
+		c->geom.width = MIN(max.width + (2 * c->bw), c->geom.width);
+	if (max.height > 0 && !(2 * c->bw > INT_MAX - max.height)) /* Checks for overflow */
+		c->geom.height = MIN(max.height + (2 * c->bw), c->geom.height);
 
 	if (c->geom.x >= bbox->x + bbox->width)
 		c->geom.x = bbox->x + bbox->width - c->geom.width;
@@ -831,7 +832,6 @@ axisnotify(struct wl_listener *listener, void *data)
 	uint32_t mods;
 	const Wheel *w;
 	IDLE_NOTIFY_ACTIVITY;
-	
 	keyboard = wlr_seat_get_keyboard(seat);
 	mods = keyboard ? wlr_keyboard_get_modifiers(keyboard) : 0;
 	for (w = wheels; w < END(wheels); w++) {
@@ -847,6 +847,7 @@ axisnotify(struct wl_listener *listener, void *data)
 	wlr_seat_pointer_notify_axis(seat,
 			event->time_msec, event->orientation, event->delta,
 			event->delta_discrete, event->source);
+
 }
 
 void //鼠标按键事件
@@ -1315,15 +1316,6 @@ createnotify(struct wl_listener *listener, void *data)
 	/* Allocate a Client for this surface */
 	c = xdg_surface->data = ecalloc(1, sizeof(*c));
 	c->surface.xdg = xdg_surface;
-	c->bw = borderpx;
-	c->isfakefullscreen = 0;
-	c->isrealfullscreen = 0;
-	c->overview_backup_bw = borderpx;
-	c->oldgeom.width = 800;
-	c->oldgeom.height = 600;
-	c->oldgeom.x = selmon->w.x + (selmon->w.width - c->oldgeom.width) / 2;
-	c->oldgeom.y = selmon->w.y + (selmon->w.height - c->oldgeom.height) / 2;
-	selmon->sel = c;
 
 	LISTEN(&xdg_surface->events.map, &c->map, mapnotify);
 	LISTEN(&xdg_surface->events.unmap, &c->unmap, unmapnotify);
@@ -2107,6 +2099,17 @@ mapnotify(struct wl_listener *listener, void *data)
 	client_get_geometry(c, &c->geom);
 	c->geom.width += 2 * c->bw;
 	c->geom.height += 2 * c->bw;
+	c->bw = borderpx;
+	c->isfakefullscreen = 0;
+	c->isrealfullscreen = 0;	
+	c->oldgeom.width = 800;
+	c->oldgeom.height = 600;
+	c->oldgeom.x = selmon->w.x + (selmon->w.width - c->oldgeom.width) / 2;
+	c->oldgeom.y = selmon->w.y + (selmon->w.height - c->oldgeom.height) / 2;
+	c->geom.x = selmon->w.x + (selmon->w.width - c->geom.width) / 2;
+	c->geom.y = selmon->w.y + (selmon->w.height - c->geom.height) / 2; 
+	selmon->sel = c;
+
 
 	/* Insert this client into client lists. */
 	if (clients.prev)
@@ -2178,7 +2181,7 @@ motionabsolute(struct wl_listener *listener, void *data)
 }
 
 void
-motionnotify(uint32_t time)
+motionnotify(uint32_t time)  //鼠标聚焦
 {
 	double sx = 0, sy = 0;
 	Client *c = NULL, *w = NULL;
@@ -2246,7 +2249,7 @@ motionrelative(struct wl_listener *listener, void *data)
 	 * generated the event. You can pass NULL for the device if you want to move
 	 * the cursor around without any input. */
 	wlr_cursor_move(cursor, &event->pointer->base, event->delta_x, event->delta_y);
-	motionnotify(event->time_msec);
+	motionnotify(event->time_msec);  //滚轮异常
 	toggle_hotarea(cursor->x,cursor->y);	
 }
 
@@ -2374,8 +2377,10 @@ pointerfocus(Client *c, struct wlr_surface *surface, double sx, double sy,
 	/* Let the client know that the mouse cursor has entered one
 	 * of its surfaces, and make keyboard focus follow if desired.
 	 * wlroots makes this a no-op if surface is already focused */
+
 	wlr_seat_pointer_notify_enter(seat, surface, sx, sy);
-	wlr_seat_pointer_notify_motion(seat, time, sx, sy);
+	wlr_seat_pointer_notify_motion(seat, time, sx, sy); //这个造成了鼠标移动的时候滚轮不起作用
+	
 }
 
 void
@@ -3721,14 +3726,6 @@ createnotifyx11(struct wl_listener *listener, void *data)
 	c = xsurface->data = ecalloc(1, sizeof(*c));
 	c->surface.xwayland = xsurface;
 	c->type = xsurface->override_redirect ? X11Unmanaged : X11Managed;
-	c->bw = borderpx;
-	c->isfakefullscreen = 0;
-	c->isrealfullscreen = 0;	
-	c->oldgeom.width = 800;
-	c->oldgeom.height = 600;
-	c->oldgeom.x = selmon->w.x + (selmon->w.width - c->oldgeom.width) / 2;
-	c->oldgeom.y = selmon->w.y + (selmon->w.height - c->oldgeom.height) / 2;
-	selmon->sel = c;
 
 	/* Listen to the various events it can emit */
 	LISTEN(&xsurface->events.map, &c->map, mapnotify);
