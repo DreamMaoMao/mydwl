@@ -56,6 +56,12 @@ static const Rule rules[] = {
 	{ "electron-netease-cloud-music",  NULL,       0,       1,           -1 },
 	{ NULL,  "图片查看器",       0,       1,           -1 },
 	{ NULL,  "图片查看",       0,       1,           -1 },
+	{ "blueman-manager",  NULL,       0,       1,           -1 },
+	{ "flameshot",  NULL,       0,       1,           -1 },
+	{ "com.xunlei.download",  NULL,       0,       1,           -1 },
+	{ "pavucontrol",  NULL,       0,       1,           -1 },
+	{ "baidunetdisk",  NULL,       0,       1,           -1 },
+
 
 };
 
@@ -180,7 +186,9 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_Tab,        view,           {0} },
 	{ WLR_MODIFIER_LOGO,                    XKB_KEY_a,          toggleoverview,           {0} },
 	{ WLR_MODIFIER_CTRL,                    XKB_KEY_Left,        viewtoleft,           {0} },
+	{ WLR_MODIFIER_LOGO,                    XKB_KEY_Left,        viewtoleft_have_client,           {0} },
 	{ WLR_MODIFIER_CTRL,                    XKB_KEY_Right,        viewtoright,           {0} },
+	{ WLR_MODIFIER_LOGO,                    XKB_KEY_Right,        viewtoright_have_client,           {0} },
     { WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO,    XKB_KEY_Left,         tagtoleft,        {0} },                     /* ctrl alt left      |  将本窗口移动到左边tag */
     { WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO,    XKB_KEY_Right,        tagtoright,       {0} }, 
 	{ MODKEY,					 XKB_KEY_q,          killclient,     {0} },

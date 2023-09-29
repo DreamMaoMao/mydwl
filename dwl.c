@@ -374,6 +374,8 @@ static void updatemons(struct wl_listener *listener, void *data);
 static void updatetitle(struct wl_listener *listener, void *data);
 static void urgent(struct wl_listener *listener, void *data);
 static void view(const Arg *arg);
+static void viewtoleft_have_client(const Arg *arg);
+static void viewtoright_have_client(const Arg *arg);
 static void viewtoleft(const Arg *arg);
 static void viewtoright(const Arg *arg);
 static void tagtoleft(const Arg *arg);
@@ -2656,6 +2658,7 @@ setfakefullscreen(Client *c, int fakefullscreen)
 		fakefullscreen_box.height = c->mon->w.height - 2 * gappov;
 		resize(c, fakefullscreen_box, 0);
 		c->isfakefullscreen = 1;
+		c->isfloating = 0;
 		set_tag_fullscreen_flag(c);
 	} else {
 		/* restore previous size instead of arrange for floating windows since
@@ -2685,6 +2688,7 @@ setrealfullscreen(Client *c, int realfullscreen)
 		c->bw = 0;
 		resize(c, c->mon->m, 0);
 		c->isrealfullscreen = 1;
+		c->isfloating = 0;
 		set_tag_fullscreen_flag(c);
 	} else {
 		/* restore previous size instead of arrange for floating windows since
@@ -3579,6 +3583,59 @@ viewtoleft(const Arg *arg)
 }
 
 void
+viewtoright_have_client(const Arg *arg)
+{
+	size_t tmptag;
+	Client *c;
+	unsigned int found = 0;
+	unsigned int n = 1;
+	unsigned int target = selmon->tagset[selmon->seltags];
+
+	if(selmon->isoverview || selmon->pertag->curtag == 0){
+		return;
+	}
+
+	for(target <<= 1;target & TAGMASK;target <<= 1,n++){
+		wl_list_for_each(c, &clients, link){
+			if(target & c->tags){
+				found = 1;
+				break;
+			}
+		}
+		if(found){
+			break;
+		}
+	}
+
+	if(!(target & TAGMASK)){
+		return;
+	}
+
+	if (!selmon || (target) == selmon->tagset[selmon->seltags])
+		return;
+	selmon->seltags ^= 1; /* toggle sel tagset */
+	if (target) {
+		selmon->tagset[selmon->seltags] = target;
+		selmon->pertag->prevtag = selmon->pertag->curtag;
+		selmon->pertag->curtag = selmon->pertag->curtag + n;
+	} else {
+		tmptag = selmon->pertag->prevtag;
+		selmon->pertag->prevtag = selmon->pertag->curtag;
+		selmon->pertag->curtag = tmptag;
+	}
+
+	selmon->nmaster = selmon->pertag->nmasters[selmon->pertag->curtag];
+	selmon->mfact = selmon->pertag->mfacts[selmon->pertag->curtag];
+	selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
+	selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
+	selmon->lt[selmon->sellt^1] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt^1];
+
+	focusclient(focustop(selmon), 1);
+	arrange(selmon);
+	printstatus();
+}
+
+void
 viewtoright(const Arg *arg)
 {
 	if(selmon->isoverview || selmon->pertag->curtag == 0){
@@ -3598,6 +3655,59 @@ viewtoright(const Arg *arg)
 		selmon->tagset[selmon->seltags] = target;
 		selmon->pertag->prevtag = selmon->pertag->curtag;
 		selmon->pertag->curtag = selmon->pertag->curtag + 1;
+	} else {
+		tmptag = selmon->pertag->prevtag;
+		selmon->pertag->prevtag = selmon->pertag->curtag;
+		selmon->pertag->curtag = tmptag;
+	}
+
+	selmon->nmaster = selmon->pertag->nmasters[selmon->pertag->curtag];
+	selmon->mfact = selmon->pertag->mfacts[selmon->pertag->curtag];
+	selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
+	selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
+	selmon->lt[selmon->sellt^1] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt^1];
+
+	focusclient(focustop(selmon), 1);
+	arrange(selmon);
+	printstatus();
+}
+
+void
+viewtoleft_have_client(const Arg *arg)
+{
+	size_t tmptag;
+	Client *c;
+	unsigned int found = 0;
+	unsigned int n = 1;
+	unsigned int target = selmon->tagset[selmon->seltags];
+
+	if(selmon->isoverview || selmon->pertag->curtag == 0){
+		return;
+	}
+
+	for(target >>= 1;target>0;target >>= 1,n++){
+		wl_list_for_each(c, &clients, link){
+			if(target & c->tags){
+				found = 1;
+				break;
+			}
+		}
+		if(found){
+			break;
+		}
+	}
+
+	if(target == 0){
+		return;
+	}
+
+	if (!selmon || (target) == selmon->tagset[selmon->seltags])
+		return;
+	selmon->seltags ^= 1; /* toggle sel tagset */
+	if (target) {
+		selmon->tagset[selmon->seltags] = target;
+		selmon->pertag->prevtag = selmon->pertag->curtag;
+		selmon->pertag->curtag = selmon->pertag->curtag - n;
 	} else {
 		tmptag = selmon->pertag->prevtag;
 		selmon->pertag->prevtag = selmon->pertag->curtag;
