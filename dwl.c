@@ -1117,6 +1117,22 @@ createkeyboard(struct wlr_keyboard *keyboard)
 	xkb_context_unref(context);
 	wlr_keyboard_set_repeat_info(keyboard, repeat_rate, repeat_delay);
 
+	if(numlockon == 1){
+		uint32_t leds = 0 ;
+		xkb_mod_mask_t locked_mods = 0;
+		leds =  leds | WLR_LED_NUM_LOCK;
+		//获取numlock所在的位置
+		xkb_mod_index_t mod_index = xkb_map_mod_get_index(keymap,
+				XKB_MOD_NAME_NUM);
+		if (mod_index != XKB_MOD_INVALID) {
+			locked_mods |= (uint32_t)1 << mod_index; //将该位置设置为1,默认为0表示锁住小键盘
+		}
+		//设置numlock为on
+		xkb_state_update_mask(keyboard->xkb_state, 0, 0,
+		locked_mods, 0, 0, 0); 
+		wlr_keyboard_led_update(keyboard,leds); //将表示numlockon的灯打开
+	}
+
 	/* Here we set up listeners for keyboard events. */
 	LISTEN(&keyboard->events.modifiers, &kb->modifiers, keypressmod);
 	LISTEN(&keyboard->events.key, &kb->key, keypress);
@@ -3194,7 +3210,7 @@ void toggleoverview(const Arg *arg) {
 	}
 	target = 1 << (i-1);
   } else if (!selmon->isoverview && !selmon->sel) {
-	target = (1 << (selmon->pertag->curtag -1));
+	target = (1 << (selmon->pertag->prevtag-1));
 	view(&(Arg){.ui = target});
 	return;
   }
