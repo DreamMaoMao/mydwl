@@ -2,6 +2,6 @@
 Encoding=UTF-8
 Name=dwl
 Comment=Dynamic window manager for wayland
-Exec=env DWL=/home/user/.config/dwl dwl -s  /home/user/.config/dwl/autostart.sh
+Exec=env XDG_CURRENT_DESKTOP=sway DWL=/home/user/.config/dwl dwl -s  /home/user/.config/dwl/autostart.sh
 Icon=dwl
 Type=Application

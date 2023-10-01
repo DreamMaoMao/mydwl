@@ -24,6 +24,7 @@
 - overview跳转前后保持浮动和全屏窗口和还原
 - 增加支持键盘数字锁可以在config.h设置默认打开功能
 - 增加左右切换tag时可以只切换到有client的tag
+- obs录屏支持
 
 # 运行需要的相关工具包
 ```
@@ -43,7 +44,7 @@ sudo pacman -S inetutils
 sudo pacman -S networkmanager 
 sudo pacman -S gdm
 
-yay -S blueman acpi mako jq alsa-utils polkit-gnome  light  nemo swappy swaybg lm_sensors  network-manager-applet playerctl python3  wlsunset  xorg-xinit xorg-xwayland wlroots wayland-protocols pavucontrol ttf-jetbrains-mono-nerd eww-wayland wofi xdg-desktop-portal-wlr
+yay -S blueman acpi mako jq alsa-utils polkit-gnome  light  nemo swappy swaybg lm_sensors  network-manager-applet playerctl python3  wlsunset  xorg-xinit xorg-xwayland wlroots wayland-protocols pavucontrol ttf-jetbrains-mono-nerd eww-wayland wofi xdg-desktop-portal-wlr xdg-desktop-portal-hyprland
 
 
 ```
