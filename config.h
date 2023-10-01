@@ -1,6 +1,7 @@
 /* speedie's dwl config */
 
 /* appearance */
+static const unsigned int new_is_master = 1; //新窗口是否插在头部
 static const unsigned int numlockon = 1; //是否打开右边小键盘
 static const unsigned int hotarea_size              = 10;
 static const unsigned int enable_hotarea            = 1;

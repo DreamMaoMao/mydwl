@@ -2084,7 +2084,6 @@ mapnotify(struct wl_listener *listener, void *data)
 	Client *p, *w, *c = wl_container_of(listener, c, map);
 	Monitor *m;
 	int i;
-
 	/* Create scene tree for this client and its border */
 	c->scene = wlr_scene_tree_create(layers[LyrTile]);
 	wlr_scene_node_set_enabled(&c->scene->node, c->type != XDGShell);
@@ -2137,12 +2136,11 @@ mapnotify(struct wl_listener *listener, void *data)
 	selmon->sel = c;
 
 
-	/* Insert this client into client lists. */
-	if (clients.prev)
-		// tile at the bottom
-		wl_list_insert(clients.prev, &c->link);
+	if (new_is_master)
+		// tile at the top
+		wl_list_insert(&clients, &c->link); //新窗口是master,头部入栈
 	else
-		wl_list_insert(&clients, &c->link);
+		wl_list_insert(clients.prev, &c->link); //尾部入栈
 	wl_list_insert(&fstack, &c->flink);
 
 	/* Set initial monitor, tags, floating status, and focus:
@@ -3867,7 +3865,6 @@ createnotifyx11(struct wl_listener *listener, void *data)
 {
 	struct wlr_xwayland_surface *xsurface = data;
 	Client *c;
-
 	/* Allocate a Client for this surface */
 	c = xsurface->data = ecalloc(1, sizeof(*c));
 	c->surface.xwayland = xsurface;
