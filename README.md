@@ -67,7 +67,7 @@ cp wofi -r ~/.config/
 cp konsole -r ~/.local/share/
 cp eww -r ~/.config/
 
-sed -i s#/home/user#$HOME# dwl.desktop
+sed -i s#/home/user#$HOME#g dwl.desktop
 sudo cp dwl.desktop /usr/share/wayland-sessions/
 ```
 
