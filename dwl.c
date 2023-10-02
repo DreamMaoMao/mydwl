@@ -196,10 +196,10 @@ typedef struct {
 struct Monitor {
 	struct wl_list link;
     struct wl_list dwl_ipc_outputs;
-	struct wlr_output *wlr_output;
+	struct wlr_output *wlr_output;  //显示器的输出,帧的目标
 	struct wlr_scene_output *scene_output;
 	struct wlr_scene_rect *fullscreen_bg; /* See createmon() for info */
-	struct wl_listener frame;
+	struct wl_listener frame;   //注意一下这个显示器的帧
 	struct wl_listener destroy;
 	struct wl_listener destroy_lock_surface;
 	struct wlr_session_lock_surface_v1 *lock_surface;
@@ -1259,7 +1259,7 @@ createmon(struct wl_listener *listener, void *data)
 	wlr_output_set_mode(wlr_output, wlr_output_preferred_mode(wlr_output));
 
 	/* Set up event listeners */
-	LISTEN(&wlr_output->events.frame, &m->frame, rendermon);
+	LISTEN(&wlr_output->events.frame, &m->frame, rendermon);  //帧渲染事件监听
 	LISTEN(&wlr_output->events.destroy, &m->destroy, cleanupmon);
 
 	wlr_output_enable(wlr_output, 1);
@@ -2406,7 +2406,6 @@ pointerfocus(Client *c, struct wlr_surface *surface, double sx, double sy,
 	// wlr_seat_pointer_send_motion(seat, time, sx, sy); //这个造成了鼠标移动的时候滚轮不起作用
 	wlr_seat_pointer_notify_motion(seat, time, sx, sy); //这个造成了鼠标移动的时候滚轮不起作用
 
-	// wlr_seat_pointer_notify_frame(seat);  //试下能不能把滚轮的合成一帧
 	
 }
 
@@ -2461,7 +2460,7 @@ quitsignal(int signo)
 
 void
 rendermon(struct wl_listener *listener, void *data)
-{
+{    //这里应该是制作动画的关键,用于捕获准备的页面帧输出
 	/* This function is called every time an output is ready to display a frame,
 	 * generally at the output's refresh rate (e.g. 60Hz). */
 	Monitor *m = wl_container_of(listener, m, frame);
@@ -2711,8 +2710,8 @@ setfullscreen(Client *c, int fullscreen)
 		return;
 	c->bw = fullscreen ? 0 : borderpx;
 	client_set_fullscreen(c, fullscreen);
-	wlr_scene_node_reparent(&c->scene->node, layers[fullscreen
-			? LyrFS : c->isfloating ? LyrFloat : LyrTile]);
+	// wlr_scene_node_reparent(&c->scene->node, layers[fullscreen
+	// 		? LyrFS : c->isfloating ? LyrFloat : LyrTile]);  //加上这句话全屏窗口右键菜单就出不来,就像他的图像层最高,不允许其他窗口在它的上成一样
 
 	if (fullscreen) {
 		c->prev = c->geom;
