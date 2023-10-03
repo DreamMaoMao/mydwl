@@ -2274,14 +2274,18 @@ motionrelative(struct wl_listener *listener, void *data)
 	 * special configuration applied for the specific input device which
 	 * generated the event. You can pass NULL for the device if you want to move
 	 * the cursor around without any input. */
-	wlr_relative_pointer_manager_v1_send_relative_motion(
-	pointer_manager,
-	seat, (uint64_t)(event->time_msec) * 1000,
-	event->delta_x, event->delta_y, event->unaccel_dx, event->unaccel_dy);
+
 
 	wlr_cursor_move(cursor, &event->pointer->base, event->delta_x, event->delta_y);
 	// wlr_seat_pointer_notify_motion(seat, event->time_msec, event->delta_x, event->delta_y); //这个造成了鼠标移动的时候滚轮不起作用
-	motionnotify(event->time_msec);  //滚轮异常
+	motionnotify(event->time_msec);  
+
+	wlr_relative_pointer_manager_v1_send_relative_motion(
+		pointer_manager,
+		seat, (uint64_t)(event->time_msec) * 1000,
+		event->delta_x, event->delta_y, 
+		event->unaccel_dx, event->unaccel_dy);
+		
 	toggle_hotarea(cursor->x,cursor->y);	
 }
 
@@ -2716,7 +2720,7 @@ setfullscreen(Client *c, int fullscreen)
 	if (!c->mon)
 		return;
 	c->bw = fullscreen ? 0 : borderpx;
-	client_set_fullscreen(c, fullscreen);
+	// client_set_fullscreen(c, fullscreen); //加上这个时不时全屏就会黑屏
 	// wlr_scene_node_reparent(&c->scene->node, layers[fullscreen
 	// 		? LyrFS : c->isfloating ? LyrFloat : LyrTile]);  //加上这句话全屏窗口右键菜单就出不来,就像他的图像层最高,不允许其他窗口在它的上成一样
 
