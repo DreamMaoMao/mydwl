@@ -22,6 +22,7 @@
 #include <wlr/types/wlr_data_device.h>
 #include <wlr/types/wlr_export_dmabuf_v1.h>
 #include <wlr/types/wlr_gamma_control_v1.h>
+#include <wlr/types/wlr_relative_pointer_v1.h>
 #include <wlr/types/wlr_idle.h>
 #include <wlr/types/wlr_idle_inhibit_v1.h>
 #include <wlr/types/wlr_idle_notify_v1.h>
@@ -402,6 +403,7 @@ static pid_t child_pid = -1;
 static int locked;
 static void *exclusive_focus;
 static struct wl_display *dpy;
+static struct wlr_relative_pointer_manager_v1 *pointer_manager;
 static struct wlr_backend *backend;
 static struct wlr_scene *scene;
 static struct wlr_scene_tree *layers[NUM_LAYERS];
@@ -2272,6 +2274,11 @@ motionrelative(struct wl_listener *listener, void *data)
 	 * special configuration applied for the specific input device which
 	 * generated the event. You can pass NULL for the device if you want to move
 	 * the cursor around without any input. */
+	wlr_relative_pointer_manager_v1_send_relative_motion(
+	pointer_manager,
+	seat, (uint64_t)(event->time_msec) * 1000,
+	event->delta_x, event->delta_y, event->unaccel_dx, event->unaccel_dy);
+
 	wlr_cursor_move(cursor, &event->pointer->base, event->delta_x, event->delta_y);
 	// wlr_seat_pointer_notify_motion(seat, event->time_msec, event->delta_x, event->delta_y); //这个造成了鼠标移动的时候滚轮不起作用
 	motionnotify(event->time_msec);  //滚轮异常
@@ -2819,6 +2826,7 @@ setup(void)
 	/* The Wayland display is managed by libwayland. It handles accepting
 	 * clients from the Unix socket, manging Wayland globals, and so on. */
 	dpy = wl_display_create();
+	pointer_manager = wlr_relative_pointer_manager_v1_create(dpy);
 
 	/* Set up signal handlers */
 #ifdef XWAYLAND
