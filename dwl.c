@@ -2713,30 +2713,61 @@ setrealfullscreen(Client *c, int realfullscreen)
 	// printstatus();
 }
 
+// void
+// setfullscreen(Client *c, int fullscreen)
+// {
+// 	c->isfullscreen = fullscreen;
+// 	if (!c->mon)
+// 		return;
+// 	c->bw = fullscreen ? 0 : borderpx;
+// 	client_set_fullscreen(c, fullscreen); //加上这个时不时全屏就会黑屏
+// 	wlr_scene_node_reparent(&c->scene->node, layers[fullscreen
+// 			? LyrFS : c->isfloating ? LyrFloat : LyrTile]);  //加上这句话全屏窗口右键菜单就出不来,就像他的图像层最高,不允许其他窗口在它的上成一样
+
+// 	if (fullscreen) {
+// 		c->prev = c->geom;
+// 		resize(c, c->mon->m, 0);
+// 		set_tag_fullscreen_flag(c);
+// 	} else {
+// 		/* restore previous size instead of arrange for floating windows since
+// 		 * client positions are set by the user and cannot be recalculated */
+// 		resize(c, c->prev, 0);
+// 		arrange(c->mon);
+// 		clear_tag_fullscreen_flag(c);
+// 	}
+// 	printstatus();
+// }
+
+
 void
-setfullscreen(Client *c, int fullscreen)
+setfullscreen(Client *c, int realfullscreen) //用自定义全屏代理自带全屏
 {
-	c->isfullscreen = fullscreen;
+	c->isrealfullscreen = realfullscreen;
+
 	if (!c->mon)
 		return;
-	c->bw = fullscreen ? 0 : borderpx;
-	// client_set_fullscreen(c, fullscreen); //加上这个时不时全屏就会黑屏
-	// wlr_scene_node_reparent(&c->scene->node, layers[fullscreen
-	// 		? LyrFS : c->isfloating ? LyrFloat : LyrTile]);  //加上这句话全屏窗口右键菜单就出不来,就像他的图像层最高,不允许其他窗口在它的上成一样
 
-	if (fullscreen) {
-		c->prev = c->geom;
+	if (realfullscreen) {
+		c->bw = 0;
 		resize(c, c->mon->m, 0);
+		c->isrealfullscreen = 1;
+		c->isfloating = 0;
 		set_tag_fullscreen_flag(c);
 	} else {
 		/* restore previous size instead of arrange for floating windows since
 		 * client positions are set by the user and cannot be recalculated */
-		resize(c, c->prev, 0);
+		// resize(c, c->prev, 0);
+		c->bw = borderpx;
+		c->isrealfullscreen = 0;
+		c->isfullscreen = 0;
+		c->isfakefullscreen = 0;
 		arrange(c->mon);
 		clear_tag_fullscreen_flag(c);
 	}
-	printstatus();
+	// arrange(c->mon);
+	// printstatus();
 }
+
 
 void
 setgaps(int oh, int ov, int ih, int iv)
