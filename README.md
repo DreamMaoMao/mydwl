@@ -2,7 +2,7 @@
 ![image](https://github.com/DreamMaoMao/superdwl/assets/30348075/037ffa8a-2d67-43ec-b5f3-ae68f2c638c7)
 
 
-# dwl - dwm for Wayland
+# dwl - dwm for Wayland(暂时还不支持动画)
 
 #改动日志
 - waybar支持
