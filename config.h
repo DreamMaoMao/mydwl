@@ -197,7 +197,7 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_space,      setlayout,      {0} },
 	{ WLR_MODIFIER_ALT, XKB_KEY_backslash,      togglefloating, {0} },
 	{ MODKEY,                    XKB_KEY_a,          togglefakefullscreen, {0} },
-	{ MODKEY,                    XKB_KEY_f,          togglerealfullscreen, {0} },
+	{ MODKEY,                    XKB_KEY_f,          togglefullscreen, {0} },
 	{ WLR_MODIFIER_CTRL,                    XKB_KEY_KP_0,          view,           {.ui = ~0} },
 	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO, XKB_KEY_KP_0, tag,            {.ui = ~0} },
 	{ MODKEY,                    XKB_KEY_comma,      focusmon,       {.i = WLR_DIRECTION_LEFT} },

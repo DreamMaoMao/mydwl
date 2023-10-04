@@ -1368,8 +1368,8 @@ void clear_fullscreen_flag(Client *c) {
     c->isfullscreen = 0;
     c->isfakefullscreen = 0;
     c->isrealfullscreen = 0;
-	client_set_fullscreen(c,false);
     c->bw = borderpx;
+	client_set_fullscreen(c, false);
     clear_tag_fullscreen_flag(c);
   }
 }
@@ -1851,7 +1851,7 @@ fullscreennotify(struct wl_listener *listener, void *data)
 	Client *c = selmon->sel;
 	if(c->isrealfullscreen){
 		setrealfullscreen(c,0);
-	}else{
+	}else {
 		setrealfullscreen(c,1);
 	}
 }
@@ -2151,8 +2151,9 @@ mapnotify(struct wl_listener *listener, void *data)
 	else
 		wl_list_insert(clients.prev, &c->link); //尾部入栈
 	wl_list_insert(&fstack, &c->flink);
-	//清楚当前tag中的全屏,让全屏退出参与平铺
-	Client *fc;
+  	Client *fc;
+
+  	// 如果当前的tag中有新创建的窗口,就让当前tag中的全屏窗口退出全屏参与平铺
   	fc = selmon->pertag->fullscreen_client[selmon->pertag->curtag];
   	if (fc) {
   	  clear_fullscreen_flag(fc);
@@ -2719,6 +2720,7 @@ setrealfullscreen(Client *c, int realfullscreen)
 		c->isfullscreen = 0;
 		c->isfakefullscreen = 0;
 		arrange(c->mon);
+		client_set_fullscreen(c, false);
 		clear_tag_fullscreen_flag(c);
 	}
 	// arrange(c->mon);
@@ -2752,17 +2754,17 @@ setrealfullscreen(Client *c, int realfullscreen)
 
 
 void
-setfullscreen(Client *c, int fullscreen) //用自定义全屏代理自带全屏
+setfullscreen(Client *c, int realfullscreen) //用自定义全屏代理自带全屏
 {
-	c->isfullscreen = fullscreen;
+	c->isrealfullscreen = realfullscreen;
 
 	if (!c->mon)
 		return;
 
-	if (fullscreen) {
+	if (realfullscreen) {
 		c->bw = 0;
 		resize(c, c->mon->m, 0);
-		c->isfullscreen = 1;
+		c->isrealfullscreen = 1;
 		c->isfloating = 0;
 		set_tag_fullscreen_flag(c);
 	} else {
