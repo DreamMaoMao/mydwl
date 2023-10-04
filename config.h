@@ -3,8 +3,8 @@
 /* appearance */
 static const unsigned int new_is_master = 1; //新窗口是否插在头部
 static const unsigned int numlockon = 1; //是否打开右边小键盘
-static const unsigned int hotarea_size              = 10;
-static const unsigned int enable_hotarea            = 1;
+static const unsigned int hotarea_size              = 10; //热区大小,10x10
+static const unsigned int enable_hotarea            = 1; //是否启用鼠标热区
 static int smartgaps                 = 0;  /* 1 means no outer gap when there is only one window */
 static int sloppyfocus               = 1;  /* focus follows mouse */
 static unsigned int gappih           = 5; /* horiz inner gap between windows */
@@ -72,8 +72,8 @@ static const Layout overviewlayout = { "󰃇",  overview };
 static const Layout layouts[] = {
 	/* symbol     arrange function */
 	{ "[]=",      tile },
-	{ "><>",      NULL },    /* no layout function means floating behavior */
-	{ "[M]",      monocle },
+	{ "><>",      grid },    /* no layout function means floating behavior */
+
 };
 
 /* monitors */
@@ -194,8 +194,7 @@ static const Key keys[] = {
     { WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO,    XKB_KEY_Right,        tagtoright,       {0} }, 
 	{ MODKEY,					 XKB_KEY_q,          killclient,     {0} },
 	{ MODKEY,                    XKB_KEY_t,          setlayout,      {.v = &layouts[0]} },
-	{ MODKEY,                    XKB_KEY_e,          setlayout,      {.v = &layouts[1]} },
-	{ MODKEY,                    XKB_KEY_m,          setlayout,      {.v = &layouts[2]} },
+	{ MODKEY,                    XKB_KEY_g,          setlayout,      {.v = &layouts[1]} },
 	{ MODKEY,                    XKB_KEY_space,      setlayout,      {0} },
 	{ WLR_MODIFIER_ALT, XKB_KEY_backslash,      togglefloating, {0} },
 	{ MODKEY,                    XKB_KEY_a,          togglefakefullscreen, {0} },

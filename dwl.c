@@ -191,7 +191,7 @@ typedef struct {
 
 typedef struct {
 	const char *symbol;
-	void (*arrange)(Monitor *);
+	void (*arrange)(Monitor *,unsigned int,unsigned int);
 } Layout;
 
 struct Monitor {
@@ -358,8 +358,8 @@ static void spawn(const Arg *arg);
 static void startdrag(struct wl_listener *listener, void *data);
 static void tag(const Arg *arg);
 static void tagmon(const Arg *arg);
-static void tile(Monitor *m);
-static void overview(Monitor *m);
+static void tile(Monitor *m, unsigned int gappo, unsigned int uappi);
+static void overview(Monitor *m, unsigned int gappo, unsigned int gappi);
 static void grid(Monitor *m, unsigned int gappo, unsigned int uappi);
 static void togglefloating(const Arg *arg);
 static void togglefullscreen(const Arg *arg);
@@ -642,9 +642,9 @@ arrange(Monitor *m)
 			(c = focustop(m)) && c->isfullscreen);
 
 	if(m->isoverview){
-		overviewlayout.arrange(m);
+		overviewlayout.arrange(m,0,0);
 	}else if (m && m->lt[m->sellt]->arrange){
-		m->lt[m->sellt]->arrange(m);
+		m->lt[m->sellt]->arrange(m,0,0);
 	}
 	motionnotify(0);
 	checkidleinhibitor(NULL);
@@ -3123,7 +3123,7 @@ tagmon(const Arg *arg)
 }
 
 void 
-overview(Monitor *m) {
+overview(Monitor *m, unsigned int gappo, unsigned int gappi) {
 	grid(m, overviewgappo, overviewgappi); 
 }
 
@@ -3272,7 +3272,7 @@ void toggleoverview(const Arg *arg) {
 }
 
 void
-tile(Monitor *m)
+tile(Monitor *m,unsigned int gappo, unsigned int uappi)
 {
 	unsigned int i, n = 0, h, r, oe = enablegaps, ie = enablegaps, mw, my, ty;
 	Client *c;
