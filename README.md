@@ -2,6 +2,11 @@
 ![image](https://github.com/DreamMaoMao/superdwl/assets/30348075/037ffa8a-2d67-43ec-b5f3-ae68f2c638c7)
 
 
+
+https://github.com/DreamMaoMao/superdwl/assets/30348075/687afa31-feda-4de7-8128-11f25382e01c
+
+
+
 # dwl - dwm for Wayland(暂时还不支持动画)
 
 #改动日志
