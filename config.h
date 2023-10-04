@@ -184,8 +184,7 @@ static const Key keys[] = {
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_H,          setmfact,       {.f = -0.05} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_L,          setmfact,       {.f = +0.05} },
 	{ MODKEY,                    XKB_KEY_s,          zoom,           {0} },
-	{ MODKEY,                    XKB_KEY_Tab,        view,           {0} },
-	{ WLR_MODIFIER_LOGO,                    XKB_KEY_a,          toggleoverview,           {0} },
+	{ MODKEY,                    XKB_KEY_Tab,        toggleoverview,           {0} },
 	{ WLR_MODIFIER_LOGO,                    XKB_KEY_Left,        viewtoleft,           {0} },
 	{ WLR_MODIFIER_CTRL,                    XKB_KEY_Left,        viewtoleft_have_client,           {0} },
 	{ WLR_MODIFIER_LOGO,                    XKB_KEY_Right,        viewtoright,           {0} },
@@ -235,6 +234,6 @@ static const Button buttons[] = {
 };
 
 static const Wheel wheels[] = {
-	{ WLR_MODIFIER_LOGO, WheelUp, viewtoleft, {0} }, //中键+super向前切换工作区
-	{ WLR_MODIFIER_LOGO, WheelDown, viewtoright, {0} }, //中键+super向后切换工作区
+	{ WLR_MODIFIER_LOGO, WheelUp, viewtoleft_have_client, {0} }, //中键+super向前切换工作区
+	{ WLR_MODIFIER_LOGO, WheelDown, viewtoright_have_client, {0} }, //中键+super向后切换工作区
 };
