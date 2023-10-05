@@ -2124,7 +2124,6 @@ mapnotify(struct wl_listener *listener, void *data)
 		LISTEN(&client_surface(c)->events.commit, &c->commit, commitnotify);
 	}
 	c->scene->node.data = c->scene_surface->node.data = c;
-
 #ifdef XWAYLAND
 	/* Handle unmanaged clients first so we can return prior create borders */
 	if (client_is_unmanaged(c)) {
@@ -2140,7 +2139,6 @@ mapnotify(struct wl_listener *listener, void *data)
 		goto unset_fullscreen;
 	}
 #endif
-
 	for (i = 0; i < 4; i++) {
 		c->border[i] = wlr_scene_rect_create(c->scene, 0, 0, bordercolor);
 		c->border[i]->node.data = c;
@@ -2162,7 +2160,6 @@ mapnotify(struct wl_listener *listener, void *data)
 	c->geom.y = selmon->w.y + (selmon->w.height - c->geom.height) / 2; 
 	selmon->sel = c;
 
-
 	if (new_is_master)
 		// tile at the top
 		wl_list_insert(&clients, &c->link); //新窗口是master,头部入栈
@@ -2170,13 +2167,11 @@ mapnotify(struct wl_listener *listener, void *data)
 		wl_list_insert(clients.prev, &c->link); //尾部入栈
 	wl_list_insert(&fstack, &c->flink);
   	Client *fc;
-
   	// 如果当前的tag中有新创建的窗口,就让当前tag中的全屏窗口退出全屏参与平铺
   	fc = selmon->pertag->fullscreen_client[selmon->pertag->curtag];
   	if (fc) {
   	  clear_fullscreen_flag(fc);
   	}
-
 	/* Set initial monitor, tags, floating status, and focus:
 	 * we always consider floating, clients that have parent and thus
 	 * we set the same tags and monitor than its parent, if not
@@ -2192,6 +2187,7 @@ mapnotify(struct wl_listener *listener, void *data)
 	printstatus();
 
 	c->foreign_toplevel = wlr_foreign_toplevel_handle_v1_create(foreign_toplevel_manager);
+
 	if(c->foreign_toplevel){
 		LISTEN(&(c->foreign_toplevel->events.request_activate),
 				&c->foreign_activate_request,handle_foreign_activate_request);
@@ -3542,8 +3538,10 @@ unmapnotify(struct wl_listener *listener, void *data)
 
 	wl_list_remove(&c->commit.link);
 	wlr_scene_node_destroy(&c->scene->node);
-	if(c->foreign_toplevel)
+	if(c->foreign_toplevel){
 		wlr_foreign_toplevel_handle_v1_destroy(c->foreign_toplevel);
+		c->foreign_toplevel = NULL;
+	}
 	printstatus();
 	motionnotify(0);
 }
