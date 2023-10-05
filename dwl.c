@@ -3628,8 +3628,13 @@ void
 updatetitle(struct wl_listener *listener, void *data)
 {
 	Client *c = wl_container_of(listener, c, set_title);
+	const char *title;
+    title = client_get_title(c) ;
+	if(title && c->foreign_toplevel)
+		wlr_foreign_toplevel_handle_v1_set_title(c->foreign_toplevel,title);
 	if (c == focustop(c->mon))
 		printstatus();
+
 }
 
 void
