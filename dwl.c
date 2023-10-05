@@ -2192,28 +2192,29 @@ mapnotify(struct wl_listener *listener, void *data)
 	printstatus();
 
 	c->foreign_toplevel = wlr_foreign_toplevel_handle_v1_create(foreign_toplevel_manager);
-	LISTEN(&(c->foreign_toplevel->events.request_activate),
-			&c->foreign_activate_request,handle_foreign_activate_request);
-	LISTEN(&(c->foreign_toplevel->events.request_fullscreen),
-			&c->foreign_fullscreen_request,handle_foreign_fullscreen_request);
-	LISTEN(&(c->foreign_toplevel->events.request_close),
-			&c->foreign_close_request,handle_foreign_close_request);
-	LISTEN(&(c->foreign_toplevel->events.destroy),
-			&c->foreign_destroy,handle_foreign_destroy);
+	if(c->foreign_toplevel){
+		LISTEN(&(c->foreign_toplevel->events.request_activate),
+				&c->foreign_activate_request,handle_foreign_activate_request);
+		LISTEN(&(c->foreign_toplevel->events.request_fullscreen),
+				&c->foreign_fullscreen_request,handle_foreign_fullscreen_request);
+		LISTEN(&(c->foreign_toplevel->events.request_close),
+				&c->foreign_close_request,handle_foreign_close_request);
+		LISTEN(&(c->foreign_toplevel->events.destroy),
+				&c->foreign_destroy,handle_foreign_destroy);
 
-	const char *appid;
-    appid = client_get_appid(c) ;
-	wlr_foreign_toplevel_handle_v1_set_app_id(c->foreign_toplevel,appid);
+		const char *appid;
+    	appid = client_get_appid(c) ;
+		if(appid)
+			wlr_foreign_toplevel_handle_v1_set_app_id(c->foreign_toplevel,appid);
 
-	const char *title;
-    title = client_get_title(c) ;
-	wlr_foreign_toplevel_handle_v1_set_title(c->foreign_toplevel,title);
+		const char *title;
+    	title = client_get_title(c) ;
+		if(title)
+			wlr_foreign_toplevel_handle_v1_set_title(c->foreign_toplevel,title);
 
-	// wlr_foreign_toplevel_handle_v1_set_fullscreen(
-	// 	c->foreign_toplevel, true);
-
-	wlr_foreign_toplevel_handle_v1_output_enter(
-			c->foreign_toplevel, selmon->wlr_output);
+		wlr_foreign_toplevel_handle_v1_output_enter(
+				c->foreign_toplevel, selmon->wlr_output);
+	}
 
 
 unset_fullscreen:
@@ -2920,9 +2921,9 @@ void
 handle_foreign_activate_request(struct wl_listener *listener, void *data) {
 	Client *c = wl_container_of(listener, c, foreign_activate_request);
 	unsigned int target,i,tag=0;
-	if((1<<(selmon->pertag->curtag - 1)) & c->tags ){
+	if(c && (1<<(selmon->pertag->curtag - 1)) & c->tags ){
 		focusclient(c,1);
-	}else {
+	}else if(c && !((1<<(selmon->pertag->curtag - 1)) & c->tags)) {
 		for(i=0;!(tag & 1);i++){
 			tag = c->tags >> i;
 		}
@@ -2942,12 +2943,16 @@ handle_foreign_fullscreen_request(
 void
 handle_foreign_close_request(struct wl_listener *listener, void *data) {
 	Client *c = wl_container_of(listener, c, foreign_close_request);
-	client_send_close(c);
+	if(c)
+		client_send_close(c);
 }
 
 void
 handle_foreign_destroy(struct wl_listener *listener, void *data) {
-	return;
+	Client *c = wl_container_of(listener, c, foreign_destroy);
+	if(c){
+		client_send_close(c);
+	}
 }
 
 
@@ -3537,7 +3542,8 @@ unmapnotify(struct wl_listener *listener, void *data)
 
 	wl_list_remove(&c->commit.link);
 	wlr_scene_node_destroy(&c->scene->node);
-	wlr_foreign_toplevel_handle_v1_destroy(c->foreign_toplevel);
+	if(c->foreign_toplevel)
+		wlr_foreign_toplevel_handle_v1_destroy(c->foreign_toplevel);
 	printstatus();
 	motionnotify(0);
 }
