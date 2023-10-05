@@ -17,14 +17,14 @@ window#waybar {
 
 #tags button{
     box-shadow: rgba(0, 0, 0, 0.116) 2 2 5 2px;
-    background-color: #fff ;
+    background-color: #edebe6 ;
     border-radius: 15px;
     margin-right: 10px;
     padding-top: 4px;
     padding-bottom: 2px;
     padding-right: 10px;
     font-weight: bolder;
-    color: 	#cba6f7 ;
+    color: 	#9d75ce ;
 }
 
 

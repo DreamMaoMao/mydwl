@@ -52,6 +52,9 @@
 #include <wlr/types/wlr_xdg_output_v1.h>
 #include <wlr/types/wlr_xdg_shell.h>
 #include <wlr/util/log.h>
+#include <wlr/types/wlr_xdg_foreign_registry.h>
+#include <wlr/types/wlr_xdg_foreign_v1.h>
+#include <wlr/types/wlr_xdg_foreign_v2.h>
 #include <xkbcommon/xkbcommon.h>
 #ifdef XWAYLAND
 #include <wlr/xwayland.h>
@@ -140,6 +143,7 @@ typedef struct {
 #endif
 	unsigned int bw;
 	unsigned int tags;
+	struct wlr_foreign_toplevel_handle_v1 *foreign_toplevel;
 	int isfloating, isurgent, isfullscreen;
 	int isfakefullscreen,isrealfullscreen;
   	int overview_backup_x, overview_backup_y, overview_backup_w,
@@ -412,7 +416,6 @@ static void *exclusive_focus;
 static struct wl_display *dpy;
 static struct wlr_relative_pointer_manager_v1 *pointer_manager;
 static struct wlr_foreign_toplevel_manager_v1 *foreign_toplevel_manager;
-static struct wlr_foreign_toplevel_handle_v1 *foreign_toplevel;
 static struct wlr_backend *backend;
 static struct wlr_scene *scene;
 static struct wlr_scene_tree *layers[NUM_LAYERS];
@@ -2172,6 +2175,7 @@ mapnotify(struct wl_listener *listener, void *data)
   	if (fc) {
   	  clear_fullscreen_flag(fc);
   	}
+
 	/* Set initial monitor, tags, floating status, and focus:
 	 * we always consider floating, clients that have parent and thus
 	 * we set the same tags and monitor than its parent, if not
@@ -2185,6 +2189,31 @@ mapnotify(struct wl_listener *listener, void *data)
 		applyrules(c);
 	}
 	printstatus();
+
+	c->foreign_toplevel = wlr_foreign_toplevel_handle_v1_create(foreign_toplevel_manager);
+	wl_signal_add(&(c->foreign_toplevel->events.request_activate),
+			&foreign_activate_request);
+	wl_signal_add(&(c->foreign_toplevel->events.request_fullscreen),
+			&foreign_fullscreen_request);
+	wl_signal_add(&(c->foreign_toplevel->events.request_close),
+			&foreign_close_request);
+	wl_signal_add(&(c->foreign_toplevel->events.destroy),
+			&foreign_destroy);
+
+	const char *appid;
+    appid = client_get_appid(c) ;
+	wlr_foreign_toplevel_handle_v1_set_app_id(c->foreign_toplevel,appid);
+
+	const char *title;
+    title = client_get_title(c) ;
+	wlr_foreign_toplevel_handle_v1_set_title(c->foreign_toplevel,title);
+
+	// wlr_foreign_toplevel_handle_v1_set_fullscreen(
+	// 	c->foreign_toplevel, true);
+
+	wlr_foreign_toplevel_handle_v1_output_enter(
+			c->foreign_toplevel, selmon->wlr_output);
+
 
 unset_fullscreen:
 	m = c->mon ? c->mon : xytomon(c->geom.x, c->geom.y);
@@ -3082,20 +3111,11 @@ setup(void)
 	wlr_scene_set_presentation(scene, wlr_presentation_create(dpy, backend));
     wl_global_create(dpy, &zdwl_ipc_manager_v2_interface, 1, NULL, dwl_ipc_manager_bind);
 
-
-	foreign_toplevel_manager =
-			wlr_foreign_toplevel_manager_v1_create(dpy);
-
-	foreign_toplevel = wlr_foreign_toplevel_handle_v1_create(foreign_toplevel_manager);
-	wl_signal_add(&(foreign_toplevel->events.request_activate),
-			&foreign_activate_request);
-	wl_signal_add(&(foreign_toplevel->events.request_fullscreen),
-			&foreign_fullscreen_request);
-	wl_signal_add(&(foreign_toplevel->events.request_close),
-			&foreign_close_request);
-	wl_signal_add(&(foreign_toplevel->events.destroy),
-			&foreign_destroy);
-
+	//创建顶层管理句柄
+	foreign_toplevel_manager =wlr_foreign_toplevel_manager_v1_create(dpy);
+	struct wlr_xdg_foreign_registry *foreign_registry = wlr_xdg_foreign_registry_create(dpy);
+	wlr_xdg_foreign_v1_create(dpy, foreign_registry);
+	wlr_xdg_foreign_v2_create(dpy, foreign_registry);
 #ifdef XWAYLAND
 	/*
 	 * Initialise the XWayland X server.
@@ -3504,6 +3524,7 @@ unmapnotify(struct wl_listener *listener, void *data)
 
 	wl_list_remove(&c->commit.link);
 	wlr_scene_node_destroy(&c->scene->node);
+	wlr_foreign_toplevel_handle_v1_destroy(c->foreign_toplevel);
 	printstatus();
 	motionnotify(0);
 }

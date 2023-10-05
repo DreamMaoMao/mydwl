@@ -10,7 +10,7 @@
     "wlr/tags": {
         "num-tags":9
     },
-    "dwl/taskbar": {
+    "wlr/taskbar": {
         "format": "{icon}",
         "icon-size": 30,
         "all-outputs": false,
