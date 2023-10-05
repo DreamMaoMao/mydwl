@@ -2590,6 +2590,7 @@ void setborder_color(Client *c){
 void
 resize(Client *c, struct wlr_box geo, int interact)
 {	
+
 	struct wlr_box *bbox = interact ? &sgeom : &c->mon->w;//去掉这个推荐的窗口大小,因为有时推荐的窗口特别大导致平铺异常
 	client_set_bounds(c, geo.width, geo.height); //去掉这个推荐的窗口大小,因为有时推荐的窗口特别大导致平铺异常
 	c->geom = geo;
@@ -2734,6 +2735,7 @@ setfakefullscreen(Client *c, int fakefullscreen)
 		c->isfullscreen = 0;
 		c->isrealfullscreen = 0;
 		arrange(c->mon);
+		client_set_fullscreen(c, false);
 		clear_tag_fullscreen_flag(c);
 	}
 	// arrange(c->mon);
