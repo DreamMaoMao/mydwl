@@ -1,9 +1,6 @@
 
-![image](https://github.com/DreamMaoMao/superdwl/assets/30348075/037ffa8a-2d67-43ec-b5f3-ae68f2c638c7)
+![image](https://github.com/DreamMaoMao/superdwl/assets/30348075/b0b77a60-67fd-4dfe-9263-c2380a1cbf50)
 
-
-
-https://github.com/DreamMaoMao/superdwl/assets/30348075/687afa31-feda-4de7-8128-11f25382e01c
 
 
 
