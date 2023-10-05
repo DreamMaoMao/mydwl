@@ -12,6 +12,7 @@ wayland_server_dep = dependency('wayland-server')
 wlroots_dep = dependency('wlroots', version : ['>=0.16.0', '<0.17.0'])
 xkbcommon_dep = dependency('xkbcommon')
 libinput_dep = dependency('libinput')
+libwayland_client_dep = dependency('wayland-client')
 
 c_args = [
   '-Wno-unused-function',
@@ -29,6 +30,12 @@ executable('dwl',
   'util.c',
   'dwl-ipc-unstable-v2-protocol.c',
   'dwl-ipc-unstable-v2-protocol.h',
+  'wlr_foreign_toplevel_management_v1.c',
+  'wlr_foreign_toplevel_management_v1.h',
+  'wlr-foreign-toplevel-management-unstable-v1-protocol.c',
+  'wlr-foreign-toplevel-management-unstable-v1-protocol.h',
+  'wlr-foreign-toplevel-management-unstable-v1-protocol.c',
+  'wlr-foreign-toplevel-management-unstable-v1-protocol.h',
   wayland_sources,
   dependencies : [
     libm,
@@ -38,6 +45,7 @@ executable('dwl',
     wlroots_dep,
     xkbcommon_dep,
     libinput_dep,
+    libwayland_client_dep,
   ],
   install : true,
   c_args : c_args

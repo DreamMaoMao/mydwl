@@ -61,6 +61,7 @@
 
 #include "dwl-ipc-unstable-v2-protocol.h"
 #include "util.h"
+#include "wlr_foreign_toplevel_management_v1.h"
 
 
 #define WheelUp			0xfffffff1
@@ -396,6 +397,12 @@ static void toggleoverview(const Arg *arg);
 static void overview_restore(Client *c, const Arg *arg);
 static void overview_backup(Client *c);
 
+static void handle_foreign_activate_request(struct wl_listener *listener, void *data);
+static void handle_foreign_fullscreen_request(struct wl_listener *listener, void *data);
+static void handle_foreign_close_request(struct wl_listener *listener, void *data);
+static void handle_foreign_destroy(struct wl_listener *listener, void *data);
+
+
 /* variables */
 static const char broken[] = "broken";
 static const char *cursor_image = "left_ptr";
@@ -404,6 +411,8 @@ static int locked;
 static void *exclusive_focus;
 static struct wl_display *dpy;
 static struct wlr_relative_pointer_manager_v1 *pointer_manager;
+static struct wlr_foreign_toplevel_manager_v1 *foreign_toplevel_manager;
+static struct wlr_foreign_toplevel_handle_v1 *foreign_toplevel;
 static struct wlr_backend *backend;
 static struct wlr_scene *scene;
 static struct wlr_scene_tree *layers[NUM_LAYERS];
@@ -472,6 +481,11 @@ static struct wl_listener request_start_drag = {.notify = requeststartdrag};
 static struct wl_listener start_drag = {.notify = startdrag};
 static struct wl_listener session_lock_create_lock = {.notify = locksession};
 static struct wl_listener session_lock_mgr_destroy = {.notify = destroysessionmgr};
+
+static struct wl_listener foreign_activate_request = {.notify = handle_foreign_activate_request};
+static struct wl_listener foreign_fullscreen_request = {.notify = handle_foreign_fullscreen_request};
+static struct wl_listener foreign_close_request = {.notify = handle_foreign_close_request};
+static struct wl_listener foreign_destroy = {.notify = handle_foreign_destroy};
 
 #ifdef XWAYLAND
 static void activatex11(struct wl_listener *listener, void *data);
@@ -1644,7 +1658,7 @@ void dwl_ipc_output_printstatus_to(DwlIpcOutput *ipc_output) {
     appid = focused ? client_get_appid(focused) : "";
 
     zdwl_ipc_output_v2_send_layout(ipc_output->resource, monitor->lt[monitor->sellt] - layouts);
-    zdwl_ipc_output_v2_send_title(ipc_output->resource, title ? title : broken);
+    zdwl_ipc_output_v2_send_title(ipc_output->resource, title ? title : broken); //就是这里让waybar无法获取到了窗口
     zdwl_ipc_output_v2_send_appid(ipc_output->resource, appid ? appid : broken);
     zdwl_ipc_output_v2_send_layout_symbol(ipc_output->resource, monitor->lt[monitor->sellt]->symbol);
     zdwl_ipc_output_v2_send_frame(ipc_output->resource);
@@ -2869,6 +2883,32 @@ setsel(struct wl_listener *listener, void *data)
 	wlr_seat_set_selection(seat, event->source, event->serial);
 }
 
+
+void
+handle_foreign_activate_request(
+		struct wl_listener *listener, void *data) {
+	return;
+}
+
+void
+handle_foreign_fullscreen_request(
+		struct wl_listener *listener, void *data) {
+	return;
+}
+
+void
+handle_foreign_close_request(
+		struct wl_listener *listener, void *data) {
+	return;
+}
+
+void
+handle_foreign_destroy(
+		struct wl_listener *listener, void *data) {
+	return;
+}
+
+
 void
 setup(void)
 {
@@ -3041,6 +3081,20 @@ setup(void)
 
 	wlr_scene_set_presentation(scene, wlr_presentation_create(dpy, backend));
     wl_global_create(dpy, &zdwl_ipc_manager_v2_interface, 1, NULL, dwl_ipc_manager_bind);
+
+
+	foreign_toplevel_manager =
+			wlr_foreign_toplevel_manager_v1_create(dpy);
+
+	foreign_toplevel = wlr_foreign_toplevel_handle_v1_create(foreign_toplevel_manager);
+	wl_signal_add(&(foreign_toplevel->events.request_activate),
+			&foreign_activate_request);
+	wl_signal_add(&(foreign_toplevel->events.request_fullscreen),
+			&foreign_fullscreen_request);
+	wl_signal_add(&(foreign_toplevel->events.request_close),
+			&foreign_close_request);
+	wl_signal_add(&(foreign_toplevel->events.destroy),
+			&foreign_destroy);
 
 #ifdef XWAYLAND
 	/*
