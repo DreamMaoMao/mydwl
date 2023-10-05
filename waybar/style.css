@@ -7,19 +7,34 @@ window#waybar {
     background-color: transparent;
 }
 
+
+#taskbar{
+    margin-top: 1px;
+    margin-bottom: 1px;
+    margin-right: 1px;
+    margin-left: 1px;
+}
+#taskbar button{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-right: 1px;
+    margin-left: 1px;
+}
+
 #tags{
     background-color: transparent;
     margin-top: 10px;
     margin-bottom: 10px;
-    margin-right: 10px;
-    margin-left: 25px;
+    margin-right: 1px;
+    margin-left: 1px;
 }
 
 #tags button{
     box-shadow: rgba(0, 0, 0, 0.116) 2 2 5 2px;
     background-color: #edebe6 ;
     border-radius: 15px;
-    margin-right: 10px;
+    margin-right: 3px;
+    margin-left: 3px;
     padding-top: 4px;
     padding-bottom: 2px;
     padding-right: 10px;
@@ -81,8 +96,8 @@ window#waybar {
     background-color: #fff ;
     border-radius: 15px;
     margin-right: 10px;
-    padding-top: 4px;
-    padding-bottom: 2px;
+    padding-top: 3px;
+    padding-bottom: 3px;
     padding-right: 10px;
     font-weight: bolder;
     color: 	#cba6f7 ;
@@ -211,19 +226,22 @@ window#waybar {
 #clock {
     background: rgb(179, 42, 142);
     /* background: linear-gradient(45deg, rgb(99, 6, 74) 0%, rgba(203,166,247,1) 64%, rgba(202,158,230,1) 100%);  */
-    margin-right: 25px;
+    margin-right: 1px;
     color: #fff ;
     background-size: 300% 300%;
     text-shadow: 0 0 5px rgba(0, 0, 0, 0.377);
     /* animation: gradient 20s ease infinite; */
     font-size: 20px;
-    padding-top: 5px;
-    padding-right: 21px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-right: 15px;
     font-weight: bolder;
-    padding-left: 20px
+    padding-left: 15px
 }
 
 #battery.charging, #battery.plugged {
+    padding-top: 3px;
+    padding-bottom: 3px;
     color: #a8e2c5;
     background-color: #2c3016 ;
 }
@@ -233,6 +251,8 @@ window#waybar {
     color:#eae4d0;
     font-weight: bolder;
     font-size: 20px;
+    padding-top: 3px;
+    padding-bottom: 3px;
     padding-left: 15px;
     padding-right: 15px;
 }
@@ -260,6 +280,10 @@ label:focus {
 
 #cpu {
     min-width: 80px;
+    margin-right: 1px;
+    margin-left: 1px;
+    padding-top: 3px;
+    padding-bottom: 3px;
     background: rgb(39, 154, 207);
     /* background: linear-gradient(52deg, rgba(180,190,254,1) 0%, rgba(137,220,235,1) 32%, rgba(137,180,250,1) 72%, rgba(166,227,161,1) 100%);  */
     background-size: 300% 300%;
@@ -272,6 +296,10 @@ label:focus {
 }
 
 #memory {
+    margin-right: 1px;
+    margin-left: 1px;
+    padding-top: 3px;
+    padding-bottom: 3px;
     background-color: #cba6f7;
     color: 	#55406e;
     font-weight: bolder;
@@ -283,84 +311,145 @@ label:focus {
 }
 
 #backlight {
+    margin-right: 1px;
+    margin-left: 1px;
+    padding-top: 3px;
+    padding-bottom: 3px;
     color: #090427;
 }
 
 #network{
+    margin-right: 1px;
+    margin-left: 1px;
+    padding-top: 3px;
+    padding-bottom: 3px;
     color:#000;
 }
 
 #network.disabled{
+    margin-right: 1px;
+    margin-left: 1px;
+    padding-top: 3px;
+    padding-bottom: 3px;
     background-color: #45475a;
 }
 
 #network.disconnected{
+    margin-right: 1px;
+    margin-left: 1px;
+    padding-top: 3px;
+    padding-bottom: 3px;
     background: rgb(243,139,168);
     background: linear-gradient(45deg, rgba(243,139,168,1) 0%, rgba(250,179,135,1) 100%); 
     color: #fff;
     font-weight: bolder;
-    padding-top: 3px;
     padding-right: 11px;
 }
 
 #network.linked, #network.wifi{
+    margin-right: 1px;
+    margin-left: 1px;
+    padding-top: 3px;
+    padding-bottom: 3px;
     background-color: #a6e3a1 ;
 }
 
 #network.ethernet{
+    margin-right: 1px;
+    margin-left: 1px;
+    padding-top: 3px;
+    padding-bottom: 3px;
     background-color:#f9e2af ;
 }
 
 
 #pulseaudio {
+    margin-right: 1px;
+    margin-left: 1px;
+    padding-top: 3px;
+    padding-bottom: 3px;
     background-color:  	#fab387;
     color: #734a31;
 }
 
 #pulseaudio.muted {
+    margin-right: 1px;
+    margin-left: 1px;
+    padding-top: 3px;
+    padding-bottom: 3px;
     background-color: #9f7154;
 }
 
 #custom-media {
+    margin-right: 1px;
+    margin-left: 1px;
     color: #66cc99;
 }
 
 #custom-media.custom-spotify {
+    margin-right: 1px;
+    margin-left: 1px;
     background-color: #66cc99;
 }
 
 #custom-media.custom-vlc {
+    margin-right: 1px;
+    margin-left: 1px;
     background-color: #ffa000;
 }
 
 #temperature {
+    margin-right: 1px;
+    margin-left: 1px;
+    padding-top: 3px;
+    padding-bottom: 3px;
     background-color: #f9e2af;
     color:#96804e;
 }
 
 #temperature.critical {
+    margin-right: 1px;
+    margin-left: 1px;
+    padding-top: 3px;
+    padding-bottom: 3px;
     background-color: #ce91a0 ;
     color:#50393f;
 }
 
 #tray {
+    margin-right: 1px;
+    margin-left: 1px;
+    padding-top: 3px;
+    padding-bottom: 3px;
     background-color: #96d5dd;
 }
 
 #tray > .passive {
+    margin-right: 1px;
+    margin-left: 1px;
+    padding-top: 3px;
+    padding-bottom: 3px;
     -gtk-icon-effect: dim;
 }
 
 #tray > .needs-attention {
+    margin-right: 1px;
+    margin-left: 1px;
+    padding-top: 3px;
+    padding-bottom: 3px;
     -gtk-icon-effect: highlight;
     background-color: #eb4d4b;
 }
 
 #idle_inhibitor {
+    margin-right: 1px;
+    margin-left: 1px;
     background-color: #2d3436;
 }
 
 #idle_inhibitor.activated {
+    margin-right: 1px;
+    margin-left: 1px;
     background-color: #ecf0f1;
     color: #2d3436;
 }

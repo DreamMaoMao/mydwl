@@ -33,6 +33,7 @@ https://github.com/DreamMaoMao/superdwl/assets/30348075/687afa31-feda-4de7-8128-
 - 增加config.h可配置新窗口是从头部入栈还是从尾部入栈
 - 增加鼠标扩展监控支持,修复原版dwl不支持在xwayland窗口移动鼠标的同时使用滚轮
 - 添加网格布局为常规可切换布局
+- foreign-toplevel协议支持,支持dunst和waybar的taskbar模块
 
 # 运行需要的相关工具包
 ```

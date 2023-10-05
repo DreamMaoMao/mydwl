@@ -6,8 +6,8 @@
 
     "margin-bottom":-11,
     "modules-left": ["dwl/tags","wlr/taskbar"],
-    "modules-right": ["tray","backlight","disk","temperature","network","battery","memory","pulseaudio","cpu","clock"],
-    "wlr/tags": {
+    "modules-right": ["tray","network","cpu","temperature","memory","clock","pulseaudio","backlight","battery"],
+    "dwl/tags": {
         "num-tags":9
     },
     "wlr/taskbar": {
@@ -78,7 +78,7 @@
     "memory": {
         "interval":2,
         "format": "{}% 󰍛",
-        "on-click":"/usr/bin/rofi -config ~/.config/rofi/all.rasi -show drun",
+        "on-click":"GDK_BACKEND=x11 nemo",
         "on-click-right":"clipman pick -t rofi"
     },
     "temperature": {

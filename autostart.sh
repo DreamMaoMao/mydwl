@@ -1,11 +1,16 @@
 #! /bin/bash
 # DWL自启动脚本 仅作参考
 
+pkill xdg
+
 systemctl --user unmask xdg-desktop-portal-hyprland
 systemctl --user mask xdg-desktop-portal-gnome
 
 dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
 /usr/libexec/xdg-desktop-portal-hyprland &
+
+#mako &
+dunst -config ~/.config/dunst/dwl_dunstrc &
 wlsunset -T 3501 -t 3500 &
 swaybg -i $DWL/wallpaper/caoyuan.jpg & # 壁纸
 waybar -c $DWL/waybar/config -s $DWL/waybar/style.css &
@@ -18,7 +23,8 @@ systemctl --user mask xdg-desktop-portal-gnome
 systemctl --user mask xdg-desktop-portal-hyprland
 # /usr/libexec/xdg-desktop-portal &
 
-mako & # 开启通知server
+# mako & # 开启通知server
+
 wl-clip-persist --clipboard regular &
 wl-paste -t text --watch clipman store --no-persist &
 blueman-applet &

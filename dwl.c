@@ -152,6 +152,12 @@ typedef struct {
   	    fullscreen_backup_h;
 	int overview_isfullscreenbak,overview_isfakefullscreenbak,overview_isrealfullscreenbak,overview_isfloatingbak;
 	uint32_t resize; /* configure serial of a pending resize */
+
+	struct wl_listener foreign_activate_request;
+	struct wl_listener foreign_fullscreen_request;
+	struct wl_listener foreign_close_request;
+	struct wl_listener foreign_destroy;
+
 } Client;
 
 typedef struct {
@@ -484,11 +490,6 @@ static struct wl_listener request_start_drag = {.notify = requeststartdrag};
 static struct wl_listener start_drag = {.notify = startdrag};
 static struct wl_listener session_lock_create_lock = {.notify = locksession};
 static struct wl_listener session_lock_mgr_destroy = {.notify = destroysessionmgr};
-
-static struct wl_listener foreign_activate_request = {.notify = handle_foreign_activate_request};
-static struct wl_listener foreign_fullscreen_request = {.notify = handle_foreign_fullscreen_request};
-static struct wl_listener foreign_close_request = {.notify = handle_foreign_close_request};
-static struct wl_listener foreign_destroy = {.notify = handle_foreign_destroy};
 
 #ifdef XWAYLAND
 static void activatex11(struct wl_listener *listener, void *data);
@@ -1661,7 +1662,7 @@ void dwl_ipc_output_printstatus_to(DwlIpcOutput *ipc_output) {
     appid = focused ? client_get_appid(focused) : "";
 
     zdwl_ipc_output_v2_send_layout(ipc_output->resource, monitor->lt[monitor->sellt] - layouts);
-    zdwl_ipc_output_v2_send_title(ipc_output->resource, title ? title : broken); //就是这里让waybar无法获取到了窗口
+    zdwl_ipc_output_v2_send_title(ipc_output->resource, title ? title : broken); 
     zdwl_ipc_output_v2_send_appid(ipc_output->resource, appid ? appid : broken);
     zdwl_ipc_output_v2_send_layout_symbol(ipc_output->resource, monitor->lt[monitor->sellt]->symbol);
     zdwl_ipc_output_v2_send_frame(ipc_output->resource);
@@ -2191,14 +2192,14 @@ mapnotify(struct wl_listener *listener, void *data)
 	printstatus();
 
 	c->foreign_toplevel = wlr_foreign_toplevel_handle_v1_create(foreign_toplevel_manager);
-	wl_signal_add(&(c->foreign_toplevel->events.request_activate),
-			&foreign_activate_request);
-	wl_signal_add(&(c->foreign_toplevel->events.request_fullscreen),
-			&foreign_fullscreen_request);
-	wl_signal_add(&(c->foreign_toplevel->events.request_close),
-			&foreign_close_request);
-	wl_signal_add(&(c->foreign_toplevel->events.destroy),
-			&foreign_destroy);
+	LISTEN(&(c->foreign_toplevel->events.request_activate),
+			&c->foreign_activate_request,handle_foreign_activate_request);
+	LISTEN(&(c->foreign_toplevel->events.request_fullscreen),
+			&c->foreign_fullscreen_request,handle_foreign_fullscreen_request);
+	LISTEN(&(c->foreign_toplevel->events.request_close),
+			&c->foreign_close_request,handle_foreign_close_request);
+	LISTEN(&(c->foreign_toplevel->events.destroy),
+			&c->foreign_destroy,handle_foreign_destroy);
 
 	const char *appid;
     appid = client_get_appid(c) ;
@@ -2914,9 +2915,20 @@ setsel(struct wl_listener *listener, void *data)
 
 
 void
-handle_foreign_activate_request(
-		struct wl_listener *listener, void *data) {
-	return;
+handle_foreign_activate_request(struct wl_listener *listener, void *data) {
+	Client *c = wl_container_of(listener, c, foreign_activate_request);
+	unsigned int target,i,tag=0;
+	if((1<<(selmon->pertag->curtag - 1)) & c->tags ){
+		focusclient(c,1);
+	}else {
+		for(i=0;!(tag & 1);i++){
+			tag = c->tags >> i;
+		}
+		target = 1 << (i-1);
+		view(&(Arg){.ui = target});
+		focusclient(c,1);
+	}
+	
 }
 
 void
@@ -2926,14 +2938,13 @@ handle_foreign_fullscreen_request(
 }
 
 void
-handle_foreign_close_request(
-		struct wl_listener *listener, void *data) {
-	return;
+handle_foreign_close_request(struct wl_listener *listener, void *data) {
+	Client *c = wl_container_of(listener, c, foreign_close_request);
+	client_send_close(c);
 }
 
 void
-handle_foreign_destroy(
-		struct wl_listener *listener, void *data) {
+handle_foreign_destroy(struct wl_listener *listener, void *data) {
 	return;
 }
 
