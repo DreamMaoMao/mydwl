@@ -179,8 +179,8 @@ static const Key keys[] = {
     { WLR_MODIFIER_ALT,                  XKB_KEY_Up,           focusdir,         {.i = UP } },              /* alt up             |  本tag内切换聚焦窗口 */
     { WLR_MODIFIER_ALT,                  XKB_KEY_Down,         focusdir,         {.i = DOWN } },    
 
-	{ MODKEY,                    XKB_KEY_i,          incnmaster,     {.i = +1} },
-	{ MODKEY,                    XKB_KEY_n,          incnmaster,     {.i = -1} },
+	{ WLR_MODIFIER_LOGO,                    XKB_KEY_e,          incnmaster,     {.i = +1} },
+	{ WLR_MODIFIER_LOGO,                    XKB_KEY_i,          incnmaster,     {.i = -1} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_H,          setmfact,       {.f = -0.05} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_L,          setmfact,       {.f = +0.05} },
 	{ MODKEY,                    XKB_KEY_s,          zoom,           {0} },

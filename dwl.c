@@ -3571,8 +3571,8 @@ unmapnotify(struct wl_listener *listener, void *data)
 {
 	/* Called when the surface is unmapped, and should no longer be shown. */
 	Client *c = wl_container_of(listener, c, unmap);
-	if(c->isfullscreen || c->isrealfullscreen || c->isrealfullscreen || c->overview_isfullscreenbak || c->overview_isfakefullscreenbak || c->overview_isrealfullscreenbak)
-		clear_tag_fullscreen_flag(c);
+	if(c->isfullscreen || c->isfakefullscreen || c->isrealfullscreen || c->overview_isfullscreenbak || c->overview_isfakefullscreenbak || c->overview_isrealfullscreenbak)
+	clear_tag_fullscreen_flag(c);
 	if (c == grabc) {
 		cursor_mode = CurNormal;
 		grabc = NULL;
