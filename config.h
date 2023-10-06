@@ -48,21 +48,21 @@ static const char *tags[] = {
 };
 
 static const Rule rules[] = {
-	/* app_id     title       tags mask     isfloating   monitor */
+	/* app_id     title       tags mask     isfloating   monitor  width height */
 	/* examples:
-	{ "Gimp",     NULL,       0,            1,           -1 },
+	{ "Gimp",     NULL,       0,            1,           -1,800,600 },
 	*/
-	{ "Google-chrome",  NULL,       1 << 3,       0,           -1 },
-	{ "Microsoft-edge-dev",  NULL,       1 << 4,       0,           -1 },
-	{ "Clash for Windows",  NULL,       0,       1,           -1 },
-	{ "electron-netease-cloud-music",  NULL,       0,       1,           -1 },
-	{ NULL,  "图片查看器",       0,       1,           -1 },
-	{ NULL,  "图片查看",       0,       1,           -1 },
-	{ "blueman-manager",  NULL,       0,       1,           -1 },
-	{ "flameshot",  NULL,       0,       1,           -1 },
-	{ "com.xunlei.download",  NULL,       0,       1,           -1 },
-	{ "pavucontrol",  NULL,       0,       1,           -1 },
-	{ "baidunetdisk",  NULL,       0,       1,           -1 },
+	{ "Google-chrome",  NULL,       1 << 3,       0,           -1 ,0,0},
+	{ "Microsoft-edge-dev",  NULL,       1 << 4,       0,           -1 ,0,0},
+	{ "Clash for Windows",  NULL,       0,       1,           -1 ,1400,800},
+	{ "electron-netease-cloud-music",  NULL,       0,       1,           -1 ,1200,800},
+	{ NULL,  "图片查看器",       0,       1,           -1 ,0,0},
+	{ NULL,  "图片查看",       0,       1,           -1 ,0,0},
+	{ "blueman-manager",  NULL,       0,       1,           -1 ,0,0},
+	{ "flameshot",  NULL,       0,       1,           -1 ,0,0},
+	{ "com.xunlei.download",  NULL,       0,       1,           -1 ,0,0},
+	{ "pavucontrol",  NULL,       0,       1,           -1 ,0,0},
+	{ "baidunetdisk",  NULL,       0,       1,           -1 ,0,0},
 
 
 };

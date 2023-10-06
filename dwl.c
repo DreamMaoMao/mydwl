@@ -158,6 +158,8 @@ typedef struct {
 	struct wl_listener foreign_close_request;
 	struct wl_listener foreign_destroy;
 
+	unsigned int set_rule_size;
+
 } Client;
 
 typedef struct {
@@ -249,6 +251,8 @@ typedef struct {
 	unsigned int tags;
 	int isfloating;
 	int monitor;
+	unsigned int width;
+	unsigned int height;
 } Rule;
 
 typedef struct {
@@ -412,7 +416,8 @@ static void handle_foreign_fullscreen_request(struct wl_listener *listener, void
 static void handle_foreign_close_request(struct wl_listener *listener, void *data);
 static void handle_foreign_destroy(struct wl_listener *listener, void *data);
 
-
+static struct wlr_box setclient_coordinate_center(struct wlr_box geom);
+static unsigned int get_tags_first_tag(unsigned int tags);
 /* variables */
 static const char broken[] = "broken";
 static const char *cursor_image = "left_ptr";
@@ -529,7 +534,7 @@ static size_t autostart_len;
 void
 applybounds(Client *c, struct wlr_box *bbox)
 {
-	if (!c->isfloating) { //只设置悬浮窗口
+	if (!c->isfloating || c->set_rule_size) { //只设置悬浮窗口或者没有规则限制的窗口
 		return;
 	}
 	struct wlr_box min = {0}, max = {0};
@@ -570,6 +575,17 @@ void toggle_hotarea(int x_root, int y_root) {
               y_root > (selmon->m.y + selmon->m.height))) {
     selmon->is_in_hotarea = 0;
   }
+}
+
+struct wlr_box
+setclient_coordinate_center(struct wlr_box geom){
+	struct wlr_box tempbox;
+	tempbox.x = selmon->w.x + (selmon->w.width - geom.width) / 2;
+	tempbox.y = selmon->w.y + (selmon->w.height - geom.height) / 2;
+	tempbox.width = geom.width;
+	tempbox.height = geom.height;
+	return tempbox;
+
 }
 
 /* function implementations */
@@ -633,16 +649,27 @@ applyrules(Client *c)
 	for (r = rules; r < END(rules); r++) {
 		if ((!r->title || strstr(title, r->title))
 				&& (!r->id || strstr(appid, r->id))) {
+
 			c->isfloating = r->isfloating;
 			newtags |= r->tags;
 			i = 0;
+
 			wl_list_for_each(m, &mons, link)
 				if (r->monitor == i++)
 					mon = m;
+
+			if(c->isfloating && r->width != 0 && r->height != 0){
+				c->geom.width = r->width;
+				c->geom.height =  r->height;
+				//重新计算居中的坐标
+				c->geom = setclient_coordinate_center(c->geom);
+				c->set_rule_size = 1;
+			}
 		}
 	}
 	wlr_scene_node_reparent(&c->scene->node, layers[c->isfloating ? LyrFloat : LyrTile]);
 	setmon(c, mon, newtags);
+	resize(c,c->geom,0);
 	if(!(c->tags & ( 1 << (selmon->pertag->curtag - 1) ))){
 		view(&(Arg){.ui = c->tags});
 	}
@@ -2154,11 +2181,13 @@ mapnotify(struct wl_listener *listener, void *data)
 	c->isrealfullscreen = 0;	
 	c->oldgeom.width = 800;
 	c->oldgeom.height = 600;
-	c->oldgeom.x = selmon->w.x + (selmon->w.width - c->oldgeom.width) / 2;
-	c->oldgeom.y = selmon->w.y + (selmon->w.height - c->oldgeom.height) / 2;
-	c->geom.x = selmon->w.x + (selmon->w.width - c->geom.width) / 2;
-	c->geom.y = selmon->w.y + (selmon->w.height - c->geom.height) / 2; 
+
+	//根据宽高让坐标屏幕居中
+	c->oldgeom = setclient_coordinate_center(c->oldgeom);
+	c->geom = setclient_coordinate_center(c->geom);
+
 	selmon->sel = c;
+	c->set_rule_size = 0;
 
 	if (new_is_master)
 		// tile at the top
@@ -2179,7 +2208,7 @@ mapnotify(struct wl_listener *listener, void *data)
 	 /* TODO: https://github.com/djpohly/dwl/pull/334#issuecomment-1330166324 */
 	if (c->type == XDGShell && (p = client_get_parent(c))) {
 		c->isfloating = 1;
-		wlr_scene_node_reparent(&c->scene->node, layers[LyrFloat]);
+		wlr_scene_node_reparent(&c->scene->node, layers[LyrFloat]); //设置登录框浮动
 		setmon(c, p->mon, p->tags);
 	} else {
 		applyrules(c);
@@ -2912,18 +2941,26 @@ setsel(struct wl_listener *listener, void *data)
 	wlr_seat_set_selection(seat, event->source, event->serial);
 }
 
+//获取tags中最坐标的tag的tagmask
+unsigned int
+get_tags_first_tag(unsigned int tags){
+	unsigned int i,target,tag;
+	tag = 0;
+	for(i=0;!(tag & 1);i++){
+		tag = tags >> i;
+	}
+	target = 1 << (i-1);	
+	return target;
+}
 
 void
 handle_foreign_activate_request(struct wl_listener *listener, void *data) {
 	Client *c = wl_container_of(listener, c, foreign_activate_request);
-	unsigned int target,i,tag=0;
+	unsigned int target;
 	if(c && (1<<(selmon->pertag->curtag - 1)) & c->tags ){
 		focusclient(c,1);
 	}else if(c && !((1<<(selmon->pertag->curtag - 1)) & c->tags)) {
-		for(i=0;!(tag & 1);i++){
-			tag = c->tags >> i;
-		}
-		target = 1 << (i-1);
+		target = get_tags_first_tag(c->tags); 
 		view(&(Arg){.ui = target});
 		focusclient(c,1);
 	}
@@ -3347,15 +3384,11 @@ void toggleoverview(const Arg *arg) {
 
 	Client *c;
 	selmon->isoverview ^= 1;
-	unsigned int target,i;
-	unsigned int tag = 0 ;
+	unsigned int target;
 	if(selmon->isoverview){
 		target = ~0;
   	}else if(!selmon->isoverview && selmon->sel) {
-		for(i=0;!(tag & 1);i++){
-			tag = selmon->sel->tags >> i;
-		}
-		target = 1 << (i-1);
+		target = get_tags_first_tag(selmon->sel->tags);
   	} else if (!selmon->isoverview && !selmon->sel) {
 		target = (1 << (selmon->pertag->prevtag-1));
 		view(&(Arg){.ui = target});
