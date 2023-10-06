@@ -667,6 +667,14 @@ applyrules(Client *c)
 			}
 		}
 	}
+	
+  	Client *fc;
+  	// 如果当前的tag中有新创建的非悬浮窗口,就让当前tag中的全屏窗口退出全屏参与平铺
+  	fc = selmon->pertag->fullscreen_client[selmon->pertag->curtag];
+  	if (fc && !c->isfloating ) {
+  	  clear_fullscreen_flag(fc);
+  	}
+
 	wlr_scene_node_reparent(&c->scene->node, layers[c->isfloating ? LyrFloat : LyrTile]);
 	setmon(c, mon, newtags);
 	resize(c,c->geom,0);
@@ -2179,8 +2187,8 @@ mapnotify(struct wl_listener *listener, void *data)
 	c->bw = borderpx;
 	c->isfakefullscreen = 0;
 	c->isrealfullscreen = 0;	
-	c->oldgeom.width = 800;
-	c->oldgeom.height = 600;
+	c->oldgeom.width = 1200;
+	c->oldgeom.height = 800;
 
 	//根据宽高让坐标屏幕居中
 	c->oldgeom = setclient_coordinate_center(c->oldgeom);
@@ -2209,13 +2217,6 @@ mapnotify(struct wl_listener *listener, void *data)
 		applyrules(c);
 	}
 	printstatus();
-
-  	Client *fc;
-  	// 如果当前的tag中有新创建的非悬浮窗口,就让当前tag中的全屏窗口退出全屏参与平铺
-  	fc = selmon->pertag->fullscreen_client[selmon->pertag->curtag];
-  	if (fc && !c->isfloating) {
-  	  clear_fullscreen_flag(fc);
-  	}
 	
 	//创建外部顶层窗口的句柄,每一个顶层窗口都有一个
 	c->foreign_toplevel = wlr_foreign_toplevel_handle_v1_create(foreign_toplevel_manager);
