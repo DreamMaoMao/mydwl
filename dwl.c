@@ -2490,7 +2490,7 @@ pointerfocus(Client *c, struct wlr_surface *surface, double sx, double sy,
 	struct timespec now;
 	int internal_call = !time;
 
-	if (sloppyfocus && !internal_call && c && !client_is_unmanaged(c))
+	if (sloppyfocus && !internal_call && c && !client_is_unmanaged(c) && c != selmon->sel)
 		focusclient(c, 1);
 
 	/* If surface is NULL, clear pointer focus */
@@ -2507,9 +2507,10 @@ pointerfocus(Client *c, struct wlr_surface *surface, double sx, double sy,
 	/* Let the client know that the mouse cursor has entered one
 	 * of its surfaces, and make keyboard focus follow if desired.
 	 * wlroots makes this a no-op if surface is already focused */
+
 	wlr_seat_pointer_notify_enter(seat, surface, sx, sy);
-	// wlr_seat_pointer_send_motion(seat, time, sx, sy); //这个造成了鼠标移动的时候滚轮不起作用
-	wlr_seat_pointer_notify_motion(seat, time, sx, sy); //这个造成了鼠标移动的时候滚轮不起作用
+
+	wlr_seat_pointer_notify_motion(seat, time, sx, sy); 
 
 	
 }
