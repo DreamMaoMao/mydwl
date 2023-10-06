@@ -1779,9 +1779,6 @@ focusclient(Client *c, int lift)
 	if (locked)
 		return;
 
-	if(c && selmon->sel != c){
-		selmon->sel  = c;
-	}
 
 	/* Warp cursor to center of client if it is outside */
 	if (warpcursor && c)
@@ -1804,6 +1801,9 @@ focusclient(Client *c, int lift)
 
 		/* Don't change border color if there is an exclusive focus or we are
 		 * handling a drag operation */
+		if(c && selmon->sel != c){
+			selmon->sel  = c;
+		}
 		setborder_color(c);
 	}
 
@@ -1832,6 +1832,7 @@ focusclient(Client *c, int lift)
 
 	if (!c) {
 		/* With no client, all we have left is to clear focus */
+		selmon->sel  = NULL;
 		wlr_seat_keyboard_notify_clear_focus(seat);
 		return;
 	}
@@ -2193,8 +2194,6 @@ mapnotify(struct wl_listener *listener, void *data)
 	//根据宽高让坐标屏幕居中
 	c->oldgeom = setclient_coordinate_center(c->oldgeom);
 	c->geom = setclient_coordinate_center(c->geom);
-
-	selmon->sel = c;
 	c->set_rule_size = 0;
 
 	if (new_is_master)
@@ -3407,7 +3406,7 @@ void toggleoverview(const Arg *arg) {
 		view(&(Arg){.ui = target});
 		return;
   	}
-   
+
   	// 正常视图到overview,退出所有窗口的浮动和全屏状态参与平铺,
   	// overview到正常视图,还原之前退出的浮动和全屏窗口状态
   	if (selmon->isoverview) {
@@ -3421,7 +3420,9 @@ void toggleoverview(const Arg *arg) {
   	    		overview_restore(c, &(Arg){.ui = target});
 		}
   	}
+
   	view(&(Arg){.ui = target});
+
 }
 
 void
