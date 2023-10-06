@@ -53,6 +53,7 @@ static const Rule rules[] = {
 	{ "Gimp",     NULL,       0,            1,           -1 },
 	*/
 	{ "Google-chrome",  NULL,       1 << 3,       0,           -1 },
+	{ "Microsoft-edge-dev",  NULL,       1 << 4,       0,           -1 },
 	{ "Clash for Windows",  NULL,       0,       1,           -1 },
 	{ "electron-netease-cloud-music",  NULL,       0,       1,           -1 },
 	{ NULL,  "图片查看器",       0,       1,           -1 },
@@ -155,15 +156,14 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 /* commands */
 static const char *termcmd[] = { "konsole", NULL };
 static const char *menucmd[] = { "wofi", NULL };
-static const char *webcmd[] = { "google-chrome", NULL };
 
 static const Key keys[] = {
 	/* Note that Shift changes certain key codes: c -> C, 2 -> at, etc. */
 	/* modifier                  key                 function        argument */
 	{ MODKEY,					 XKB_KEY_space,      spawn,          {.v = menucmd } },
 	{ MODKEY, 					 XKB_KEY_Return,     spawn,          {.v = termcmd } },
-    { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_W,          spawn,          {.v = webcmd } },
     { WLR_MODIFIER_LOGO,         XKB_KEY_Return, 		 spawn, SHCMD("google-chrome") },
+    { WLR_MODIFIER_LOGO,         XKB_KEY_space, 		 spawn, SHCMD("microsoft-edge") },
 	{ WLR_MODIFIER_CTRL,         XKB_KEY_Return,          spawn, SHCMD("bash ~/tool/clash.sh") }, 
     { WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO,         XKB_KEY_Return, 		 spawn, SHCMD("konsole -e /usr/local/bin/yazi") },  
     { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,         XKB_KEY_a, 		 spawn, SHCMD("grim -g \"$(slurp)\" - | swappy -f -") }, 

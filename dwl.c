@@ -2947,6 +2947,10 @@ void
 handle_foreign_destroy(struct wl_listener *listener, void *data) {
 	Client *c = wl_container_of(listener, c, foreign_destroy);
 	if(c){
+		wl_list_remove(&c->foreign_activate_request.link);
+		wl_list_remove(&c->foreign_fullscreen_request.link);
+		wl_list_remove(&c->foreign_close_request.link);
+		wl_list_remove(&c->foreign_destroy.link);
 		client_send_close(c);
 	}
 }
@@ -3341,36 +3345,37 @@ void overview_restore(Client *c, const Arg *arg) {
 // 显示所有tag 或 跳转到聚焦窗口的tag
 void toggleoverview(const Arg *arg) {
 
-  	// unsigned int target = selmon->sel && selmon->sel->tags != TAGMASK ? selmon->sel->tags
-    //                                                         : selmon->seltags;
- 
-
-  selmon->isoverview ^= 1;
-  unsigned int target,i;
-  unsigned int tag = 0 ;
-  if(selmon->isoverview){
-	target = ~0;
-  }else if(!selmon->isoverview && selmon->sel) {
-	for(i=0;!(tag & 1);i++){
-		tag = selmon->sel->tags >> i;
-	}
-	target = 1 << (i-1);
-  } else if (!selmon->isoverview && !selmon->sel) {
-	target = (1 << (selmon->pertag->prevtag-1));
-	view(&(Arg){.ui = target});
-	return;
-  }
-  Client *c;
-  // 正常视图到overview,退出所有窗口的浮动和全屏状态参与平铺,
-  // overview到正常视图,还原之前退出的浮动和全屏窗口状态
-  if (selmon->isoverview) {
-    wl_list_for_each(c, &clients, link)
-      overview_backup(c);
-  } else {
-	wl_list_for_each(c, &clients, link)
-      overview_restore(c, &(Arg){.ui = target});
-  }
-  view(&(Arg){.ui = target});
+	Client *c;
+	selmon->isoverview ^= 1;
+	unsigned int target,i;
+	unsigned int tag = 0 ;
+	if(selmon->isoverview){
+		target = ~0;
+  	}else if(!selmon->isoverview && selmon->sel) {
+		for(i=0;!(tag & 1);i++){
+			tag = selmon->sel->tags >> i;
+		}
+		target = 1 << (i-1);
+  	} else if (!selmon->isoverview && !selmon->sel) {
+		target = (1 << (selmon->pertag->prevtag-1));
+		view(&(Arg){.ui = target});
+		return;
+  	}
+   
+  	// 正常视图到overview,退出所有窗口的浮动和全屏状态参与平铺,
+  	// overview到正常视图,还原之前退出的浮动和全屏窗口状态
+  	if (selmon->isoverview) {
+  	  	wl_list_for_each(c, &clients, link){
+	  		if(c)
+  	    		overview_backup(c);
+		}
+  	} else {
+		wl_list_for_each(c, &clients, link){
+			if(c)
+  	    		overview_restore(c, &(Arg){.ui = target});
+		}
+  	}
+  	view(&(Arg){.ui = target});
 }
 
 void
