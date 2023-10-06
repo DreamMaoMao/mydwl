@@ -2195,12 +2195,7 @@ mapnotify(struct wl_listener *listener, void *data)
 	else
 		wl_list_insert(clients.prev, &c->link); //尾部入栈
 	wl_list_insert(&fstack, &c->flink);
-  	Client *fc;
-  	// 如果当前的tag中有新创建的窗口,就让当前tag中的全屏窗口退出全屏参与平铺
-  	fc = selmon->pertag->fullscreen_client[selmon->pertag->curtag];
-  	if (fc) {
-  	  clear_fullscreen_flag(fc);
-  	}
+
 	/* Set initial monitor, tags, floating status, and focus:
 	 * we always consider floating, clients that have parent and thus
 	 * we set the same tags and monitor than its parent, if not
@@ -2215,8 +2210,17 @@ mapnotify(struct wl_listener *listener, void *data)
 	}
 	printstatus();
 
+  	Client *fc;
+  	// 如果当前的tag中有新创建的非悬浮窗口,就让当前tag中的全屏窗口退出全屏参与平铺
+  	fc = selmon->pertag->fullscreen_client[selmon->pertag->curtag];
+  	if (fc && !c->isfloating) {
+  	  clear_fullscreen_flag(fc);
+  	}
+	
+	//创建外部顶层窗口的句柄,每一个顶层窗口都有一个
 	c->foreign_toplevel = wlr_foreign_toplevel_handle_v1_create(foreign_toplevel_manager);
 
+	//监听来自外部对于窗口的事件请求
 	if(c->foreign_toplevel){
 		LISTEN(&(c->foreign_toplevel->events.request_activate),
 				&c->foreign_activate_request,handle_foreign_activate_request);
@@ -2226,17 +2230,17 @@ mapnotify(struct wl_listener *listener, void *data)
 				&c->foreign_close_request,handle_foreign_close_request);
 		LISTEN(&(c->foreign_toplevel->events.destroy),
 				&c->foreign_destroy,handle_foreign_destroy);
-
+		//设置外部顶层句柄的id为应用的id
 		const char *appid;
     	appid = client_get_appid(c) ;
 		if(appid)
 			wlr_foreign_toplevel_handle_v1_set_app_id(c->foreign_toplevel,appid);
-
+		//设置外部顶层句柄的title为应用的title
 		const char *title;
     	title = client_get_title(c) ;
 		if(title)
 			wlr_foreign_toplevel_handle_v1_set_title(c->foreign_toplevel,title);
-
+		//设置外部顶层句柄的显示监视器为当前监视器
 		wlr_foreign_toplevel_handle_v1_output_enter(
 				c->foreign_toplevel, selmon->wlr_output);
 	}
