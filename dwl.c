@@ -668,16 +668,16 @@ applyrules(Client *c)
 		}
 	}
 	
-  	Client *fc;
+	wlr_scene_node_reparent(&c->scene->node, layers[c->isfloating ? LyrFloat : LyrTile]);
+	Client *fc;
   	// 如果当前的tag中有新创建的非悬浮窗口,就让当前tag中的全屏窗口退出全屏参与平铺
   	fc = selmon->pertag->fullscreen_client[selmon->pertag->curtag];
   	if (fc && !c->isfloating ) {
-  	  clear_fullscreen_flag(fc);
+  	  	clear_fullscreen_flag(fc);
   	}
-
-	wlr_scene_node_reparent(&c->scene->node, layers[c->isfloating ? LyrFloat : LyrTile]);
 	setmon(c, mon, newtags);
 	resize(c,c->geom,0);
+
 	if(!(c->tags & ( 1 << (selmon->pertag->curtag - 1) ))){
 		view(&(Arg){.ui = c->tags});
 	}
@@ -2217,7 +2217,14 @@ mapnotify(struct wl_listener *listener, void *data)
 		applyrules(c);
 	}
 	printstatus();
-	
+
+	// Client *fc;
+  	// // 如果当前的tag中有新创建的非悬浮窗口,就让当前tag中的全屏窗口退出全屏参与平铺
+  	// fc = selmon->pertag->fullscreen_client[selmon->pertag->curtag];
+  	// if (fc && !c->isfloating ) {
+  	//   clear_fullscreen_flag(fc);
+  	// }
+
 	//创建外部顶层窗口的句柄,每一个顶层窗口都有一个
 	c->foreign_toplevel = wlr_foreign_toplevel_handle_v1_create(foreign_toplevel_manager);
 
@@ -2919,7 +2926,8 @@ setmon(Client *c, Monitor *m, unsigned int newtags)
 		resize(c, c->geom, 0);
 		wlr_surface_send_enter(client_surface(c), m->wlr_output);
 		c->tags = newtags ? newtags : m->tagset[m->seltags]; /* assign tags of target monitor */
-		setfullscreen(c, c->isfullscreen); /* This will call arrange(c->mon) */
+		arrange(c->mon);
+		// setfullscreen(c, c->isfullscreen); /* This will call arrange(c->mon) */
 	}
 	focusclient(focustop(selmon), 1);
 }
@@ -3562,7 +3570,8 @@ unmapnotify(struct wl_listener *listener, void *data)
 {
 	/* Called when the surface is unmapped, and should no longer be shown. */
 	Client *c = wl_container_of(listener, c, unmap);
-	clear_tag_fullscreen_flag(c);
+	if(c->isfullscreen || c->isrealfullscreen || c->isrealfullscreen || c->overview_isfullscreenbak || c->overview_isfakefullscreenbak || c->overview_isrealfullscreenbak)
+		clear_tag_fullscreen_flag(c);
 	if (c == grabc) {
 		cursor_mode = CurNormal;
 		grabc = NULL;
