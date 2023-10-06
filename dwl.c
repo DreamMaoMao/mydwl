@@ -3000,7 +3000,6 @@ handle_foreign_destroy(struct wl_listener *listener, void *data) {
 		wl_list_remove(&c->foreign_fullscreen_request.link);
 		wl_list_remove(&c->foreign_close_request.link);
 		wl_list_remove(&c->foreign_destroy.link);
-		client_send_close(c);
 	}
 }
 
