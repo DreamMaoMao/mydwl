@@ -2776,6 +2776,7 @@ setfakefullscreen(Client *c, int fakefullscreen)
 		fakefullscreen_box.y = c->mon->w.y + gappoh;
 		fakefullscreen_box.width = c->mon->w.width - 2 * gappov;
 		fakefullscreen_box.height = c->mon->w.height - 2 * gappov;
+		wlr_scene_node_raise_to_top(&c->scene->node); //将视图提升到顶层
 		resize(c, fakefullscreen_box, 0);
 		c->isfakefullscreen = 1;
 		c->isfloating = 0;
@@ -2808,6 +2809,7 @@ setrealfullscreen(Client *c, int realfullscreen)
 
 	if (realfullscreen) {
 		c->bw = 0;
+		wlr_scene_node_raise_to_top(&c->scene->node); //将视图提升到顶层
 		resize(c, c->mon->m, 0);
 		c->isrealfullscreen = 1;
 		c->isfloating = 0;
@@ -2865,6 +2867,7 @@ setfullscreen(Client *c, int realfullscreen) //用自定义全屏代理自带全
 
 	if (realfullscreen) {
 		c->bw = 0;
+		wlr_scene_node_raise_to_top(&c->scene->node); //将视图提升到顶层
 		resize(c, c->mon->m, 0);
 		c->isrealfullscreen = 1;
 		c->isfloating = 0;
