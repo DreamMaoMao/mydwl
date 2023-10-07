@@ -675,6 +675,13 @@ applyrules(Client *c)
   	if (fc && !c->isfloating ) {
   	  	clear_fullscreen_flag(fc);
   	}
+
+	//设置非悬浮客户端它当前处于平铺模式
+	if(c->isfloating){
+		client_set_tiled(c,false);
+	}else {
+		client_set_tiled(c,true);
+	}
 	setmon(c, mon, newtags);
 	resize(c,c->geom,0);
 
@@ -1082,9 +1089,10 @@ closemon(Monitor *m)
 	}
 
 	wl_list_for_each(c, &clients, link) {
-		if (c->isfloating && c->geom.x > m->m.width)
+		if (c->isfloating && c->geom.x > m->m.width){
 			resize(c, (struct wlr_box){.x = c->geom.x - m->w.width, .y = c->geom.y,
 				.width = c->geom.width, .height = c->geom.height}, 0);
+		}
 		if (c->mon == m)
 			setmon(c, selmon, c->tags);
 	}
@@ -1132,8 +1140,9 @@ commitnotify(struct wl_listener *listener, void *data)
 	client_get_geometry(c, &box);
 
 	if (c->mon && !wlr_box_empty(&box) && (box.width != c->geom.width - 2 * c->bw
-			|| box.height != c->geom.height - 2 * c->bw))
+			|| box.height != c->geom.height - 2 * c->bw)){
 		c->isfloating ? resize(c, c->geom, 1) : arrange(c->mon);
+	}
 
 	/* mark a pending resize as completed */
 	if (c->resize && c->resize <= c->surface.xdg->current.configure_serial)
@@ -2181,7 +2190,6 @@ mapnotify(struct wl_listener *listener, void *data)
 	}
 
 	/* Initialize client geometry with room for border */
-	client_set_tiled(c, WLR_EDGE_TOP | WLR_EDGE_BOTTOM | WLR_EDGE_LEFT | WLR_EDGE_RIGHT);
 	client_get_geometry(c, &c->geom);
 	c->geom.width += 2 * c->bw;
 	c->geom.height += 2 * c->bw;
@@ -2194,6 +2202,7 @@ mapnotify(struct wl_listener *listener, void *data)
 	//根据宽高让坐标屏幕居中
 	c->oldgeom = setclient_coordinate_center(c->oldgeom);
 	c->geom = setclient_coordinate_center(c->geom);
+	//初始化窗口规则是否有设置标识
 	c->set_rule_size = 0;
 
 	if (new_is_master)
@@ -2216,13 +2225,6 @@ mapnotify(struct wl_listener *listener, void *data)
 		applyrules(c);
 	}
 	printstatus();
-
-	// Client *fc;
-  	// // 如果当前的tag中有新创建的非悬浮窗口,就让当前tag中的全屏窗口退出全屏参与平铺
-  	// fc = selmon->pertag->fullscreen_client[selmon->pertag->curtag];
-  	// if (fc && !c->isfloating ) {
-  	//   clear_fullscreen_flag(fc);
-  	// }
 
 	//创建外部顶层窗口的句柄,每一个顶层窗口都有一个
 	c->foreign_toplevel = wlr_foreign_toplevel_handle_v1_create(foreign_toplevel_manager);
@@ -2299,6 +2301,7 @@ motionabsolute(struct wl_listener *listener, void *data)
 	wlr_cursor_warp_absolute(cursor, &event->pointer->base, event->x, event->y);
 	motionnotify(event->time_msec);
 }
+
 
 void
 motionnotify(uint32_t time)  //鼠标聚焦
@@ -2733,8 +2736,10 @@ setfloating(Client *c, int floating)
 {
 	c->isfloating = floating;
 	if(c->isfloating){
+		client_set_tiled(c,false);
 		resize(c,c->oldgeom,1);
 	}else{
+		client_set_tiled(c,true);
 		c->oldgeom = c->geom;
 	}
 	wlr_scene_node_reparent(&c->scene->node, layers[c->isfloating ? LyrFloat : LyrTile]);
@@ -2763,6 +2768,7 @@ setfakefullscreen(Client *c, int fakefullscreen)
 		resize(c, fakefullscreen_box, 0);
 		c->isfakefullscreen = 1;
 		c->isfloating = 0;
+		client_set_tiled(c,true);
 		set_tag_fullscreen_flag(c);
 	} else {
 		/* restore previous size instead of arrange for floating windows since
@@ -2794,6 +2800,7 @@ setrealfullscreen(Client *c, int realfullscreen)
 		resize(c, c->mon->m, 0);
 		c->isrealfullscreen = 1;
 		c->isfloating = 0;
+		client_set_tiled(c,true);
 		set_tag_fullscreen_flag(c);
 	} else {
 		/* restore previous size instead of arrange for floating windows since
@@ -2850,6 +2857,7 @@ setfullscreen(Client *c, int realfullscreen) //用自定义全屏代理自带全
 		resize(c, c->mon->m, 0);
 		c->isrealfullscreen = 1;
 		c->isfloating = 0;
+		client_set_tiled(c,true);
 		set_tag_fullscreen_flag(c);
 	} else {
 		/* restore previous size instead of arrange for floating windows since
@@ -3352,6 +3360,7 @@ void overview_backup(Client *c) {
   c->overview_backup_bw = c->bw;
   if (c->isfloating) {
     c->isfloating = 0;
+	client_set_tiled(c,true);
   }
   if (c->isfullscreen || c->isfakefullscreen ||c->isrealfullscreen ) {
     // if (c->bw == 0) { // 真全屏窗口清除x11全屏属性
@@ -3377,6 +3386,7 @@ void overview_restore(Client *c, const Arg *arg) {
   c->overview_isrealfullscreenbak = 0;
   c->bw = c->overview_backup_bw;
   if (c->isfloating) {
+	client_set_tiled(c,false);
     // XRaiseWindow(dpy, c->win); // 提升悬浮窗口到顶层
     resizeclient(c, c->overview_backup_x, c->overview_backup_y, c->overview_backup_w,
            c->overview_backup_h, 1);
@@ -4053,13 +4063,15 @@ activatex11(struct wl_listener *listener, void *data)
 void
 configurex11(struct wl_listener *listener, void *data)
 {
+
 	Client *c = wl_container_of(listener, c, configure);
 	struct wlr_xwayland_surface_configure_event *event = data;
 	if (!c->mon)
 		return;
-	if (c->isfloating || c->type == X11Unmanaged)
+	if (c->isfloating || c->type == X11Unmanaged){
 		resize(c, (struct wlr_box){.x = event->x, .y = event->y,
 				.width = event->width, .height = event->height}, 0);
+	}
 	else
 		arrange(c->mon);
 }
