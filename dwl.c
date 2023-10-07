@@ -2505,7 +2505,7 @@ pointerfocus(Client *c, struct wlr_surface *surface, double sx, double sy,
 	int internal_call = !time;
 
 	if (sloppyfocus && !internal_call && c && !client_is_unmanaged(c) && c != selmon->sel)
-		focusclient(c, 1);
+		focusclient(c, 0);
 
 	/* If surface is NULL, clear pointer focus */
 	if (!surface) {
