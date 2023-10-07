@@ -266,24 +266,24 @@ typedef struct {
 } SessionLock;
 
 /* function declarations */
-static void logtofile(const char *fmt, ...);
-static void lognumtofile(unsigned int num);
-static void applybounds(Client *c, struct wlr_box *bbox);
-static void applyrules(Client *c);
-static void arrange(Monitor *m);
-static void arrangelayer(Monitor *m, struct wl_list *list,
-		struct wlr_box *usable_area, int exclusive);
+static void logtofile(const char *fmt, ...); //日志函数
+static void lognumtofile(unsigned int num);  //日志函数
+static void applybounds(Client *c, struct wlr_box *bbox); //设置边界规则,能让一些窗口拥有比较适合的大小
+static void applyrules(Client *c); //窗口规则应用,应用config.h中定义的窗口规则
+static void arrange(Monitor *m); //布局函数,让窗口俺平铺规则移动和重置大小
+static void arrangelayer(Monitor *m, struct wl_list *list, 
+struct wlr_box *usable_area, int exclusive);
 static void arrangelayers(Monitor *m);
-static void autostartexec(void);
-static void axisnotify(struct wl_listener *listener, void *data);
-static void buttonpress(struct wl_listener *listener, void *data);
-static void chvt(const Arg *arg);
+static void autostartexec(void);  //自启动命令执行
+static void axisnotify(struct wl_listener *listener, void *data);  //滚轮事件处理
+static void buttonpress(struct wl_listener *listener, void *data); //鼠标按键事件处理
+static void chvt(const Arg *arg); 
 static void checkidleinhibitor(struct wlr_surface *exclude);
-static void cleanup(void);
-static void cleanupkeyboard(struct wl_listener *listener, void *data);
-static void cleanupmon(struct wl_listener *listener, void *data);
-static void closemon(Monitor *m);
-static void toggle_hotarea(int x_root, int y_root);
+static void cleanup(void);  //退出清理
+static void cleanupkeyboard(struct wl_listener *listener, void *data); //退出清理
+static void cleanupmon(struct wl_listener *listener, void *data); //退出清理
+static void closemon(Monitor *m); //退出清理
+static void toggle_hotarea(int x_root, int y_root); //触发热区
 static void commitlayersurfacenotify(struct wl_listener *listener, void *data);
 static void commitnotify(struct wl_listener *listener, void *data);
 static void createdecoration(struct wl_listener *listener, void *data);
@@ -3202,6 +3202,7 @@ setup(void)
 	struct wlr_xdg_foreign_registry *foreign_registry = wlr_xdg_foreign_registry_create(dpy);
 	wlr_xdg_foreign_v1_create(dpy, foreign_registry);
 	wlr_xdg_foreign_v2_create(dpy, foreign_registry);
+
 #ifdef XWAYLAND
 	/*
 	 * Initialise the XWayland X server.
