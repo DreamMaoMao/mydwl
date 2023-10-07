@@ -3,6 +3,10 @@
 
 
 
+https://github.com/DreamMaoMao/superdwl/assets/30348075/7dbae8e6-b1f9-43b2-a670-58d94f36a3af
+
+
+
 
 # dwl - dwm for Wayland(暂时还不支持动画)
 
