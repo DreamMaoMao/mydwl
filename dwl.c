@@ -3537,6 +3537,9 @@ void
 togglefakefullscreen(const Arg *arg)
 {
 	Client *sel = focustop(selmon);
+	if(!sel){
+		return;
+	}
 	if (sel->isfullscreen || sel->isfakefullscreen || sel->isrealfullscreen)
 		setfakefullscreen(sel, 0);
 	else
@@ -3548,6 +3551,9 @@ void
 togglerealfullscreen(const Arg *arg)
 {
 	Client *sel = focustop(selmon);
+	if(!sel){
+		return;
+	}
 	if (sel->isfullscreen || sel->isfakefullscreen || sel->isrealfullscreen)
 		setrealfullscreen(sel, 0);
 	else
@@ -3557,7 +3563,7 @@ togglerealfullscreen(const Arg *arg)
 void
 togglegaps(const Arg *arg)
 {
-	enablegaps = !enablegaps;
+	enablegaps ^= 1;
 	arrange(selmon);
 }
 
