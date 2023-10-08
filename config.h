@@ -87,7 +87,7 @@ static const MonitorRule monrules[] = {
 	{ "eDP-1",    0.5,  1,      2,    &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL },
 	*/
 	/* defaults */
-	{ NULL,       0.55, 1,      1,    &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL },
+	{ NULL,       0.55, 1,      1,    NULL, WL_OUTPUT_TRANSFORM_NORMAL },
 };
 
 /* keyboard */
@@ -162,55 +162,56 @@ static const char *menucmd[] = { "wofi", NULL };
 
 static const Key keys[] = {
 	/* Note that Shift changes certain key codes: c -> C, 2 -> at, etc. */
-	/* modifier                  key                 function        argument */
-	{ MODKEY,					 XKB_KEY_space,      spawn,          {.v = menucmd } },
-	{ MODKEY, 					 XKB_KEY_Return,     spawn,          {.v = termcmd } },
-    { WLR_MODIFIER_LOGO,         XKB_KEY_Return, 		 spawn, SHCMD("google-chrome") },
-    { WLR_MODIFIER_LOGO,         XKB_KEY_space, 		 spawn, SHCMD("microsoft-edge") },
-	{ WLR_MODIFIER_CTRL,         XKB_KEY_Return,          spawn, SHCMD("bash ~/tool/clash.sh") }, 
-    { WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO,         XKB_KEY_Return, 		 spawn, SHCMD("konsole -e /usr/local/bin/yazi") },  
-    { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,         XKB_KEY_a, 		 spawn, SHCMD("grim -g \"$(slurp)\" - | swappy -f -") }, 
-	{ WLR_MODIFIER_LOGO,         XKB_KEY_h,          spawn, SHCMD("bash ~/.config/hypr/scripts/hide_waybar.sh") }, 
-	{ WLR_MODIFIER_LOGO,         XKB_KEY_l,          spawn, SHCMD("swaylock -f -c 000000") }, 
+	/* modifier                  			key                 	function        			argument */
+	{ MODKEY,					 			XKB_KEY_space,      	spawn,          			{.v = menucmd } },
+	{ MODKEY, 					 			XKB_KEY_Return,     	spawn,          			{.v = termcmd } },
+    { WLR_MODIFIER_LOGO,         			XKB_KEY_Return, 		spawn, 						SHCMD("google-chrome") },
+    { WLR_MODIFIER_LOGO,         			XKB_KEY_space, 			spawn, 						SHCMD("microsoft-edge") },
+	{ WLR_MODIFIER_CTRL,         			XKB_KEY_Return,         spawn, 						SHCMD("bash ~/tool/clash.sh") }, 
+    { WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO,  XKB_KEY_Return, 		spawn, 						SHCMD("konsole -e /usr/local/bin/yazi") },  
+    { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,   XKB_KEY_a, 		 		spawn, 						SHCMD("grim -g \"$(slurp)\" - | swappy -f -") }, 
+	{ WLR_MODIFIER_LOGO,         			XKB_KEY_h,          	spawn, 						SHCMD("bash ~/.config/hypr/scripts/hide_waybar.sh") }, 
+	{ WLR_MODIFIER_LOGO,         			XKB_KEY_l,          	spawn, 						SHCMD("swaylock -f -c 000000") }, 
 
-	{ WLR_MODIFIER_LOGO,                    	XKB_KEY_Tab,          focusstack,     {.i = +1} },
-	{ WLR_MODIFIER_LOGO|WLR_MODIFIER_SHIFT,   	XKB_KEY_Tab,          focusstack,     {.i = -1} },
-  	{ WLR_MODIFIER_ALT,                  XKB_KEY_k,            focusdir,         {.i = UP } },              /* alt k              | 二维聚焦窗口 */
-  	{ WLR_MODIFIER_ALT,                  XKB_KEY_j,            focusdir,         {.i = DOWN } },            /* alt j              | 二维聚焦窗口 */
-  	{ WLR_MODIFIER_ALT,                  XKB_KEY_h,            focusdir,         {.i = LEFT } },            /* alt h              | 二维聚焦窗口 */
-  	{ WLR_MODIFIER_ALT,                  XKB_KEY_l,            focusdir,         {.i = RIGHT } },           /* alt l              | 二维聚焦窗口 */
-    { WLR_MODIFIER_ALT,                  XKB_KEY_Left,         focusdir,         {.i = LEFT } },            /* alt left           |  本tag内切换聚焦窗口 */
-    { WLR_MODIFIER_ALT,                  XKB_KEY_Right,        focusdir,         {.i = RIGHT } },           /* alt right          |  本tag内切换聚焦窗口 */
-    { WLR_MODIFIER_ALT,                  XKB_KEY_Up,           focusdir,         {.i = UP } },              /* alt up             |  本tag内切换聚焦窗口 */
-    { WLR_MODIFIER_ALT,                  XKB_KEY_Down,         focusdir,         {.i = DOWN } },    
+	{ WLR_MODIFIER_LOGO,                    XKB_KEY_Tab,          	focusstack,     			{.i = +1} },
+	{ WLR_MODIFIER_LOGO|WLR_MODIFIER_SHIFT, XKB_KEY_Tab,          	focusstack,     			{.i = -1} },
+  	{ WLR_MODIFIER_ALT,                  	XKB_KEY_k,            	focusdir,         			{.i = UP } },              /* alt k              | 二维聚焦窗口 */
+  	{ WLR_MODIFIER_ALT,                  	XKB_KEY_j,            	focusdir,         			{.i = DOWN } },            /* alt j              | 二维聚焦窗口 */
+  	{ WLR_MODIFIER_ALT,                  	XKB_KEY_h,            	focusdir,         			{.i = LEFT } },            /* alt h              | 二维聚焦窗口 */
+  	{ WLR_MODIFIER_ALT,                  	XKB_KEY_l,            	focusdir,         			{.i = RIGHT } },           /* alt l              | 二维聚焦窗口 */
+    { WLR_MODIFIER_ALT,                  	XKB_KEY_Left,         	focusdir,         			{.i = LEFT } },            /* alt left           |  本tag内切换聚焦窗口 */
+    { WLR_MODIFIER_ALT,                  	XKB_KEY_Right,        	focusdir,         			{.i = RIGHT } },           /* alt right          |  本tag内切换聚焦窗口 */
+    { WLR_MODIFIER_ALT,                  	XKB_KEY_Up,           	focusdir,         			{.i = UP } },              /* alt up             |  本tag内切换聚焦窗口 */
+    { WLR_MODIFIER_ALT,                  	XKB_KEY_Down,         	focusdir,         			{.i = DOWN } },    
 
-	{ WLR_MODIFIER_LOGO,                    XKB_KEY_e,          incnmaster,     {.i = +1} },
-	{ WLR_MODIFIER_LOGO,                    XKB_KEY_i,          incnmaster,     {.i = -1} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_H,          setmfact,       {.f = -0.05} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_L,          setmfact,       {.f = +0.05} },
-	{ MODKEY,                    XKB_KEY_s,          zoom,           {0} },
-	{ MODKEY,                    XKB_KEY_Tab,        toggleoverview,           {0} },
-	{ WLR_MODIFIER_LOGO,                    XKB_KEY_Left,        viewtoleft,           {0} },
-	{ WLR_MODIFIER_CTRL,                    XKB_KEY_Left,        viewtoleft_have_client,           {0} },
-	{ WLR_MODIFIER_LOGO,                    XKB_KEY_Right,        viewtoright,           {0} },
-	{ WLR_MODIFIER_CTRL,                    XKB_KEY_Right,        viewtoright_have_client,           {0} },
-    { WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO,    XKB_KEY_Left,         tagtoleft,        {0} },                     /* ctrl alt left      |  将本窗口移动到左边tag */
-    { WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO,    XKB_KEY_Right,        tagtoright,       {0} }, 
-	{ MODKEY,					 XKB_KEY_q,          killclient,     {0} },
-	{ MODKEY,                    XKB_KEY_t,          setlayout,      {.v = &layouts[0]} },
-	{ MODKEY,                    XKB_KEY_g,          setlayout,      {.v = &layouts[1]} },
-	{ WLR_MODIFIER_ALT, XKB_KEY_backslash,      togglefloating, {0} },
-	{ MODKEY,                    XKB_KEY_a,          togglefakefullscreen, {0} },
-	{ MODKEY,                    XKB_KEY_f,          togglerealfullscreen, {0} },
-	{ WLR_MODIFIER_CTRL,                    XKB_KEY_KP_0,          view,           {.ui = ~0} },
-	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO, XKB_KEY_KP_0, tag,            {.ui = ~0} },
-	{ MODKEY,                    XKB_KEY_comma,      focusmon,       {.i = WLR_DIRECTION_LEFT} },
-	{ MODKEY,                    XKB_KEY_period,     focusmon,       {.i = WLR_DIRECTION_RIGHT} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_less,       tagmon,         {.i = WLR_DIRECTION_LEFT} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_greater,    tagmon,         {.i = WLR_DIRECTION_RIGHT} },
-    { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_X,          incgaps,        {.i = +1 } },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Z,          incgaps,        {.i = -1 } },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_0,          togglegaps,     {0} },
+	{ WLR_MODIFIER_LOGO,                    XKB_KEY_e,          	incnmaster,     			{.i = +1} },
+	{ WLR_MODIFIER_LOGO,                    XKB_KEY_i,          	incnmaster,     			{.i = -1} },
+	{ WLR_MODIFIER_LOGO, 					XKB_KEY_comma,          setmfact,       			{.f = -0.05} },
+	{ WLR_MODIFIER_LOGO, 					XKB_KEY_period,         setmfact,       			{.f = +0.05} },
+	{ MODKEY,                    			XKB_KEY_s,          	zoom,           			{0} },
+	{ MODKEY,                    			XKB_KEY_Tab,        	toggleoverview,         	{0} },
+	{ WLR_MODIFIER_LOGO,                    XKB_KEY_Left,        	viewtoleft,           		{0} },
+	{ WLR_MODIFIER_CTRL,                    XKB_KEY_Left,        	viewtoleft_have_client, 	{0} },
+	{ WLR_MODIFIER_LOGO,                    XKB_KEY_Right,        	viewtoright,            	{0} },
+	{ WLR_MODIFIER_CTRL,                    XKB_KEY_Right,        	viewtoright_have_client,	{0} },
+    { WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO,  XKB_KEY_Left,         	tagtoleft,        			{0} },                     /* ctrl alt left      |  将本窗口移动到左边tag */
+    { WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO,  XKB_KEY_Right,        	tagtoright,       			{0} }, 
+	{ MODKEY,					 			XKB_KEY_q,          	killclient,     			{0} },
+	{ MODKEY,                    			XKB_KEY_t,          	setlayout,      			{.v = &layouts[0]} },
+	{ MODKEY,                    			XKB_KEY_g,          	setlayout,      			{.v = &layouts[1]} },
+	{ WLR_MODIFIER_LOGO,                    XKB_KEY_n,          	switch_layout,      		{0} },
+	{ WLR_MODIFIER_ALT, 					XKB_KEY_backslash,      togglefloating, 			{0} },
+	{ MODKEY,                    			XKB_KEY_a,          	togglefakefullscreen, 		{0} },
+	{ MODKEY,                    			XKB_KEY_f,          	togglerealfullscreen, 		{0} },
+	{ WLR_MODIFIER_CTRL,                    XKB_KEY_KP_0,          	view,           			{.ui = ~0} },
+	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO, 	XKB_KEY_KP_0, 			tag,            			{.ui = ~0} },
+	{ MODKEY,                    			XKB_KEY_comma,      	focusmon,       			{.i = WLR_DIRECTION_LEFT} },
+	{ MODKEY,                    			XKB_KEY_period,     	focusmon,       			{.i = WLR_DIRECTION_RIGHT} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, 			XKB_KEY_less,       	tagmon,         			{.i = WLR_DIRECTION_LEFT} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, 			XKB_KEY_greater,    	tagmon,         			{.i = WLR_DIRECTION_RIGHT} },
+    { MODKEY|WLR_MODIFIER_SHIFT, 			XKB_KEY_X,          	incgaps,        			{.i = +1 } },
+	{ MODKEY|WLR_MODIFIER_SHIFT, 			XKB_KEY_Z,          	incgaps,        			{.i = -1 } },
+	{ MODKEY|WLR_MODIFIER_SHIFT, 			XKB_KEY_0,          	togglegaps,     			{0} },
 	TAGKEYS(          XKB_KEY_KP_1, XKB_KEY_exclam,                     0),
 	TAGKEYS(          XKB_KEY_KP_2, XKB_KEY_at,                         1),
 	TAGKEYS(          XKB_KEY_KP_3, XKB_KEY_numbersign,                 2),
@@ -230,14 +231,14 @@ static const Key keys[] = {
 };
 
 static const Button buttons[] = {
-	{ WLR_MODIFIER_LOGO, BTN_LEFT,   moveresize,     {.ui = CurMove } },
-	{ 0, BTN_MIDDLE, togglefakefullscreen, {0} }, //中键触发假全屏
-	{ WLR_MODIFIER_LOGO, BTN_RIGHT,  moveresize,     {.ui = CurResize } },
-	{ 0, BTN_LEFT,  toggleoverview,     {0} },
-	{ 0, BTN_RIGHT,  killclient,     {0} },
+	{ WLR_MODIFIER_LOGO, 	BTN_LEFT,   	moveresize,     			{.ui = CurMove } },
+	{ 0, 					BTN_MIDDLE, 	togglefakefullscreen, 		{0} }, //中键触发假全屏
+	{ WLR_MODIFIER_LOGO, 	BTN_RIGHT,  	moveresize,     			{.ui = CurResize } },
+	{ 0, 					BTN_LEFT,  		toggleoverview,     		{0} },
+	{ 0, 					BTN_RIGHT,  	killclient,     			{0} },
 };
 
 static const Wheel wheels[] = {
-	{ WLR_MODIFIER_LOGO, WheelUp, viewtoleft_have_client, {0} }, //中键+super向前切换工作区
-	{ WLR_MODIFIER_LOGO, WheelDown, viewtoright_have_client, {0} }, //中键+super向后切换工作区
+	{ WLR_MODIFIER_LOGO, WheelUp, 	viewtoleft_have_client, 	{0} }, //中键+super向前切换工作区
+	{ WLR_MODIFIER_LOGO, WheelDown, viewtoright_have_client, 	{0} }, //中键+super向后切换工作区
 };

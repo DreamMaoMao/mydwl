@@ -364,6 +364,7 @@ static void setfakefullscreen(Client *c, int fakefullscreen);
 static void setrealfullscreen(Client *c, int realfullscreen);
 static void setgaps(int oh, int ov, int ih, int iv);
 static void setlayout(const Arg *arg);
+static void switch_layout(const Arg *arg);
 static void setmfact(const Arg *arg);
 static void setmon(Client *c, Monitor *m, unsigned int newtags);
 static void setpsel(struct wl_listener *listener, void *data);
@@ -1320,7 +1321,12 @@ createmon(struct wl_listener *listener, void *data)
 			m->nmaster = r->nmaster;
 			wlr_output_set_scale(wlr_output, r->scale);
 			wlr_xcursor_manager_load(cursor_mgr, r->scale);
-			m->lt[0] = m->lt[1] = r->lt;
+			if(r->lt)
+				m->lt[0] = m->lt[1] = r->lt;
+			else{
+				m->lt[0] = &layouts[0];
+				m->lt[1] = &layouts[1];
+			}
 			wlr_output_set_transform(wlr_output, r->rr);
 			break;
 		}
@@ -2912,6 +2918,20 @@ setlayout(const Arg *arg)
 		selmon->lt[selmon->sellt] = (Layout *)arg->v;
 		selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt] = (Layout *)arg->v;
 	}
+	/* TODO change layout symbol? */
+	arrange(selmon);
+	printstatus();
+}
+
+void
+switch_layout(const Arg *arg)
+{
+	if (!selmon)
+		return;
+	
+	selmon->sellt ^= 1;
+	selmon->pertag->sellts[selmon->pertag->curtag] = selmon->sellt;
+
 	/* TODO change layout symbol? */
 	arrange(selmon);
 	printstatus();
