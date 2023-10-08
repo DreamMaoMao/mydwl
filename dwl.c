@@ -623,14 +623,13 @@ void set_tag_fullscreen_flag(Client *c) {
 }
 
 void clear_tag_fullscreen_flag(Client *c) {
-  unsigned int tags, i;
-  unsigned mask = 1;
-
-  for (tags = c->tags, i = 0; tags > 0; i++, tags = tags >> 1) {
-    if (tags & mask) {
-      c->mon->pertag->fullscreen_client[i + 1] = NULL;
-    }
-  }
+	unsigned int tags_len = LENGTH(tags);
+	unsigned int i;
+	for(i = 0; i <= tags_len; i++){
+		if(c->mon->pertag->fullscreen_client[i] && c && c->mon->pertag->fullscreen_client[i] == c){
+			c->mon->pertag->fullscreen_client[i] = NULL;
+		}
+	}
 }
 
 void
@@ -2170,8 +2169,7 @@ void
 mapnotify(struct wl_listener *listener, void *data)
 {
 	/* Called when the surface is mapped, or ready to display on-screen. */
-	Client *p, *w, *c = wl_container_of(listener, c, map);
-	Monitor *m;
+	Client *p, *c = wl_container_of(listener, c, map);
 	int i;
 	/* Create scene tree for this client and its border */
 	c->scene = wlr_scene_tree_create(layers[LyrTile]);
@@ -3622,7 +3620,7 @@ unmapnotify(struct wl_listener *listener, void *data)
 {
 	/* Called when the surface is unmapped, and should no longer be shown. */
 	Client *c = wl_container_of(listener, c, unmap);
-	if(c->isfullscreen || c->isfakefullscreen || c->isrealfullscreen || c->overview_isfullscreenbak || c->overview_isfakefullscreenbak || c->overview_isrealfullscreenbak)
+	// if(c->isfullscreen || c->isfakefullscreen || c->isrealfullscreen || c->overview_isfullscreenbak || c->overview_isfakefullscreenbak || c->overview_isrealfullscreenbak)
 	clear_tag_fullscreen_flag(c);
 	if (c == grabc) {
 		cursor_mode = CurNormal;
