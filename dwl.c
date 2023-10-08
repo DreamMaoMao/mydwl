@@ -2904,10 +2904,14 @@ setlayout(const Arg *arg)
 {
 	if (!selmon)
 		return;
-	if (!arg || !arg->v || arg->v != selmon->lt[selmon->sellt])
+	if (!arg || !arg->v || arg->v != selmon->lt[selmon->sellt]){
 		selmon->sellt ^= 1;
-	if (arg && arg->v)
+		selmon->pertag->sellts[selmon->pertag->curtag] = selmon->sellt;
+	}
+	if (arg && arg->v){
 		selmon->lt[selmon->sellt] = (Layout *)arg->v;
+		selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt] = (Layout *)arg->v;
+	}
 	/* TODO change layout symbol? */
 	arrange(selmon);
 	printstatus();

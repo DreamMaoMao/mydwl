@@ -58,11 +58,14 @@ static const Rule rules[] = {
 	{ "electron-netease-cloud-music",  NULL,       0,       1,           -1 ,1200,800},
 	{ NULL,  "图片查看器",       0,       1,           -1 ,0,0},
 	{ NULL,  "图片查看",       0,       1,           -1 ,0,0},
+	{ NULL,  "选择文件",       0,       1,           -1 ,1200,800},
 	{ "blueman-manager",  NULL,       0,       1,           -1 ,0,0},
 	{ "flameshot",  NULL,       0,       1,           -1 ,0,0},
 	{ "com.xunlei.download",  NULL,       0,       1,           -1 ,0,0},
 	{ "pavucontrol",  NULL,       0,       1,           -1 ,0,0},
-	{ "baidunetdisk",  NULL,       0,       1,           -1 ,0,0},
+	{ "baidunetdisk",  NULL,       0,       1,           -1 ,1400,800},
+	{ "alixby3",  NULL,       0,       1,           -1 ,1400,800},
+
 
 
 };
@@ -196,7 +199,6 @@ static const Key keys[] = {
 	{ MODKEY,					 XKB_KEY_q,          killclient,     {0} },
 	{ MODKEY,                    XKB_KEY_t,          setlayout,      {.v = &layouts[0]} },
 	{ MODKEY,                    XKB_KEY_g,          setlayout,      {.v = &layouts[1]} },
-	{ MODKEY,                    XKB_KEY_space,      setlayout,      {0} },
 	{ WLR_MODIFIER_ALT, XKB_KEY_backslash,      togglefloating, {0} },
 	{ MODKEY,                    XKB_KEY_a,          togglefakefullscreen, {0} },
 	{ MODKEY,                    XKB_KEY_f,          togglerealfullscreen, {0} },
