@@ -1857,7 +1857,8 @@ focusclient(Client *c, int lift)
 
 	if (!c) {
 		/* With no client, all we have left is to clear focus */
-		selmon->sel  = NULL;
+		if(selmon->sel)
+			selmon->sel  = NULL;
 		wlr_seat_keyboard_notify_clear_focus(seat);
 		return;
 	}
@@ -2574,8 +2575,9 @@ printstatus(void)
 
 void
 quit(const Arg *arg)
-{
-	wl_display_terminate(dpy);
+{	
+	cleanup();
+	// wl_display_terminate(dpy);
 }
 
 void
