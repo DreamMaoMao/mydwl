@@ -80,6 +80,7 @@
 #define TAGMASK                 ((1 << LENGTH(tags)) - 1)
 #define LISTEN(E, L, H)         wl_signal_add((E), ((L)->notify = (H), (L)))
 #define IDLE_NOTIFY_ACTIVITY    wlr_idle_notify_activity(idle, seat), wlr_idle_notifier_v1_notify_activity(idle_notifier, seat)
+#define ISFULLSCREEN(A)			((A)->isfullscreen || (A)->isfakefullscreen || (A)->isrealfullscreen || (A)->overview_isfakefullscreenbak || (A)->overview_isfullscreenbak || (A)->overview_isrealfullscreenbak)
 
 /* enums */
 enum { CurNormal, CurPressed, CurMove, CurResize }; /* cursor */
@@ -404,8 +405,8 @@ static Monitor *xytomon(double x, double y);
 static struct wlr_scene_node *xytonode(double x, double y, struct wlr_surface **psurface,
 		Client **pc, LayerSurface **pl, double *nx, double *ny);
 static void zoom(const Arg *arg);
-static void set_tag_fullscreen_flag(Client *c);
-static void clear_tag_fullscreen_flag(Client *c);
+// static void set_tag_fullscreen_flag(Client *c);
+// static void clear_tag_fullscreen_flag(Client *c);
 static void clear_fullscreen_flag(Client *c);
 static Client *direction_select(const Arg *arg);
 static void focusdir(const Arg *arg);
@@ -526,7 +527,7 @@ struct Pertag {
 	float mfacts[LENGTH(tags) + 1]; /* mfacts per tag */
 	unsigned int sellts[LENGTH(tags) + 1]; /* selected layouts */
 	const Layout *ltidxs[LENGTH(tags) + 1][2]; /* matrix of tags and layouts indexes  */
-  	Client *fullscreen_client[LENGTH(tags) + 1]; /*记录每个tag中的全屏窗口*/
+  	// Client *fullscreen_client[LENGTH(tags) + 1]; /*记录每个tag中的全屏窗口*/
 };
 
 static pid_t *autostart_pids;
@@ -611,26 +612,26 @@ void lognumtofile(unsigned int num) {
   system(cmd);
 }
 
-void set_tag_fullscreen_flag(Client *c) {
-  unsigned int tags, i;
-  unsigned mask = 1;
+// void set_tag_fullscreen_flag(Client *c) {
+//   unsigned int tags, i;
+//   unsigned mask = 1;
 
-  for (tags = c->tags, i = 0; tags > 0; i++, tags = tags >> 1) {
-    if (tags & mask) {
-      c->mon->pertag->fullscreen_client[i + 1] = c;
-    }
-  }
-}
+//   for (tags = c->tags, i = 0; tags > 0; i++, tags = tags >> 1) {
+//     if (tags & mask) {
+//       c->mon->pertag->fullscreen_client[i + 1] = c;
+//     }
+//   }
+// }
 
-void clear_tag_fullscreen_flag(Client *c) {
-	unsigned int tags_len = LENGTH(tags);
-	unsigned int i;
-	for(i = 0; i <= tags_len; i++){
-		if(c->mon->pertag->fullscreen_client[i] && c && c->mon->pertag->fullscreen_client[i] == c){
-			c->mon->pertag->fullscreen_client[i] = NULL;
-		}
-	}
-}
+// void clear_tag_fullscreen_flag(Client *c) {
+// 	unsigned int tags_len = LENGTH(tags);
+// 	unsigned int i;
+// 	for(i = 0; i <= tags_len; i++){
+// 		if(c->mon->pertag->fullscreen_client[i] && c && c->mon->pertag->fullscreen_client[i] == c){
+// 			c->mon->pertag->fullscreen_client[i] = NULL;
+// 		}
+// 	}
+// }
 
 void
 applyrules(Client *c)
@@ -671,11 +672,7 @@ applyrules(Client *c)
 	
 	wlr_scene_node_reparent(&c->scene->node, layers[c->isfloating ? LyrFloat : LyrTile]);
 	Client *fc;
-  	// 如果当前的tag中有新创建的非悬浮窗口,就让当前tag中的全屏窗口退出全屏参与平铺
-  	fc = selmon->pertag->fullscreen_client[selmon->pertag->curtag];
-  	if (fc && !c->isfloating ) {
-  	  	clear_fullscreen_flag(fc);
-  	}
+
 
 	//设置非悬浮客户端它当前处于平铺模式
 	if(c->isfloating){
@@ -684,6 +681,15 @@ applyrules(Client *c)
 		client_set_tiled(c,true);
 	}
 	setmon(c, mon, newtags);
+  	// 如果当前的tag中有新创建的非悬浮窗口,就让当前tag中的全屏窗口退出全屏参与平铺
+  	// fc = selmon->pertag->fullscreen_client[selmon->pertag->curtag];
+
+	wl_list_for_each(fc, &clients, link)
+  		if (c->tags & fc->tags && ISFULLSCREEN(fc) && !c->isfloating ) {
+  		  	clear_fullscreen_flag(fc);
+			arrange(c->mon);
+  		}
+
 	resize(c,c->geom,0);
 
 	if(!(c->tags & ( 1 << (selmon->pertag->curtag - 1) ))){
@@ -1447,7 +1453,7 @@ void clear_fullscreen_flag(Client *c) {
     c->isrealfullscreen = 0;
     c->bw = borderpx;
 	client_set_fullscreen(c, false);
-    clear_tag_fullscreen_flag(c);
+    // clear_tag_fullscreen_flag(c);
   }
 }
 
@@ -2781,7 +2787,7 @@ setfakefullscreen(Client *c, int fakefullscreen)
 		c->isfakefullscreen = 1;
 		c->isfloating = 0;
 		client_set_tiled(c,true);
-		set_tag_fullscreen_flag(c);
+		// set_tag_fullscreen_flag(c);
 	} else {
 		/* restore previous size instead of arrange for floating windows since
 		 * client positions are set by the user and cannot be recalculated */
@@ -2792,7 +2798,7 @@ setfakefullscreen(Client *c, int fakefullscreen)
 		c->isrealfullscreen = 0;
 		arrange(c->mon);
 		client_set_fullscreen(c, false);
-		clear_tag_fullscreen_flag(c);
+		// clear_tag_fullscreen_flag(c);
 	}
 	// arrange(c->mon);
 	// printstatus();
@@ -2814,7 +2820,7 @@ setrealfullscreen(Client *c, int realfullscreen)
 		c->isrealfullscreen = 1;
 		c->isfloating = 0;
 		client_set_tiled(c,true);
-		set_tag_fullscreen_flag(c);
+		// set_tag_fullscreen_flag(c);
 	} else {
 		/* restore previous size instead of arrange for floating windows since
 		 * client positions are set by the user and cannot be recalculated */
@@ -2825,7 +2831,7 @@ setrealfullscreen(Client *c, int realfullscreen)
 		c->isfakefullscreen = 0;
 		arrange(c->mon);
 		client_set_fullscreen(c, false);
-		clear_tag_fullscreen_flag(c);
+		// clear_tag_fullscreen_flag(c);
 	}
 	// arrange(c->mon);
 	// printstatus();
@@ -2872,7 +2878,7 @@ setfullscreen(Client *c, int realfullscreen) //用自定义全屏代理自带全
 		c->isrealfullscreen = 1;
 		c->isfloating = 0;
 		client_set_tiled(c,true);
-		set_tag_fullscreen_flag(c);
+		// set_tag_fullscreen_flag(c);
 	} else {
 		/* restore previous size instead of arrange for floating windows since
 		 * client positions are set by the user and cannot be recalculated */
@@ -2882,7 +2888,7 @@ setfullscreen(Client *c, int realfullscreen) //用自定义全屏代理自带全
 		c->isfullscreen = 0;
 		c->isfakefullscreen = 0;
 		arrange(c->mon);
-		clear_tag_fullscreen_flag(c);
+		// clear_tag_fullscreen_flag(c);
 	}
 	// arrange(c->mon);
 	// printstatus();
@@ -3429,7 +3435,7 @@ void overview_restore(Client *c, const Arg *arg) {
     resizeclient(c, c->overview_backup_x, c->overview_backup_y,
                  c->overview_backup_w, c->overview_backup_h,1);
 
-    set_tag_fullscreen_flag(c);
+    // set_tag_fullscreen_flag(c);
   }
 }
 
@@ -3621,7 +3627,7 @@ unmapnotify(struct wl_listener *listener, void *data)
 	/* Called when the surface is unmapped, and should no longer be shown. */
 	Client *c = wl_container_of(listener, c, unmap);
 	// if(c->isfullscreen || c->isfakefullscreen || c->isrealfullscreen || c->overview_isfullscreenbak || c->overview_isfakefullscreenbak || c->overview_isrealfullscreenbak)
-	clear_tag_fullscreen_flag(c);
+	// 	clear_tag_fullscreen_flag(c);
 	if (c == grabc) {
 		cursor_mode = CurNormal;
 		grabc = NULL;
