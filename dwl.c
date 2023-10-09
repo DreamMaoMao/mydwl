@@ -681,11 +681,10 @@ applyrules(Client *c)
 		client_set_tiled(c,true);
 	}
 	setmon(c, mon, newtags);
-  	// 如果当前的tag中有新创建的非悬浮窗口,就让当前tag中的全屏窗口退出全屏参与平铺
-  	// fc = selmon->pertag->fullscreen_client[selmon->pertag->curtag];
 
+  	// 如果当前的tag中有新创建的非悬浮窗口,就让当前tag中的全屏窗口退出全屏参与平铺
 	wl_list_for_each(fc, &clients, link)
-  		if (c->tags & fc->tags && ISFULLSCREEN(fc) && !c->isfloating ) {
+  		if (fc && c->tags & fc->tags && ISFULLSCREEN(fc) && !c->isfloating ) {
   		  	clear_fullscreen_flag(fc);
 			arrange(c->mon);
   		}
@@ -904,18 +903,22 @@ axisnotify(struct wl_listener *listener, void *data)
 	const Wheel *w;
 	IDLE_NOTIFY_ACTIVITY;
 	keyboard = wlr_seat_get_keyboard(seat);
+
+	//获取当前按键的mask,比如alt+super或者alt+ctrl
 	mods = keyboard ? wlr_keyboard_get_modifiers(keyboard) : 0;
+
+	//处理滚轮事件绑定的函数
 	for (w = wheels; w < END(wheels); w++) {
-		if (CLEANMASK(mods) == CLEANMASK(w->mod) &&
-				(unsigned int)event->delta == w->wheel && w->func) {
+		if (CLEANMASK(mods) == CLEANMASK(w->mod) && //按键一致
+				(unsigned int)event->delta == w->wheel && w->func) { //滚轮方向判断一致且处理函数存在
 			w->func(&w->arg);
-			return;
+			return; //如果成功匹配就不把这个滚轮事件传送给客户端了
 		}
 	}
 	/* TODO: allow usage of scroll whell for mousebindings, it can be implemented
 	 * checking the event's orientation and the delta of the event */
 	/* Notify the client with pointer focus of the axis event. */
-	wlr_seat_pointer_notify_axis(seat, //滚轮
+	wlr_seat_pointer_notify_axis(seat, //滚轮事件发送给客户端也就是窗口
 			event->time_msec, event->orientation, event->delta,
 			event->delta_discrete, event->source);
 
@@ -1325,9 +1328,11 @@ createmon(struct wl_listener *listener, void *data)
 			wlr_xcursor_manager_load(cursor_mgr, r->scale);
 			if(r->lt)
 				m->lt[0] = m->lt[1] = r->lt;
-			else{
-				m->lt[0] = &layouts[0];
+			else if(LENGTH(layouts) > 1){
+				m->lt[0] = &layouts[0]; //默认就有两个布局
 				m->lt[1] = &layouts[1];
+			}else{
+				m->lt[0] = m->lt[1] = &layouts[0];
 			}
 			wlr_output_set_transform(wlr_output, r->rr);
 			break;
@@ -1432,13 +1437,6 @@ createnotify(struct wl_listener *listener, void *data)
 	LISTEN(&xdg_surface->toplevel->events.request_maximize, &c->maximize,
 			maximizenotify);
 
-  	// Client *fc;
-
-  	// // 如果当前的tag中有新创建的窗口,就让当前tag中的全屏窗口退出全屏参与平铺
-  	// fc = selmon->pertag->fullscreen_client[selmon->pertag->curtag];
-  	// if (fc) {
-  	//   clear_fullscreen_flag(fc);
-  	// }
 }
 
 
@@ -1829,7 +1827,7 @@ focusclient(Client *c, int lift)
 
 		/* Don't change border color if there is an exclusive focus or we are
 		 * handling a drag operation */
-		if(c && selmon->sel != c){
+		if(c && selmon->sel != c){ //切换当前窗口记录为聚焦窗口
 			selmon->sel  = c;
 		}
 		setborder_color(c);
@@ -1932,6 +1930,9 @@ fullscreennotify(struct wl_listener *listener, void *data)
 	// Client *c = wl_container_of(listener, c, fullscreen);
 	// setfullscreen(c, client_wants_fullscreen(c));
 	Client *c = selmon->sel;
+	if(!c){
+		return;  //没有聚焦的窗口就什么也不操作
+	}
 	if(c->isrealfullscreen){
 		setrealfullscreen(c,0); //自带的全屏函数容易黑屏有bug,换这个就没有问题
 	}else {
@@ -2617,7 +2618,7 @@ requeststartdrag(struct wl_listener *listener, void *data)
 		wlr_data_source_destroy(event->drag->source);
 }
 
-void 
+void //为了兼容dwm代码封装的
 resizeclient(Client *c,int x,int y,int w,int h, int interact)
 {
 	struct wlr_box tmp_box;
@@ -4142,13 +4143,6 @@ createnotifyx11(struct wl_listener *listener, void *data)
 	LISTEN(&xsurface->events.destroy, &c->destroy, destroynotify);
 	LISTEN(&xsurface->events.request_fullscreen, &c->fullscreen, fullscreennotify);
 
-  	// Client *fc;
-
-  	// // 如果当前的tag中有新创建的窗口,就让当前tag中的全屏窗口退出全屏参与平铺
-  	// fc = selmon->pertag->fullscreen_client[selmon->pertag->curtag];
-  	// if (fc) {
-  	//   clear_fullscreen_flag(fc);
-  	// }
 }
 
 Atom
