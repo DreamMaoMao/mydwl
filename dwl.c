@@ -2135,6 +2135,16 @@ killclient(const Arg *arg)
 	Client *sel = focustop(selmon);
 	if (sel)
 		client_send_close(sel);
+	else{
+		if(selmon->sel)
+			selmon->sel = NULL;
+		if(selmon->isoverview){
+			Arg arg = {0};
+			toggleoverview(&arg);
+		}
+		return;
+	}
+		
 }
 
 void
@@ -3650,6 +3660,17 @@ unmapnotify(struct wl_listener *listener, void *data)
 		wlr_foreign_toplevel_handle_v1_destroy(c->foreign_toplevel);
 		c->foreign_toplevel = NULL;
 	}
+
+	Client *selnext = focustop(selmon);
+	if(!selnext){
+		if(selmon->sel)
+			selmon->sel = NULL;
+		if(selmon->isoverview){
+			Arg arg = {0};
+			toggleoverview(&arg);
+		}		
+	}
+
 	printstatus();
 	motionnotify(0);
 }
