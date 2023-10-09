@@ -915,13 +915,9 @@ axisnotify(struct wl_listener *listener, void *data)
 	/* TODO: allow usage of scroll whell for mousebindings, it can be implemented
 	 * checking the event's orientation and the delta of the event */
 	/* Notify the client with pointer focus of the axis event. */
-	// wlr_seat_pointer_send_axis(seat, //滚轮
-	// 		event->time_msec, event->orientation, event->delta,
-	// 		event->delta_discrete, event->source);
 	wlr_seat_pointer_notify_axis(seat, //滚轮
 			event->time_msec, event->orientation, event->delta,
 			event->delta_discrete, event->source);
-	// wlr_seat_pointer_notify_frame(seat);  //试下能不能把滚轮的合成一帧
 
 
 }
@@ -1148,6 +1144,7 @@ commitnotify(struct wl_listener *listener, void *data)
 
 	//这一段有点问题,当一个窗口接受到了大小调整之后,他会触发这个事件,但它拒绝调整的话,
 	//这里又要他去调整,它继续接受并触发这个事件,但它又拒绝调整大小,就会导致这个逻辑陷入循环之中
+	//所以对拒绝重置大小的应用加个计数器拒绝两次,同样大小就不再向他请求,除非更改大小再请求
 	if (c->mon && !wlr_box_empty(&box) && (box.width != c->geom.width - 2 * c->bw
 			|| box.height != c->geom.height - 2 * c->bw)  ){
 		if(c->isfloating){
@@ -1510,7 +1507,8 @@ cursorframe(struct wl_listener *listener, void *data)
 	 * multiple events together. For instance, two axis events may happen at the
 	 * same time, in which case a frame event won't be sent in between. */
 	/* Notify the client with pointer focus of the frame event. */
-	//应该是这里没有处理好 导致鼠标移动事件和滚轮事件不能同时触发
+	//滚轮和鼠标会在这里合成一帧发送(wayland窗口),xwayland不支持这种方式,所以xwayland需要额外的扩展事件通知,
+	//wlr_relative_pointer_manager_v1_send_relative_motion,这个在motionrelative中
 
 	wlr_seat_pointer_notify_frame(seat);
 }
@@ -1863,7 +1861,7 @@ focusclient(Client *c, int lift)
 	if (!c) {
 		/* With no client, all we have left is to clear focus */
 		if(selmon->sel)
-			selmon->sel  = NULL;
+			selmon->sel  = NULL; //这个很关键,因为很多地方用到当前窗口做计算,不重置成NULL就会到处有野指针
 		wlr_seat_keyboard_notify_clear_focus(seat);
 		return;
 	}
@@ -1935,7 +1933,7 @@ fullscreennotify(struct wl_listener *listener, void *data)
 	// setfullscreen(c, client_wants_fullscreen(c));
 	Client *c = selmon->sel;
 	if(c->isrealfullscreen){
-		setrealfullscreen(c,0);
+		setrealfullscreen(c,0); //自带的全屏函数容易黑屏有bug,换这个就没有问题
 	}else {
 		setrealfullscreen(c,1);
 	}
@@ -2173,7 +2171,7 @@ maplayersurfacenotify(struct wl_listener *listener, void *data)
 
 void
 mapnotify(struct wl_listener *listener, void *data)
-{
+{ //x11和wayland窗口的创建都会出发来这里初始化相关窗口元素
 	/* Called when the surface is mapped, or ready to display on-screen. */
 	Client *p, *c = wl_container_of(listener, c, map);
 	int i;
@@ -2244,7 +2242,7 @@ mapnotify(struct wl_listener *listener, void *data)
 		wlr_scene_node_reparent(&c->scene->node, layers[LyrFloat]); //设置登录框浮动
 		setmon(c, p->mon, p->tags);
 	} else {
-		applyrules(c);
+		applyrules(c); //窗口预设规则应用,全屏窗口自动退出判断也在里面
 	}
 	printstatus();
 
@@ -2376,7 +2374,7 @@ motionnotify(uint32_t time)  //鼠标聚焦
 	pointerfocus(c, surface, sx, sy, time);
 }
 
-void
+void //光标相对位置移动事件处理
 motionrelative(struct wl_listener *listener, void *data)
 {
 	/* This event is forwarded by the cursor when a pointer emits a _relative_
@@ -2388,21 +2386,21 @@ motionrelative(struct wl_listener *listener, void *data)
 	 * generated the event. You can pass NULL for the device if you want to move
 	 * the cursor around without any input. */
 
-
+	//通知光标设备移动
 	wlr_cursor_move(cursor, &event->pointer->base, event->delta_x, event->delta_y);
-	// wlr_seat_pointer_notify_motion(seat, event->time_msec, event->delta_x, event->delta_y); //这个造成了鼠标移动的时候滚轮不起作用
+	//处理一些事件,比如窗口聚焦,图层聚焦通知到客户端
 	motionnotify(event->time_msec);  
-
+	//扩展事件通知,没有这个鼠标移动的时候滑轮将无法使用
 	wlr_relative_pointer_manager_v1_send_relative_motion(
 		pointer_manager,
 		seat, (uint64_t)(event->time_msec) * 1000,
 		event->delta_x, event->delta_y, 
 		event->unaccel_dx, event->unaccel_dy);
-		
+	//鼠标左下热区判断是否触发	
 	toggle_hotarea(cursor->x,cursor->y);	
 }
 
-void
+void //鼠标移动浮动窗口和修改浮动窗口大小
 moveresize(const Arg *arg)
 {
 	if (cursor_mode != CurNormal && cursor_mode != CurPressed)
@@ -2575,7 +2573,7 @@ void
 quit(const Arg *arg)
 {	
 	cleanup();
-	// wl_display_terminate(dpy);
+	// wl_display_terminate(dpy); //这个会在系统日志里引发崩溃异常,所以换成cleanup
 }
 
 void
@@ -2587,6 +2585,7 @@ quitsignal(int signo)
 void
 rendermon(struct wl_listener *listener, void *data)
 {    //这里应该是制作动画的关键,用于捕获准备的页面帧输出
+	//应该可以在这里添加渲染逻辑,还没弄清楚
 	/* This function is called every time an output is ready to display a frame,
 	 * generally at the output's refresh rate (e.g. 60Hz). */
 	Monitor *m = wl_container_of(listener, m, frame);
