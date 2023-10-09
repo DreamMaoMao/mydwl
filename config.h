@@ -28,7 +28,7 @@ static int warpcursor = 0; /* Warp cursor to focused client */
 
 /* Autostart */
 static const char *const autostart[] = {
-    "/bin/sh", "-c", "$HOME/.config/hypr/autostart.sh", NULL,
+    "/bin/sh", "-c", "$DWL/autostart.sh", NULL,
     NULL,
 };
 
@@ -73,10 +73,10 @@ static const Rule rules[] = {
 /* layout(s) */
 static const Layout overviewlayout = { "󰃇",  overview };
 
-static const Layout layouts[] = {
+static const Layout layouts[] = { //最少两个,不能删除少于两个
 	/* symbol     arrange function */
-	{ "[]=",      tile },
-	{ "><>",      grid },    /* no layout function means floating behavior */
+	{ "󱞬",      tile },	//堆栈布局
+	{ "﩯",      grid },    //网格布局
 
 };
 
@@ -211,7 +211,7 @@ static const Key keys[] = {
 	{ MODKEY|WLR_MODIFIER_SHIFT, 			XKB_KEY_greater,    	tagmon,         			{.i = WLR_DIRECTION_RIGHT} },
     { MODKEY|WLR_MODIFIER_SHIFT, 			XKB_KEY_X,          	incgaps,        			{.i = +1 } },
 	{ MODKEY|WLR_MODIFIER_SHIFT, 			XKB_KEY_Z,          	incgaps,        			{.i = -1 } },
-	{ MODKEY|WLR_MODIFIER_SHIFT, 			XKB_KEY_0,          	togglegaps,     			{0} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, 			XKB_KEY_KP_0,          	togglegaps,     			{0} },
 	TAGKEYS(          XKB_KEY_KP_1, XKB_KEY_exclam,                     0),
 	TAGKEYS(          XKB_KEY_KP_2, XKB_KEY_at,                         1),
 	TAGKEYS(          XKB_KEY_KP_3, XKB_KEY_numbersign,                 2),
