@@ -3283,7 +3283,7 @@ tag(const Arg *arg) {
 	Client *fc;
   	if (target_client  && arg->ui & TAGMASK) {
 		target_client->tags = arg->ui & TAGMASK;
-  		wl_list_for_each(fc, &clients, link){ //不知道为什么这个执行之后会卡死,可能是渲染的问题
+  		wl_list_for_each(fc, &clients, link){ 
   			if (fc && fc != target_client && target_client->tags & fc->tags && ISFULLSCREEN(fc) && !target_client->isfloating ) {
   				clear_fullscreen_flag(fc);
   			}
