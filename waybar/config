@@ -15,6 +15,7 @@
         "icon-size": 30,
         "all-outputs": false,
         "tooltip-format": "{title}",
+        "markup": true,
         "on-click": "activate",
         "on-click-right": "close",
         "ignore-list": [
@@ -31,7 +32,8 @@
         "format-icons": {
             "default": ["", "", ""]
         },
-        "on-click": "blueman-manager"
+        "on-click": "blueman-manager",
+        "on-click-right":"amixer set Master toggle",
     },
     "keyboard-state": {
         "interval":1,       

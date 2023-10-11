@@ -1,14 +1,8 @@
 
-![image](https://github.com/DreamMaoMao/superdwl/assets/30348075/b0b77a60-67fd-4dfe-9263-c2380a1cbf50)
+![image](https://github.com/DreamMaoMao/superdwl/assets/30348075/037ffa8a-2d67-43ec-b5f3-ae68f2c638c7)
 
 
-
-https://github.com/DreamMaoMao/superdwl/assets/30348075/7dbae8e6-b1f9-43b2-a670-58d94f36a3af
-
-
-
-
-# dwl - dwm for Wayland(暂时还不支持动画)
+# dwl - dwm for Wayland
 
 #改动日志
 - waybar支持
@@ -30,11 +24,6 @@ https://github.com/DreamMaoMao/superdwl/assets/30348075/7dbae8e6-b1f9-43b2-a670-
 - overview跳转前后保持浮动和全屏窗口和还原
 - 增加支持键盘数字锁可以在config.h设置默认打开功能
 - 增加左右切换tag时可以只切换到有client的tag
-- obs录屏支持
-- 增加config.h可配置新窗口是从头部入栈还是从尾部入栈
-- 增加鼠标扩展监控支持,修复原版dwl不支持在xwayland窗口移动鼠标的同时使用滚轮
-- 添加网格布局为常规可切换布局
-- foreign-toplevel协议支持,支持dunst和waybar的taskbar模块
 
 # 运行需要的相关工具包
 ```
@@ -54,7 +43,7 @@ sudo pacman -S inetutils
 sudo pacman -S networkmanager 
 sudo pacman -S gdm
 
-yay -S blueman acpi mako jq alsa-utils polkit-gnome  light  nemo swappy swaybg lm_sensors  network-manager-applet playerctl python3  wlsunset  xorg-xinit xorg-xwayland wlroots wayland-protocols pavucontrol ttf-jetbrains-mono-nerd eww-wayland wofi xdg-desktop-portal-wlr xdg-desktop-portal-hyprland
+yay -S blueman acpi mako jq alsa-utils polkit-gnome  light  nemo swappy swaybg lm_sensors  network-manager-applet playerctl python3  wlsunset  xorg-xinit xorg-xwayland wlroots wayland-protocols pavucontrol ttf-jetbrains-mono-nerd eww-wayland wofi xdg-desktop-portal-wlr
 
 
 ```
@@ -78,7 +67,7 @@ cp wofi -r ~/.config/
 cp konsole -r ~/.local/share/
 cp eww -r ~/.config/
 
-sed -i s#/home/user#$HOME#g dwl.desktop
+sed -i s#/home/user#$HOME# dwl.desktop
 sudo cp dwl.desktop /usr/share/wayland-sessions/
 ```
 

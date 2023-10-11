@@ -1,7 +1,12 @@
 /* speedie's dwl config */
-
+#define COLOR(hex)    { ((hex >> 24) & 0xFF) / 255.0f, \
+                        ((hex >> 16) & 0xFF) / 255.0f, \
+                        ((hex >> 8) & 0xFF) / 255.0f, \
+                        (hex & 0xFF) / 255.0f }
 /* appearance */
 static const unsigned int new_is_master = 1; //新窗口是否插在头部
+/* logging */
+static int log_level = WLR_ERROR;
 static const unsigned int numlockon = 1; //是否打开右边小键盘
 static const unsigned int hotarea_size              = 10; //热区大小,10x10
 static const unsigned int enable_hotarea            = 1; //是否启用鼠标热区
@@ -17,6 +22,8 @@ static const float rootcolor[]             = { 0.3, 0.3, 0.3, 1.0 };
 static const float bordercolor[]           = { 0, 0, 0, 0 };
 static const float focuscolor[]            = { 0.6, 0.4, 0.1, 1 };
 static const float fakefullscreencolor[]   = { 0.1, 0.5, 0.2, 1 };
+static const float urgentcolor[]           = COLOR(0xff0000ff);
+
 
 static const int overviewgappi = 24; /* overview时 窗口与边缘 缝隙大小 */
 static const int overviewgappo = 60; /* overview时 窗口与窗口 缝隙大小 */
@@ -28,7 +35,7 @@ static int warpcursor = 0; /* Warp cursor to focused client */
 
 /* Autostart */
 static const char *const autostart[] = {
-    "/bin/sh", "-c", "$HOME/.config/hypr/autostart.sh", NULL,
+    "/bin/sh", "-c", "$DWL/autostart.sh", NULL,
     NULL,
 };
 
@@ -73,10 +80,10 @@ static const Rule rules[] = {
 /* layout(s) */
 static const Layout overviewlayout = { "󰃇",  overview };
 
-static const Layout layouts[] = {
+static const Layout layouts[] = { //最少两个,不能删除少于两个
 	/* symbol     arrange function */
-	{ "[]=",      tile },
-	{ "><>",      grid },    /* no layout function means floating behavior */
+	{ "󱞬",      tile },	//堆栈布局
+	{ "﩯",      grid },    //网格布局
 
 };
 
@@ -87,7 +94,7 @@ static const MonitorRule monrules[] = {
 	{ "eDP-1",    0.5,  1,      2,    &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL },
 	*/
 	/* defaults */
-	{ NULL,       0.55, 1,      1,    NULL, WL_OUTPUT_TRANSFORM_NORMAL },
+	{ NULL,       0.55, 1,      1,    &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL,-1,-1 },
 };
 
 /* keyboard */
@@ -211,7 +218,7 @@ static const Key keys[] = {
 	{ MODKEY|WLR_MODIFIER_SHIFT, 			XKB_KEY_greater,    	tagmon,         			{.i = WLR_DIRECTION_RIGHT} },
     { MODKEY|WLR_MODIFIER_SHIFT, 			XKB_KEY_X,          	incgaps,        			{.i = +1 } },
 	{ MODKEY|WLR_MODIFIER_SHIFT, 			XKB_KEY_Z,          	incgaps,        			{.i = -1 } },
-	{ MODKEY|WLR_MODIFIER_SHIFT, 			XKB_KEY_0,          	togglegaps,     			{0} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, 			XKB_KEY_KP_0,          	togglegaps,     			{0} },
 	TAGKEYS(          XKB_KEY_KP_1, XKB_KEY_exclam,                     0),
 	TAGKEYS(          XKB_KEY_KP_2, XKB_KEY_at,                         1),
 	TAGKEYS(          XKB_KEY_KP_3, XKB_KEY_numbersign,                 2),

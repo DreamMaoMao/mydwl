@@ -227,7 +227,7 @@ window#waybar {
     background: rgb(179, 42, 142);
     /* background: linear-gradient(45deg, rgb(99, 6, 74) 0%, rgba(203,166,247,1) 64%, rgba(202,158,230,1) 100%);  */
     margin-right: 1px;
-    color: #fff ;
+    color: #f8e1b7 ;
     background-size: 300% 300%;
     text-shadow: 0 0 5px rgba(0, 0, 0, 0.377);
     /* animation: gradient 20s ease infinite; */
@@ -290,7 +290,7 @@ label:focus {
     /* animation: gradient 20s ease infinite; */
     text-shadow: 0 0 5px rgba(0, 0, 0, 0.377);
     /* background-color: #b4befe; */
-    color: 	#ffffff;
+    color: 	#edebe6;
     font-weight: bolder;
 
 }
@@ -406,7 +406,6 @@ label:focus {
     background-color: #f9e2af;
     color:#96804e;
 }
-
 #temperature.critical {
     margin-right: 1px;
     margin-left: 1px;

@@ -7,6 +7,7 @@ systemctl --user unmask xdg-desktop-portal-hyprland
 systemctl --user mask xdg-desktop-portal-gnome
 
 dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
+
 /usr/libexec/xdg-desktop-portal-hyprland &
 
 #mako &
