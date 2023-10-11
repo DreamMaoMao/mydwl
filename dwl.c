@@ -160,7 +160,6 @@ typedef struct {
 	struct wl_listener foreign_destroy;
 
 	unsigned int set_rule_size;
-	unsigned int resize_fail_count;
 
 } Client;
 
@@ -1117,28 +1116,12 @@ commitlayersurfacenotify(struct wl_listener *listener, void *data)
 void
 commitnotify(struct wl_listener *listener, void *data)
 {
-	Client *c = wl_container_of(listener, c, commit);
-	struct wlr_box box = {0};
-	client_get_geometry(c, &box);
 
-	//这一段有点问题,当一个窗口接受到了大小调整之后,他会触发这个事件,但它拒绝调整的话,
-	//这里又要他去调整,它继续接受并触发这个事件,但它又拒绝调整大小,就会导致这个逻辑陷入循环之中
-	//所以对拒绝重置大小的应用加个计数器拒绝两次,同样大小就不再向他请求,除非更改大小再请求
-	if (c->mon && !wlr_box_empty(&box) && (box.width != c->geom.width - 2 * c->bw
-			|| box.height != c->geom.height - 2 * c->bw)  ){
-		if(c->isfloating){
-			resize(c, c->geom, 1);
-		}else if(!c->isfloating && c->resize_fail_count <= 2){
-			c->resize_fail_count = c->resize_fail_count + 1;
-			arrange(c->mon);
-		} 
-	}
+	Client *c = wl_container_of(listener, c, commit);
 
 	/* mark a pending resize as completed */
-	if (c->resize && c->resize <= c->surface.xdg->current.configure_serial){
+	if (c->resize && c->resize <= c->surface.xdg->current.configure_serial)
 		c->resize = 0;
-		c->resize_fail_count = 0; //成功设置窗口大小后重置失败计数
-	}
 }
 
 void
@@ -2203,7 +2186,6 @@ mapnotify(struct wl_listener *listener, void *data)
 	c->isrealfullscreen = 0;	
 	c->oldgeom.width = 1200;
 	c->oldgeom.height = 800;
-	c->resize_fail_count = 0;
 
 	//根据宽高让坐标屏幕居中
 	c->oldgeom = setclient_coordinate_center(c->oldgeom);
