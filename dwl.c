@@ -1,6 +1,7 @@
 /*
  * See LICENSE file for copyright and license details.
  */
+#define XWAYLNAD 1
 #include <getopt.h>
 #include <libinput.h>
 #include <limits.h>
@@ -958,26 +959,26 @@ arrangelayers(Monitor *m)
 }
 
 
-// void
-// autostartexec(void) {
-// 	const char *const *p;
-// 	size_t i = 0;
+void
+autostartexec(void) {
+	const char *const *p;
+	size_t i = 0;
 
-// 	/* count entries */
-// 	for (p = autostart; *p; autostart_len++, p++)
-// 		while (*++p);
+	/* count entries */
+	for (p = autostart; *p; autostart_len++, p++)
+		while (*++p);
 
-// 	autostart_pids = calloc(autostart_len, sizeof(pid_t));
-// 	for (p = autostart; *p; i++, p++) {
-// 		if ((autostart_pids[i] = fork()) == 0) {
-// 			setsid();
-// 			execvp(*p, (char *const *)p);
-// 			die("dwl: execvp %s:", *p);
-// 		}
-// 		/* skip arguments */
-// 		while (*++p);
-// 	}
-// }
+	autostart_pids = calloc(autostart_len, sizeof(pid_t));
+	for (p = autostart; *p; i++, p++) {
+		if ((autostart_pids[i] = fork()) == 0) {
+			setsid();
+			execvp(*p, (char *const *)p);
+			die("dwl: execvp %s:", *p);
+		}
+		/* skip arguments */
+		while (*++p);
+	}
+}
 
 void //鼠标滚轮事件
 axisnotify(struct wl_listener *listener, void *data)
@@ -990,7 +991,7 @@ axisnotify(struct wl_listener *listener, void *data)
 	struct wlr_keyboard *keyboard;
 	uint32_t mods;
 	const Wheel *w;
-	IDLE_NOTIFY_ACTIVITY;
+	// IDLE_NOTIFY_ACTIVITY;
 	keyboard = wlr_seat_get_keyboard(seat);
 
 	//获取当前按键的mask,比如alt+super或者alt+ctrl
@@ -1022,7 +1023,7 @@ buttonpress(struct wl_listener *listener, void *data)
 	uint32_t mods;
 	Client *c;
 	const Button *b;
-	IDLE_NOTIFY_ACTIVITY;
+	// IDLE_NOTIFY_ACTIVITY;
 
 	switch (event->state) {
 	case WLR_BUTTON_PRESSED:
@@ -1423,6 +1424,19 @@ createmon(struct wl_listener *listener, void *data)
 
 	wl_list_insert(&mons, &m->link);
 	printstatus();
+
+	m->pertag = calloc(1, sizeof(Pertag));
+	m->pertag->curtag = m->pertag->prevtag = 1;
+
+	for (i = 0; i <= LENGTH(tags); i++) {
+		m->pertag->nmasters[i] = m->nmaster;
+		m->pertag->mfacts[i] = m->mfact;
+
+		m->pertag->ltidxs[i][0] = m->lt[0];
+		m->pertag->ltidxs[i][1] = m->lt[1];
+		m->pertag->sellts[i] = m->sellt;
+	}
+
 
 	/* The xdg-protocol specifies:
 	 *
@@ -2289,10 +2303,75 @@ maplayersurfacenotify(struct wl_listener *listener, void *data)
 	motionnotify(0);
 }
 
+// void //17
+// mapnotify(struct wl_listener *listener, void *data)
+// {
+// 	/* Called when the surface is mapped, or ready to display on-screen. */
+// 	Client *p, *w, *c = wl_container_of(listener, c, map);
+// 	Monitor *m;
+// 	int i;
+
+// 	/* Create scene tree for this client and its border */
+// 	c->scene = client_surface(c)->data = wlr_scene_tree_create(layers[LyrTile]);
+// 	wlr_scene_node_set_enabled(&c->scene->node, c->type != XDGShell);
+// 	c->scene_surface = c->type == XDGShell
+// 			? wlr_scene_xdg_surface_create(c->scene, c->surface.xdg)
+// 			: wlr_scene_subsurface_tree_create(c->scene, client_surface(c));
+// 	c->scene->node.data = c->scene_surface->node.data = c;
+
+// 	/* Handle unmanaged clients first so we can return prior create borders */
+// 	if (client_is_unmanaged(c)) {
+// 		client_get_geometry(c, &c->geom);
+// 		/* Unmanaged clients always are floating */
+// 		wlr_scene_node_reparent(&c->scene->node, layers[LyrFloat]);
+// 		wlr_scene_node_set_position(&c->scene->node, c->geom.x + borderpx,
+// 			c->geom.y + borderpx);
+// 		if (client_wants_focus(c)) {
+// 			focusclient(c, 1);
+// 			exclusive_focus = c;
+// 		}
+// 		goto unset_fullscreen;
+// 	}
+
+// 	for (i = 0; i < 4; i++) {
+// 		c->border[i] = wlr_scene_rect_create(c->scene, 0, 0, bordercolor);
+// 		c->border[i]->node.data = c;
+// 	}
+
+// 	/* Initialize client geometry with room for border */
+// 	client_set_tiled(c, WLR_EDGE_TOP | WLR_EDGE_BOTTOM | WLR_EDGE_LEFT | WLR_EDGE_RIGHT);
+// 	client_get_geometry(c, &c->geom);
+// 	c->geom.width += 2 * c->bw;
+// 	c->geom.height += 2 * c->bw;
+
+// 	/* Insert this client into client lists. */
+// 	wl_list_insert(&clients, &c->link);
+// 	wl_list_insert(&fstack, &c->flink);
+
+// 	/* Set initial monitor, tags, floating status, and focus:
+// 	 * we always consider floating, clients that have parent and thus
+// 	 * we set the same tags and monitor than its parent, if not
+// 	 * try to apply rules for them */
+// 	 /* TODO: https://github.com/djpohly/dwl/pull/334#issuecomment-1330166324 */
+// 	if (c->type == XDGShell && (p = client_get_parent(c))) {
+// 		c->isfloating = 1;
+// 		wlr_scene_node_reparent(&c->scene->node, layers[LyrFloat]);
+// 		setmon(c, p->mon, p->tags);
+// 	} else {
+// 		applyrules(c);
+// 	}
+// 	printstatus();
+
+// unset_fullscreen:
+// 	m = c->mon ? c->mon : xytomon(c->geom.x, c->geom.y);
+// 	wl_list_for_each(w, &clients, link)
+// 		if (w != c && w->isfullscreen && m == w->mon && (w->tags & c->tags))
+// 			setfullscreen(w, 0);
+// }
+
 void
 mapnotify(struct wl_listener *listener, void *data)
-{
-	/* Called when the surface is mapped, or ready to display on-screen. */
+{ //x11和wayland窗口的创建都会出发来这里初始化相关窗口元素
 	Client *p, *w, *c = wl_container_of(listener, c, map);
 	Monitor *m;
 	int i;
@@ -2316,22 +2395,36 @@ mapnotify(struct wl_listener *listener, void *data)
 			focusclient(c, 1);
 			exclusive_focus = c;
 		}
-		goto unset_fullscreen;
+		return;
 	}
-
+	
 	for (i = 0; i < 4; i++) {
 		c->border[i] = wlr_scene_rect_create(c->scene, 0, 0, bordercolor);
 		c->border[i]->node.data = c;
 	}
 
 	/* Initialize client geometry with room for border */
-	client_set_tiled(c, WLR_EDGE_TOP | WLR_EDGE_BOTTOM | WLR_EDGE_LEFT | WLR_EDGE_RIGHT);
 	client_get_geometry(c, &c->geom);
 	c->geom.width += 2 * c->bw;
 	c->geom.height += 2 * c->bw;
+	c->bw = borderpx;
+	c->isfakefullscreen = 0;
+	c->isrealfullscreen = 0;	
+	c->oldgeom.width = 1200;
+	c->oldgeom.height = 800;
+	c->resize_fail_count = 0;
 
-	/* Insert this client into client lists. */
-	wl_list_insert(&clients, &c->link);
+	//根据宽高让坐标屏幕居中
+	c->oldgeom = setclient_coordinate_center(c->oldgeom);
+	c->geom = setclient_coordinate_center(c->geom);
+	//初始化窗口规则是否有设置标识
+	c->set_rule_size = 0;
+
+	if (new_is_master)
+		// tile at the top
+		wl_list_insert(&clients, &c->link); //新窗口是master,头部入栈
+	else
+		wl_list_insert(clients.prev, &c->link); //尾部入栈
 	wl_list_insert(&fstack, &c->flink);
 
 	/* Set initial monitor, tags, floating status, and focus:
@@ -2341,126 +2434,42 @@ mapnotify(struct wl_listener *listener, void *data)
 	 /* TODO: https://github.com/djpohly/dwl/pull/334#issuecomment-1330166324 */
 	if (c->type == XDGShell && (p = client_get_parent(c))) {
 		c->isfloating = 1;
-		wlr_scene_node_reparent(&c->scene->node, layers[LyrFloat]);
+		wlr_scene_node_reparent(&c->scene->node, layers[LyrFloat]); //设置登录框浮动
 		setmon(c, p->mon, p->tags);
 	} else {
-		applyrules(c);
+		applyrules(c); //窗口预设规则应用,全屏窗口自动退出判断也在里面
 	}
 	printstatus();
 
-unset_fullscreen:
-	m = c->mon ? c->mon : xytomon(c->geom.x, c->geom.y);
-	wl_list_for_each(w, &clients, link)
-		if (w != c && w->isfullscreen && m == w->mon && (w->tags & c->tags))
-			setfullscreen(w, 0);
+	//创建外部顶层窗口的句柄,每一个顶层窗口都有一个
+	c->foreign_toplevel = wlr_foreign_toplevel_handle_v1_create(foreign_toplevel_manager);
+
+	//监听来自外部对于窗口的事件请求
+	if(c->foreign_toplevel){
+		LISTEN(&(c->foreign_toplevel->events.request_activate),
+				&c->foreign_activate_request,handle_foreign_activate_request);
+		LISTEN(&(c->foreign_toplevel->events.request_fullscreen),
+				&c->foreign_fullscreen_request,handle_foreign_fullscreen_request);
+		LISTEN(&(c->foreign_toplevel->events.request_close),
+				&c->foreign_close_request,handle_foreign_close_request);
+		LISTEN(&(c->foreign_toplevel->events.destroy),
+				&c->foreign_destroy,handle_foreign_destroy);
+		//设置外部顶层句柄的id为应用的id
+		const char *appid;
+    	appid = client_get_appid(c) ;
+		if(appid)
+			wlr_foreign_toplevel_handle_v1_set_app_id(c->foreign_toplevel,appid);
+		//设置外部顶层句柄的title为应用的title
+		const char *title;
+    	title = client_get_title(c) ;
+		if(title)
+			wlr_foreign_toplevel_handle_v1_set_title(c->foreign_toplevel,title);
+		//设置外部顶层句柄的显示监视器为当前监视器
+		wlr_foreign_toplevel_handle_v1_output_enter(
+				c->foreign_toplevel, selmon->wlr_output);
+	}
+
 }
-
-// void
-// mapnotify(struct wl_listener *listener, void *data)
-// { //x11和wayland窗口的创建都会出发来这里初始化相关窗口元素
-// 	/* Called when the surface is mapped, or ready to display on-screen. */
-// 	Client *p, *c = wl_container_of(listener, c, map);
-// 	int i;
-// 	/* Create scene tree for this client and its border */
-// 	c->scene = wlr_scene_tree_create(layers[LyrTile]);
-// 	wlr_scene_node_set_enabled(&c->scene->node, c->type != XDGShell);
-// 	c->scene_surface = c->type == XDGShell
-// 			? wlr_scene_xdg_surface_create(c->scene, c->surface.xdg)
-// 			: wlr_scene_subsurface_tree_create(c->scene, client_surface(c));
-// 	if (client_surface(c)) {
-// 		client_surface(c)->data = c->scene;
-// 		/* Ideally we should do this in createnotify{,x11} but at that moment
-// 		* wlr_xwayland_surface doesn't have wlr_surface yet. */
-// 		LISTEN(&client_surface(c)->events.commit, &c->commit, commitnotify);
-// 	}
-// 	c->scene->node.data = c->scene_surface->node.data = c;
-// #ifdef XWAYLAND
-// 	/* Handle unmanaged clients first so we can return prior create borders */
-// 	if (client_is_unmanaged(c)) {
-// 		client_get_geometry(c, &c->geom);
-// 		/* Unmanaged clients always are floating */
-// 		wlr_scene_node_reparent(&c->scene->node, layers[LyrFloat]);
-// 		wlr_scene_node_set_position(&c->scene->node, c->geom.x + borderpx,
-// 			c->geom.y + borderpx);
-// 		if (client_wants_focus(c)) {
-// 			focusclient(c, 1);
-// 			exclusive_focus = c;
-// 		}
-// 		return;
-// 	}
-// #endif
-// 	for (i = 0; i < 4; i++) {
-// 		c->border[i] = wlr_scene_rect_create(c->scene, 0, 0, bordercolor);
-// 		c->border[i]->node.data = c;
-// 	}
-
-// 	/* Initialize client geometry with room for border */
-// 	client_get_geometry(c, &c->geom);
-// 	c->geom.width += 2 * c->bw;
-// 	c->geom.height += 2 * c->bw;
-// 	c->bw = borderpx;
-// 	c->isfakefullscreen = 0;
-// 	c->isrealfullscreen = 0;	
-// 	c->oldgeom.width = 1200;
-// 	c->oldgeom.height = 800;
-// 	c->resize_fail_count = 0;
-
-// 	//根据宽高让坐标屏幕居中
-// 	c->oldgeom = setclient_coordinate_center(c->oldgeom);
-// 	c->geom = setclient_coordinate_center(c->geom);
-// 	//初始化窗口规则是否有设置标识
-// 	c->set_rule_size = 0;
-
-// 	if (new_is_master)
-// 		// tile at the top
-// 		wl_list_insert(&clients, &c->link); //新窗口是master,头部入栈
-// 	else
-// 		wl_list_insert(clients.prev, &c->link); //尾部入栈
-// 	wl_list_insert(&fstack, &c->flink);
-
-// 	/* Set initial monitor, tags, floating status, and focus:
-// 	 * we always consider floating, clients that have parent and thus
-// 	 * we set the same tags and monitor than its parent, if not
-// 	 * try to apply rules for them */
-// 	 /* TODO: https://github.com/djpohly/dwl/pull/334#issuecomment-1330166324 */
-// 	if (c->type == XDGShell && (p = client_get_parent(c))) {
-// 		c->isfloating = 1;
-// 		wlr_scene_node_reparent(&c->scene->node, layers[LyrFloat]); //设置登录框浮动
-// 		setmon(c, p->mon, p->tags);
-// 	} else {
-// 		applyrules(c); //窗口预设规则应用,全屏窗口自动退出判断也在里面
-// 	}
-// 	printstatus();
-
-// 	//创建外部顶层窗口的句柄,每一个顶层窗口都有一个
-// 	c->foreign_toplevel = wlr_foreign_toplevel_handle_v1_create(foreign_toplevel_manager);
-
-// 	//监听来自外部对于窗口的事件请求
-// 	if(c->foreign_toplevel){
-// 		LISTEN(&(c->foreign_toplevel->events.request_activate),
-// 				&c->foreign_activate_request,handle_foreign_activate_request);
-// 		LISTEN(&(c->foreign_toplevel->events.request_fullscreen),
-// 				&c->foreign_fullscreen_request,handle_foreign_fullscreen_request);
-// 		LISTEN(&(c->foreign_toplevel->events.request_close),
-// 				&c->foreign_close_request,handle_foreign_close_request);
-// 		LISTEN(&(c->foreign_toplevel->events.destroy),
-// 				&c->foreign_destroy,handle_foreign_destroy);
-// 		//设置外部顶层句柄的id为应用的id
-// 		const char *appid;
-//     	appid = client_get_appid(c) ;
-// 		if(appid)
-// 			wlr_foreign_toplevel_handle_v1_set_app_id(c->foreign_toplevel,appid);
-// 		//设置外部顶层句柄的title为应用的title
-// 		const char *title;
-//     	title = client_get_title(c) ;
-// 		if(title)
-// 			wlr_foreign_toplevel_handle_v1_set_title(c->foreign_toplevel,title);
-// 		//设置外部顶层句柄的显示监视器为当前监视器
-// 		wlr_foreign_toplevel_handle_v1_output_enter(
-// 				c->foreign_toplevel, selmon->wlr_output);
-// 	}
-
-// }
 
 void //17
 maximizenotify(struct wl_listener *listener, void *data)
@@ -2875,6 +2884,7 @@ run(char *startup_cmd)
 		die("startup: backend_start");
 
 	/* Now that the socket exists and the backend is started, run the startup command */
+	// autostartexec();
 	if (startup_cmd) {
 		int piperw[2];
 		if (pipe(piperw) < 0)
@@ -3790,7 +3800,6 @@ unmapnotify(struct wl_listener *listener, void *data)
 		wl_list_remove(&c->flink);
 	}
 
-	wl_list_remove(&c->commit.link);
 	wlr_scene_node_destroy(&c->scene->node);
 	if(c->foreign_toplevel){
 		wlr_foreign_toplevel_handle_v1_destroy(c->foreign_toplevel);

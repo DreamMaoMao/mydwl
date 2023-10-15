@@ -2,6 +2,8 @@
     "files.associations": {
         "*.tcc": "c",
         "list": "c",
-        "vector": "c"
+        "vector": "c",
+        "wlr_layer_shell_v1.h": "c",
+        "wlr_cursor_shape_v1.h": "c"
     }
 }

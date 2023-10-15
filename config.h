@@ -35,8 +35,11 @@ static int warpcursor = 0; /* Warp cursor to focused client */
 
 /* Autostart */
 static const char *const autostart[] = {
-    "/bin/sh", "-c", "$DWL/autostart.sh", NULL,
-    NULL,
+	"/bin/sh",
+	"-c",
+	"$DWL/autostart.sh",
+	NULL,
+	NULL,
 };
 
 /* tagging
