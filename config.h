@@ -221,7 +221,6 @@ static const Key keys[] = {
     { MODKEY|WLR_MODIFIER_SHIFT, 			XKB_KEY_X,          	incgaps,        			{.i = +1 } },
 	{ MODKEY|WLR_MODIFIER_SHIFT, 			XKB_KEY_Z,          	incgaps,        			{.i = -1 } },
 	{ MODKEY|WLR_MODIFIER_SHIFT, 			XKB_KEY_KP_0,          	togglegaps,     			{0} },
-	{ WLR_MODIFIER_LOGO,         			XKB_KEY_h,          	togglebar, 						{0}}, 
 	TAGKEYS(          XKB_KEY_KP_1, XKB_KEY_exclam,                     0),
 	TAGKEYS(          XKB_KEY_KP_2, XKB_KEY_at,                         1),
 	TAGKEYS(          XKB_KEY_KP_3, XKB_KEY_numbersign,                 2),

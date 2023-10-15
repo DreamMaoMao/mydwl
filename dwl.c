@@ -295,7 +295,6 @@ static void autostartexec(void);  //自启动命令执行
 static void axisnotify(struct wl_listener *listener, void *data);  //滚轮事件处理
 static void buttonpress(struct wl_listener *listener, void *data); //鼠标按键事件处理
 static void chvt(const Arg *arg); 
-static void togglebar(const Arg *arg);
 static void checkidleinhibitor(struct wlr_surface *exclude);
 static void cleanup(void);  //退出清理
 static void cleanupkeyboard(struct wl_listener *listener, void *data); //退出清理
@@ -1907,13 +1906,6 @@ void dwl_ipc_output_release(struct wl_client *client, struct wl_resource *resour
 
 
 void
-togglebar(const Arg *arg) {
-	DwlIpcOutput *ipc_output;
-	wl_list_for_each(ipc_output, &selmon->dwl_ipc_outputs, link)
-		zdwl_ipc_output_v2_send_toggle_visibility(ipc_output->resource);
-}
-
-void
 focusclient(Client *c, int lift)
 {
 	struct wlr_surface *old = seat->keyboard_state.focused_surface;
@@ -2795,6 +2787,7 @@ printstatus(void)
 		printf("%s tags %u %u %u %u\n", m->wlr_output->name, occ, m->tagset[m->seltags],
 				sel, urg);
 		printf("%s layout %s\n", m->wlr_output->name, m->ltsymbol);
+		dwl_ipc_output_printstatus(m);
 	}
 	fflush(stdout);
 }
