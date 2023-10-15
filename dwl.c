@@ -88,9 +88,10 @@
 #define LISTEN_STATIC(E, H)     do { static struct wl_listener _l = {.notify = (H)}; wl_signal_add((E), &_l); } while (0)
 
 /* enums */
+/* enums */
 enum { CurNormal, CurPressed, CurMove, CurResize }; /* cursor */
 enum { XDGShell, LayerShell, X11Managed, X11Unmanaged }; /* client types */
-enum { LyrBg, LyrBottom, LyrTop, LyrOverlay, LyrTile, LyrFloat, LyrFS, LyrDragIcon, LyrBlock, NUM_LAYERS }; /* scene layers */
+enum { LyrBg, LyrBottom, LyrTile, LyrFloat, LyrFS, LyrTop, LyrOverlay, LyrBlock, NUM_LAYERS }; /* scene layers */
 #ifdef XWAYLAND
 enum { NetWMWindowTypeDialog, NetWMWindowTypeSplash, NetWMWindowTypeToolbar,
 	NetWMWindowTypeUtility, NetLast }; /* EWMH atoms */
@@ -695,12 +696,13 @@ void lognumtofile(unsigned int num) {
   system(cmd);
 }
 
-void
+
+void // 17
 applyrules(Client *c)
 {
 	/* rule matching */
 	const char *appid, *title;
-	unsigned int i, newtags = 0;
+	uint32_t i, newtags = 0;
 	const Rule *r;
 	Monitor *mon = selmon, *m;
 
@@ -713,15 +715,13 @@ applyrules(Client *c)
 	for (r = rules; r < END(rules); r++) {
 		if ((!r->title || strstr(title, r->title))
 				&& (!r->id || strstr(appid, r->id))) {
-
 			c->isfloating = r->isfloating;
 			newtags |= r->tags;
 			i = 0;
-
 			wl_list_for_each(m, &mons, link)
 				if (r->monitor == i++)
 					mon = m;
-
+					
 			if(c->isfloating && r->width != 0 && r->height != 0){
 				c->geom.width = r->width;
 				c->geom.height =  r->height;
@@ -731,18 +731,13 @@ applyrules(Client *c)
 			}
 		}
 	}
-	
+
+
+
 	wlr_scene_node_reparent(&c->scene->node, layers[c->isfloating ? LyrFloat : LyrTile]);
-	Client *fc;
-
-
-	//设置非悬浮客户端它当前处于平铺模式
-	if(c->isfloating){
-		client_set_tiled(c,false);
-	}else {
-		client_set_tiled(c,true);
-	}
 	setmon(c, mon, newtags);
+
+	Client *fc;
 
   	// 如果当前的tag中有新创建的非悬浮窗口,就让当前tag中的全屏窗口退出全屏参与平铺
 	wl_list_for_each(fc, &clients, link)
@@ -757,6 +752,69 @@ applyrules(Client *c)
 		view(&(Arg){.ui = c->tags});
 	}
 }
+
+// void
+// applyrules(Client *c)
+// {
+// 	/* rule matching */
+// 	const char *appid, *title;
+// 	unsigned int i, newtags = 0;
+// 	const Rule *r;
+// 	Monitor *mon = selmon, *m;
+
+// 	c->isfloating = client_is_float_type(c);
+// 	if (!(appid = client_get_appid(c)))
+// 		appid = broken;
+// 	if (!(title = client_get_title(c)))
+// 		title = broken;
+
+// 	for (r = rules; r < END(rules); r++) {
+// 		if ((!r->title || strstr(title, r->title))
+// 				&& (!r->id || strstr(appid, r->id))) {
+
+// 			c->isfloating = r->isfloating;
+// 			newtags |= r->tags;
+// 			i = 0;
+
+// 			wl_list_for_each(m, &mons, link)
+// 				if (r->monitor == i++)
+// 					mon = m;
+
+// 			if(c->isfloating && r->width != 0 && r->height != 0){
+// 				c->geom.width = r->width;
+// 				c->geom.height =  r->height;
+// 				//重新计算居中的坐标
+// 				c->geom = setclient_coordinate_center(c->geom);
+// 				c->set_rule_size = 1;
+// 			}
+// 		}
+// 	}
+	
+// 	wlr_scene_node_reparent(&c->scene->node, layers[c->isfloating ? LyrFloat : LyrTile]);
+// 	Client *fc;
+
+
+// 	//设置非悬浮客户端它当前处于平铺模式
+// 	if(c->isfloating){
+// 		client_set_tiled(c,false);
+// 	}else {
+// 		client_set_tiled(c,true);
+// 	}
+// 	setmon(c, mon, newtags);
+
+//   	// 如果当前的tag中有新创建的非悬浮窗口,就让当前tag中的全屏窗口退出全屏参与平铺
+// 	wl_list_for_each(fc, &clients, link)
+//   		if (fc && c->tags & fc->tags && ISFULLSCREEN(fc) && !c->isfloating ) {
+//   		  	clear_fullscreen_flag(fc);
+// 			arrange(c->mon);
+//   		}
+
+// 	resize(c,c->geom,0);
+
+// 	if(!(c->tags & ( 1 << (selmon->pertag->curtag - 1) ))){
+// 		view(&(Arg){.ui = c->tags});
+// 	}
+// }
 
 
 // void //17
