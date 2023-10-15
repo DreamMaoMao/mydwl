@@ -1383,21 +1383,36 @@ createmon(struct wl_listener *listener, void *data)
 	Monitor *m = wlr_output->data = ecalloc(1, sizeof(*m));
 	m->wlr_output = wlr_output;
 
+    wl_list_init(&m->dwl_ipc_outputs);
 	wlr_output_init_render(wlr_output, alloc, drw);
 
 	/* Initialize monitor state using configured rules */
 	for (i = 0; i < LENGTH(m->layers); i++)
 		wl_list_init(&m->layers[i]);
+
+	m->gappih = gappih;
+	m->gappiv = gappiv;
+	m->gappoh = gappoh;
+	m->gappov = gappov;
+	m->isoverview = 0;
+	m->sel = NULL;
+	m->is_in_hotarea = 0;
 	m->tagset[0] = m->tagset[1] = 1;
 	for (r = monrules; r < END(monrules); r++) {
 		if (!r->name || strstr(wlr_output->name, r->name)) {
 			m->mfact = r->mfact;
 			m->nmaster = r->nmaster;
 			wlr_output_set_scale(wlr_output, r->scale);
-			m->lt[0] = m->lt[1] = r->lt;
+			wlr_xcursor_manager_load(cursor_mgr, r->scale);
+			if(r->lt)
+				m->lt[0] = m->lt[1] = r->lt;
+			else if(LENGTH(layouts) > 1){
+				m->lt[0] = &layouts[0]; //默认就有两个布局
+				m->lt[1] = &layouts[1];
+			}else{
+				m->lt[0] = m->lt[1] = &layouts[0];
+			}
 			wlr_output_set_transform(wlr_output, r->rr);
-			m->m.x = r->x;
-			m->m.y = r->y;
 			break;
 		}
 	}
@@ -2420,12 +2435,14 @@ mapnotify(struct wl_listener *listener, void *data)
 	//初始化窗口规则是否有设置标识
 	c->set_rule_size = 0;
 
+	//nop
 	if (new_is_master)
 		// tile at the top
 		wl_list_insert(&clients, &c->link); //新窗口是master,头部入栈
 	else
 		wl_list_insert(clients.prev, &c->link); //尾部入栈
 	wl_list_insert(&fstack, &c->flink);
+
 
 	/* Set initial monitor, tags, floating status, and focus:
 	 * we always consider floating, clients that have parent and thus
@@ -2884,7 +2901,7 @@ run(char *startup_cmd)
 		die("startup: backend_start");
 
 	/* Now that the socket exists and the backend is started, run the startup command */
-	// autostartexec();
+	autostartexec();
 	if (startup_cmd) {
 		int piperw[2];
 		if (pipe(piperw) < 0)
