@@ -2769,7 +2769,7 @@ printstatus(void)
 		printf("%s tags %u %u %u %u\n", m->wlr_output->name, occ, m->tagset[m->seltags],
 				sel, urg);
 		printf("%s layout %s\n", m->wlr_output->name, m->ltsymbol);
-		dwl_ipc_output_printstatus(m);
+		dwl_ipc_output_printstatus(m); //更新waybar上tag的状态 这里很关键
 	}
 	fflush(stdout);
 }
@@ -2855,24 +2855,33 @@ resize(Client *c, struct wlr_box geo, int interact)
 {	
 
 	struct wlr_box *bbox = interact ? &sgeom : &c->mon->w;//去掉这个推荐的窗口大小,因为有时推荐的窗口特别大导致平铺异常
+	struct wlr_box surface = {0};
 	client_set_bounds(c, geo.width, geo.height); //去掉这个推荐的窗口大小,因为有时推荐的窗口特别大导致平铺异常
 	c->geom = geo;
 	applybounds(c, bbox);//去掉这个推荐的窗口大小,因为有时推荐的窗口特别大导致平铺异常
+	surface = (struct wlr_box){.width = c->geom.width - 2 * c->bw,
+		.height = c->geom.height - 2 * c->bw};
 
 	/* Update scene-graph, including borders */
 	wlr_scene_node_set_position(&c->scene->node, c->geom.x, c->geom.y);
 	wlr_scene_node_set_position(&c->scene_surface->node, c->bw, c->bw);
 	wlr_scene_rect_set_size(c->border[0], c->geom.width, c->bw);
 	wlr_scene_rect_set_size(c->border[1], c->geom.width, c->bw);
-	wlr_scene_rect_set_size(c->border[2], c->bw, c->geom.height - 2 * c->bw);
-	wlr_scene_rect_set_size(c->border[3], c->bw, c->geom.height - 2 * c->bw);
+	// wlr_scene_rect_set_size(c->border[2], c->bw, c->geom.height - 2 * c->bw);
+	// wlr_scene_rect_set_size(c->border[3], c->bw, c->geom.height - 2 * c->bw);
+	wlr_scene_rect_set_size(c->border[2], c->bw, surface.height);
+	wlr_scene_rect_set_size(c->border[3], c->bw, surface.height);
 	wlr_scene_node_set_position(&c->border[1]->node, 0, c->geom.height - c->bw);
 	wlr_scene_node_set_position(&c->border[2]->node, 0, c->bw);
 	wlr_scene_node_set_position(&c->border[3]->node, c->geom.width - c->bw, c->bw);
 
 	/* this is a no-op if size hasn't changed */
-	c->resize = client_set_size(c, c->geom.width - 2 * c->bw,
-			c->geom.height - 2 * c->bw);
+	// c->resize = client_set_size(c, c->geom.width - 2 * c->bw,
+	// 		c->geom.height - 2 * c->bw);
+
+	//使用裁剪的窗口大小,避免窗口拒绝重置大小导致布局混乱
+	c->resize = client_set_size(c, surface.width, surface.height);
+	wlr_scene_subsurface_tree_set_clip(&c->scene_surface->node, &surface);
 	setborder_color(c);
 
 }
