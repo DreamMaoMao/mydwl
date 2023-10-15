@@ -441,7 +441,7 @@ static struct wlr_box setclient_coordinate_center(struct wlr_box geom);
 static unsigned int get_tags_first_tag(unsigned int tags);
 /* variables */
 static const char broken[] = "broken";
-static const char *cursor_image = "left_ptr";
+// static const char *cursor_image = "left_ptr";
 static pid_t child_pid = -1;
 static int locked;
 static void *exclusive_focus;
@@ -461,10 +461,10 @@ static struct wlr_xdg_activation_v1 *activation;
 static struct wlr_xdg_decoration_manager_v1 *xdg_decoration_mgr;
 static struct wl_list clients; /* tiling order */
 static struct wl_list fstack;  /* focus order */
-static struct wlr_idle *idle;
+// static struct wlr_idle *idle;
 static struct wlr_idle_notifier_v1 *idle_notifier;
 static struct wlr_idle_inhibit_manager_v1 *idle_inhibit_mgr;
-static struct wlr_input_inhibit_manager *input_inhibit_mgr;
+// static struct wlr_input_inhibit_manager *input_inhibit_mgr;
 static struct wlr_layer_shell_v1 *layer_shell;
 static struct wlr_output_manager_v1 *output_mgr;
 static struct wlr_virtual_keyboard_manager_v1 *virtual_keyboard_mgr;
@@ -495,33 +495,33 @@ static Monitor *selmon;
 static int enablegaps = 1;   /* enables gaps, used by togglegaps */
 
 /* global event handlers */
-static struct wl_listener cursor_axis = {.notify = axisnotify};
-static struct wl_listener cursor_button = {.notify = buttonpress};
-static struct wl_listener cursor_frame = {.notify = cursorframe};
-static struct wl_listener cursor_motion = {.notify = motionrelative};
-static struct wl_listener cursor_motion_absolute = {.notify = motionabsolute};
-static struct wl_listener drag_icon_destroy = {.notify = destroydragicon};
+// static struct wl_listener cursor_axis = {.notify = axisnotify};
+// static struct wl_listener cursor_button = {.notify = buttonpress};
+// static struct wl_listener cursor_frame = {.notify = cursorframe};
+// static struct wl_listener cursor_motion = {.notify = motionrelative};
+// static struct wl_listener cursor_motion_absolute = {.notify = motionabsolute};
+// static struct wl_listener drag_icon_destroy = {.notify = destroydragicon};
 static struct zdwl_ipc_manager_v2_interface dwl_manager_implementation = {.release = dwl_ipc_manager_release, .get_output = dwl_ipc_manager_get_output};
 static struct zdwl_ipc_output_v2_interface dwl_output_implementation = {.release = dwl_ipc_output_release, .set_tags = dwl_ipc_output_set_tags, .set_layout = dwl_ipc_output_set_layout, .set_client_tags = dwl_ipc_output_set_client_tags};
-static struct wl_listener idle_inhibitor_create = {.notify = createidleinhibitor};
-static struct wl_listener idle_inhibitor_destroy = {.notify = destroyidleinhibitor};
-static struct wl_listener layout_change = {.notify = updatemons};
-static struct wl_listener new_input = {.notify = inputdevice};
-static struct wl_listener new_virtual_keyboard = {.notify = virtualkeyboard};
-static struct wl_listener new_output = {.notify = createmon};
-static struct wl_listener new_xdg_surface = {.notify = createnotify};
-static struct wl_listener new_xdg_decoration = {.notify = createdecoration};
-static struct wl_listener new_layer_shell_surface = {.notify = createlayersurface};
-static struct wl_listener output_mgr_apply = {.notify = outputmgrapply};
-static struct wl_listener output_mgr_test = {.notify = outputmgrtest};
-static struct wl_listener request_activate = {.notify = urgent};
-static struct wl_listener request_cursor = {.notify = setcursor};
-static struct wl_listener request_set_psel = {.notify = setpsel};
-static struct wl_listener request_set_sel = {.notify = setsel};
-static struct wl_listener request_start_drag = {.notify = requeststartdrag};
-static struct wl_listener start_drag = {.notify = startdrag};
-static struct wl_listener session_lock_create_lock = {.notify = locksession};
-static struct wl_listener session_lock_mgr_destroy = {.notify = destroysessionmgr};
+// static struct wl_listener idle_inhibitor_create = {.notify = createidleinhibitor};
+// static struct wl_listener idle_inhibitor_destroy = {.notify = destroyidleinhibitor};
+// static struct wl_listener layout_change = {.notify = updatemons};
+// static struct wl_listener new_input = {.notify = inputdevice};
+// static struct wl_listener new_virtual_keyboard = {.notify = virtualkeyboard};
+// static struct wl_listener new_output = {.notify = createmon};
+// static struct wl_listener new_xdg_surface = {.notify = createnotify};
+// static struct wl_listener new_xdg_decoration = {.notify = createdecoration};
+// static struct wl_listener new_layer_shell_surface = {.notify = createlayersurface};
+// static struct wl_listener output_mgr_apply = {.notify = outputmgrapply};
+// static struct wl_listener output_mgr_test = {.notify = outputmgrtest};
+// static struct wl_listener request_activate = {.notify = urgent};
+// static struct wl_listener request_cursor = {.notify = setcursor};
+// static struct wl_listener request_set_psel = {.notify = setpsel};
+// static struct wl_listener request_set_sel = {.notify = setsel};
+// static struct wl_listener request_start_drag = {.notify = requeststartdrag};
+// static struct wl_listener start_drag = {.notify = startdrag};
+// static struct wl_listener session_lock_create_lock = {.notify = locksession};
+// static struct wl_listener session_lock_mgr_destroy = {.notify = destroysessionmgr};
 static struct wl_listener lock_listener = {.notify = locksession};
 
 
@@ -535,8 +535,8 @@ static void associatex11(struct wl_listener *listener, void *data);
 static Atom getatom(xcb_connection_t *xc, const char *name);
 static void sethints(struct wl_listener *listener, void *data);
 static void xwaylandready(struct wl_listener *listener, void *data);
-static struct wl_listener new_xwayland_surface = {.notify = createnotifyx11};
-static struct wl_listener xwayland_ready = {.notify = xwaylandready};
+// static struct wl_listener new_xwayland_surface = {.notify = createnotifyx11};
+// static struct wl_listener xwayland_ready = {.notify = xwaylandready};
 static struct wlr_xwayland *xwayland;
 static Atom netatom[NetLast];
 #endif
@@ -2377,8 +2377,8 @@ maplayersurfacenotify(struct wl_listener *listener, void *data)
 void
 mapnotify(struct wl_listener *listener, void *data)
 { //x11和wayland窗口的创建都会出发来这里初始化相关窗口元素
-	Client *p, *w, *c = wl_container_of(listener, c, map);
-	Monitor *m;
+	Client *p, *c = wl_container_of(listener, c, map);
+
 	int i;
 
 	/* Create scene tree for this client and its border */
