@@ -69,7 +69,7 @@ static const Rule rules[] = {
 	{ NULL,  "图片查看器",       0,       1,           -1 ,0,0},
 	{ NULL,  "图片查看",       0,       1,           -1 ,0,0},
 	{ NULL,  "选择文件",       0,       1,           -1 ,1200,800},
-	{ "blueman-manager",  NULL,       0,       1,           -1 ,0,0},
+	{ "blueman-manager",  NULL,       0,       1,           -1 ,700,600},
 	{ "flameshot",  NULL,       0,       1,           -1 ,0,0},
 	{ "com.xunlei.download",  NULL,       0,       1,           -1 ,0,0},
 	{ "pavucontrol",  NULL,       0,       1,           -1 ,0,0},

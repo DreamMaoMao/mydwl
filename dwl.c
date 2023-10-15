@@ -496,33 +496,8 @@ static Monitor *selmon;
 static int enablegaps = 1;   /* enables gaps, used by togglegaps */
 
 /* global event handlers */
-// static struct wl_listener cursor_axis = {.notify = axisnotify};
-// static struct wl_listener cursor_button = {.notify = buttonpress};
-// static struct wl_listener cursor_frame = {.notify = cursorframe};
-// static struct wl_listener cursor_motion = {.notify = motionrelative};
-// static struct wl_listener cursor_motion_absolute = {.notify = motionabsolute};
-// static struct wl_listener drag_icon_destroy = {.notify = destroydragicon};
 static struct zdwl_ipc_manager_v2_interface dwl_manager_implementation = {.release = dwl_ipc_manager_release, .get_output = dwl_ipc_manager_get_output};
 static struct zdwl_ipc_output_v2_interface dwl_output_implementation = {.release = dwl_ipc_output_release, .set_tags = dwl_ipc_output_set_tags, .set_layout = dwl_ipc_output_set_layout, .set_client_tags = dwl_ipc_output_set_client_tags};
-// static struct wl_listener idle_inhibitor_create = {.notify = createidleinhibitor};
-// static struct wl_listener idle_inhibitor_destroy = {.notify = destroyidleinhibitor};
-// static struct wl_listener layout_change = {.notify = updatemons};
-// static struct wl_listener new_input = {.notify = inputdevice};
-// static struct wl_listener new_virtual_keyboard = {.notify = virtualkeyboard};
-// static struct wl_listener new_output = {.notify = createmon};
-// static struct wl_listener new_xdg_surface = {.notify = createnotify};
-// static struct wl_listener new_xdg_decoration = {.notify = createdecoration};
-// static struct wl_listener new_layer_shell_surface = {.notify = createlayersurface};
-// static struct wl_listener output_mgr_apply = {.notify = outputmgrapply};
-// static struct wl_listener output_mgr_test = {.notify = outputmgrtest};
-// static struct wl_listener request_activate = {.notify = urgent};
-// static struct wl_listener request_cursor = {.notify = setcursor};
-// static struct wl_listener request_set_psel = {.notify = setpsel};
-// static struct wl_listener request_set_sel = {.notify = setsel};
-// static struct wl_listener request_start_drag = {.notify = requeststartdrag};
-// static struct wl_listener start_drag = {.notify = startdrag};
-// static struct wl_listener session_lock_create_lock = {.notify = locksession};
-// static struct wl_listener session_lock_mgr_destroy = {.notify = destroysessionmgr};
 static struct wl_listener lock_listener = {.notify = locksession};
 
 
@@ -749,92 +724,6 @@ applyrules(Client *c)
 		view(&(Arg){.ui = c->tags});
 	}
 }
-
-// void
-// applyrules(Client *c)
-// {
-// 	/* rule matching */
-// 	const char *appid, *title;
-// 	unsigned int i, newtags = 0;
-// 	const Rule *r;
-// 	Monitor *mon = selmon, *m;
-
-// 	c->isfloating = client_is_float_type(c);
-// 	if (!(appid = client_get_appid(c)))
-// 		appid = broken;
-// 	if (!(title = client_get_title(c)))
-// 		title = broken;
-
-// 	for (r = rules; r < END(rules); r++) {
-// 		if ((!r->title || strstr(title, r->title))
-// 				&& (!r->id || strstr(appid, r->id))) {
-
-// 			c->isfloating = r->isfloating;
-// 			newtags |= r->tags;
-// 			i = 0;
-
-// 			wl_list_for_each(m, &mons, link)
-// 				if (r->monitor == i++)
-// 					mon = m;
-
-// 			if(c->isfloating && r->width != 0 && r->height != 0){
-// 				c->geom.width = r->width;
-// 				c->geom.height =  r->height;
-// 				//重新计算居中的坐标
-// 				c->geom = setclient_coordinate_center(c->geom);
-// 				c->set_rule_size = 1;
-// 			}
-// 		}
-// 	}
-	
-// 	wlr_scene_node_reparent(&c->scene->node, layers[c->isfloating ? LyrFloat : LyrTile]);
-// 	Client *fc;
-
-
-// 	//设置非悬浮客户端它当前处于平铺模式
-// 	if(c->isfloating){
-// 		client_set_tiled(c,false);
-// 	}else {
-// 		client_set_tiled(c,true);
-// 	}
-// 	setmon(c, mon, newtags);
-
-//   	// 如果当前的tag中有新创建的非悬浮窗口,就让当前tag中的全屏窗口退出全屏参与平铺
-// 	wl_list_for_each(fc, &clients, link)
-//   		if (fc && c->tags & fc->tags && ISFULLSCREEN(fc) && !c->isfloating ) {
-//   		  	clear_fullscreen_flag(fc);
-// 			arrange(c->mon);
-//   		}
-
-// 	resize(c,c->geom,0);
-
-// 	if(!(c->tags & ( 1 << (selmon->pertag->curtag - 1) ))){
-// 		view(&(Arg){.ui = c->tags});
-// 	}
-// }
-
-
-// void //17
-// arrange(Monitor *m)
-// {
-// 	Client *c;
-// 	wl_list_for_each(c, &clients, link) {
-// 		if (c->mon == m) {
-// 			wlr_scene_node_set_enabled(&c->scene->node, VISIBLEON(c, m));
-// 			client_set_suspended(c, !VISIBLEON(c, m));
-// 		}
-// 	}
-
-// 	wlr_scene_node_set_enabled(&m->fullscreen_bg->node,
-// 			(c = focustop(m)) && c->isfullscreen);
-
-// 	strncpy(m->ltsymbol, m->lt[m->sellt]->symbol, LENGTH(m->ltsymbol));
-
-// 	if (m->lt[m->sellt]->arrange)
-// 		m->lt[m->sellt]->arrange(m,0,0);
-// 	motionnotify(0);
-// 	checkidleinhibitor(NULL);
-// }
 
 void //17
 arrange(Monitor *m)
@@ -2379,71 +2268,6 @@ maplayersurfacenotify(struct wl_listener *listener, void *data)
 	motionnotify(0);
 }
 
-// void //17
-// mapnotify(struct wl_listener *listener, void *data)
-// {
-// 	/* Called when the surface is mapped, or ready to display on-screen. */
-// 	Client *p, *w, *c = wl_container_of(listener, c, map);
-// 	Monitor *m;
-// 	int i;
-
-// 	/* Create scene tree for this client and its border */
-// 	c->scene = client_surface(c)->data = wlr_scene_tree_create(layers[LyrTile]);
-// 	wlr_scene_node_set_enabled(&c->scene->node, c->type != XDGShell);
-// 	c->scene_surface = c->type == XDGShell
-// 			? wlr_scene_xdg_surface_create(c->scene, c->surface.xdg)
-// 			: wlr_scene_subsurface_tree_create(c->scene, client_surface(c));
-// 	c->scene->node.data = c->scene_surface->node.data = c;
-
-// 	/* Handle unmanaged clients first so we can return prior create borders */
-// 	if (client_is_unmanaged(c)) {
-// 		client_get_geometry(c, &c->geom);
-// 		/* Unmanaged clients always are floating */
-// 		wlr_scene_node_reparent(&c->scene->node, layers[LyrFloat]);
-// 		wlr_scene_node_set_position(&c->scene->node, c->geom.x + borderpx,
-// 			c->geom.y + borderpx);
-// 		if (client_wants_focus(c)) {
-// 			focusclient(c, 1);
-// 			exclusive_focus = c;
-// 		}
-// 		goto unset_fullscreen;
-// 	}
-
-// 	for (i = 0; i < 4; i++) {
-// 		c->border[i] = wlr_scene_rect_create(c->scene, 0, 0, bordercolor);
-// 		c->border[i]->node.data = c;
-// 	}
-
-// 	/* Initialize client geometry with room for border */
-// 	client_set_tiled(c, WLR_EDGE_TOP | WLR_EDGE_BOTTOM | WLR_EDGE_LEFT | WLR_EDGE_RIGHT);
-// 	client_get_geometry(c, &c->geom);
-// 	c->geom.width += 2 * c->bw;
-// 	c->geom.height += 2 * c->bw;
-
-// 	/* Insert this client into client lists. */
-// 	wl_list_insert(&clients, &c->link);
-// 	wl_list_insert(&fstack, &c->flink);
-
-// 	/* Set initial monitor, tags, floating status, and focus:
-// 	 * we always consider floating, clients that have parent and thus
-// 	 * we set the same tags and monitor than its parent, if not
-// 	 * try to apply rules for them */
-// 	 /* TODO: https://github.com/djpohly/dwl/pull/334#issuecomment-1330166324 */
-// 	if (c->type == XDGShell && (p = client_get_parent(c))) {
-// 		c->isfloating = 1;
-// 		wlr_scene_node_reparent(&c->scene->node, layers[LyrFloat]);
-// 		setmon(c, p->mon, p->tags);
-// 	} else {
-// 		applyrules(c);
-// 	}
-// 	printstatus();
-
-// unset_fullscreen:
-// 	m = c->mon ? c->mon : xytomon(c->geom.x, c->geom.y);
-// 	wl_list_for_each(w, &clients, link)
-// 		if (w != c && w->isfullscreen && m == w->mon && (w->tags & c->tags))
-// 			setfullscreen(w, 0);
-// }
 
 void
 mapnotify(struct wl_listener *listener, void *data)
@@ -3770,38 +3594,6 @@ tile(Monitor *m,unsigned int gappo, unsigned int uappi)
 	}
 }
 
-// void //17
-// tile(Monitor *m,unsigned int gappo, unsigned int uappi)
-// {
-// 	unsigned int i, n = 0, mw, my, ty;
-// 	Client *c;
-
-// 	wl_list_for_each(c, &clients, link)
-// 		if (VISIBLEON(c, m) && !c->isfloating && !c->isfullscreen)
-// 			n++;
-// 	if (n == 0)
-// 		return;
-
-// 	if (n > m->nmaster)
-// 		mw = m->nmaster ? m->w.width * m->mfact : 0;
-// 	else
-// 		mw = m->w.width;
-// 	i = my = ty = 0;
-// 	wl_list_for_each(c, &clients, link) {
-// 		if (!VISIBLEON(c, m) || c->isfloating || c->isfullscreen)
-// 			continue;
-// 		if (i < m->nmaster) {
-// 			resize(c, (struct wlr_box){.x = m->w.x, .y = m->w.y + my, .width = mw,
-// 				.height = (m->w.height - my) / (MIN(n, m->nmaster) - i)}, 0);
-// 			my += c->geom.height;
-// 		} else {
-// 			resize(c, (struct wlr_box){.x = m->w.x + mw, .y = m->w.y + ty,
-// 				.width = m->w.width - mw, .height = (m->w.height - ty) / (n - i)}, 0);
-// 			ty += c->geom.height;
-// 		}
-// 		i++;
-// 	}
-// }
 
 void
 togglefloating(const Arg *arg)
