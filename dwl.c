@@ -3648,10 +3648,10 @@ void toggleoverview(const Arg *arg) {
 
 }
 
-void //17
+void
 tile(Monitor *m,unsigned int gappo, unsigned int uappi)
 {
-	unsigned int i, n = 0, mw, my, ty;
+	unsigned int i, n = 0, h, r, oe = enablegaps, ie = enablegaps, mw, my, ty;
 	Client *c;
 
 	wl_list_for_each(c, &clients, link)
@@ -3660,26 +3660,68 @@ tile(Monitor *m,unsigned int gappo, unsigned int uappi)
 	if (n == 0)
 		return;
 
+	if (smartgaps == n) {
+		oe = 0; // outer gaps disabled
+	}
+
 	if (n > m->nmaster)
-		mw = m->nmaster ? m->w.width * m->mfact : 0;
+		mw = m->nmaster ? (m->w.width + m->gappiv*ie) * m->mfact : 0;
 	else
-		mw = m->w.width;
-	i = my = ty = 0;
+		mw = m->w.width - 2*m->gappov*oe + m->gappiv*ie;
+	i = 0;
+	my = ty = m->gappoh*oe;
 	wl_list_for_each(c, &clients, link) {
-		if (!VISIBLEON(c, m) || c->isfloating || c->isfullscreen)
+		if (!VISIBLEON(c, m) || c->isfloating || c->isfullscreen ||c->isrealfullscreen || c->isfakefullscreen )
 			continue;
 		if (i < m->nmaster) {
-			resize(c, (struct wlr_box){.x = m->w.x, .y = m->w.y + my, .width = mw,
-				.height = (m->w.height - my) / (MIN(n, m->nmaster) - i)}, 0);
-			my += c->geom.height;
+			r = MIN(n, m->nmaster) - i;
+			h = (m->w.height - my - m->gappoh*oe - m->gappih*ie * (r - 1)) / r;
+			resize(c, (struct wlr_box){.x = m->w.x + m->gappov*oe, .y = m->w.y + my,
+				.width = mw - m->gappiv*ie, .height = h}, 0);
+			my += c->geom.height + m->gappih*ie;
 		} else {
-			resize(c, (struct wlr_box){.x = m->w.x + mw, .y = m->w.y + ty,
-				.width = m->w.width - mw, .height = (m->w.height - ty) / (n - i)}, 0);
-			ty += c->geom.height;
+			r = n - i;
+			h = (m->w.height - ty - m->gappoh*oe - m->gappih*ie * (r - 1)) / r;
+			resize(c, (struct wlr_box){.x = m->w.x + mw + m->gappov*oe, .y = m->w.y + ty,
+				.width = m->w.width - mw - 2*m->gappov*oe, .height = h}, 0);
+			ty += c->geom.height + m->gappih*ie;
 		}
 		i++;
 	}
 }
+
+// void //17
+// tile(Monitor *m,unsigned int gappo, unsigned int uappi)
+// {
+// 	unsigned int i, n = 0, mw, my, ty;
+// 	Client *c;
+
+// 	wl_list_for_each(c, &clients, link)
+// 		if (VISIBLEON(c, m) && !c->isfloating && !c->isfullscreen)
+// 			n++;
+// 	if (n == 0)
+// 		return;
+
+// 	if (n > m->nmaster)
+// 		mw = m->nmaster ? m->w.width * m->mfact : 0;
+// 	else
+// 		mw = m->w.width;
+// 	i = my = ty = 0;
+// 	wl_list_for_each(c, &clients, link) {
+// 		if (!VISIBLEON(c, m) || c->isfloating || c->isfullscreen)
+// 			continue;
+// 		if (i < m->nmaster) {
+// 			resize(c, (struct wlr_box){.x = m->w.x, .y = m->w.y + my, .width = mw,
+// 				.height = (m->w.height - my) / (MIN(n, m->nmaster) - i)}, 0);
+// 			my += c->geom.height;
+// 		} else {
+// 			resize(c, (struct wlr_box){.x = m->w.x + mw, .y = m->w.y + ty,
+// 				.width = m->w.width - mw, .height = (m->w.height - ty) / (n - i)}, 0);
+// 			ty += c->geom.height;
+// 		}
+// 		i++;
+// 	}
+// }
 
 void
 togglefloating(const Arg *arg)
