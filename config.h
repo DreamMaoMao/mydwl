@@ -180,7 +180,6 @@ static const Key keys[] = {
 	{ WLR_MODIFIER_CTRL,         			XKB_KEY_Return,         spawn, 						SHCMD("bash ~/tool/clash.sh") }, 
     { WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO,  XKB_KEY_Return, 		spawn, 						SHCMD("konsole -e /usr/local/bin/yazi") },  
     { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,   XKB_KEY_a, 		 		spawn, 						SHCMD("grim -g \"$(slurp)\" - | swappy -f -") }, 
-	{ WLR_MODIFIER_LOGO,         			XKB_KEY_h,          	spawn, 						SHCMD("bash ~/.config/hypr/scripts/hide_waybar.sh") }, 
 	{ WLR_MODIFIER_LOGO,         			XKB_KEY_l,          	spawn, 						SHCMD("swaylock -f -c 000000") }, 
 
 	{ WLR_MODIFIER_LOGO,                    XKB_KEY_Tab,          	focusstack,     			{.i = +1} },
@@ -222,6 +221,7 @@ static const Key keys[] = {
     { MODKEY|WLR_MODIFIER_SHIFT, 			XKB_KEY_X,          	incgaps,        			{.i = +1 } },
 	{ MODKEY|WLR_MODIFIER_SHIFT, 			XKB_KEY_Z,          	incgaps,        			{.i = -1 } },
 	{ MODKEY|WLR_MODIFIER_SHIFT, 			XKB_KEY_KP_0,          	togglegaps,     			{0} },
+	{ WLR_MODIFIER_LOGO,         			XKB_KEY_h,          	togglebar, 						{0}}, 
 	TAGKEYS(          XKB_KEY_KP_1, XKB_KEY_exclam,                     0),
 	TAGKEYS(          XKB_KEY_KP_2, XKB_KEY_at,                         1),
 	TAGKEYS(          XKB_KEY_KP_3, XKB_KEY_numbersign,                 2),

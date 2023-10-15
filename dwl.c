@@ -295,6 +295,7 @@ static void autostartexec(void);  //自启动命令执行
 static void axisnotify(struct wl_listener *listener, void *data);  //滚轮事件处理
 static void buttonpress(struct wl_listener *listener, void *data); //鼠标按键事件处理
 static void chvt(const Arg *arg); 
+static void togglebar(const Arg *arg);
 static void checkidleinhibitor(struct wlr_surface *exclude);
 static void cleanup(void);  //退出清理
 static void cleanupkeyboard(struct wl_listener *listener, void *data); //退出清理
@@ -566,6 +567,9 @@ static size_t autostart_len;
 void //17
 applybounds(Client *c, struct wlr_box *bbox)
 {
+	if (!c->isfloating || c->set_rule_size) { //只设置悬浮窗口或者没有规则限制的窗口
+		return;
+	}
 	if (!c->isfullscreen) {
 		struct wlr_box min = {0}, max = {0};
 		client_get_size_hints(c, &max, &min);
@@ -1157,6 +1161,9 @@ cleanupmon(struct wl_listener *listener, void *data)
 	LayerSurface *l, *tmp;
 	int i;
 
+    DwlIpcOutput *ipc_output;
+    wl_list_for_each(ipc_output, &m->dwl_ipc_outputs, link)
+        wl_resource_destroy(ipc_output->resource);
 	for (i = 0; i <= ZWLR_LAYER_SHELL_V1_LAYER_OVERLAY; i++)
 		wl_list_for_each_safe(l, tmp, &m->layers[i], link)
 			wlr_layer_surface_v1_destroy(l->layer_surface);
@@ -1896,6 +1903,14 @@ void dwl_ipc_output_set_tags(struct wl_client *client, struct wl_resource *resou
 
 void dwl_ipc_output_release(struct wl_client *client, struct wl_resource *resource) {
     wl_resource_destroy(resource);
+}
+
+
+void
+togglebar(const Arg *arg) {
+	DwlIpcOutput *ipc_output;
+	wl_list_for_each(ipc_output, &selmon->dwl_ipc_outputs, link)
+		zdwl_ipc_output_v2_send_toggle_visibility(ipc_output->resource);
 }
 
 void
