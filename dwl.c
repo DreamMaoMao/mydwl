@@ -2600,8 +2600,7 @@ motionrelative(struct wl_listener *listener, void *data)
 	 * generated the event. You can pass NULL for the device if you want to move
 	 * the cursor around without any input. */
 
-	//通知光标设备移动
-	wlr_cursor_move(cursor, &event->pointer->base, event->delta_x, event->delta_y);
+
 	//处理一些事件,比如窗口聚焦,图层聚焦通知到客户端
 	motionnotify(event->time_msec);  
 	//扩展事件通知,没有这个鼠标移动的时候滑轮将无法使用
@@ -2610,6 +2609,8 @@ motionrelative(struct wl_listener *listener, void *data)
 		seat, (uint64_t)(event->time_msec) * 1000,
 		event->delta_x, event->delta_y, 
 		event->unaccel_dx, event->unaccel_dy);
+	//通知光标设备移动
+	wlr_cursor_move(cursor, &event->pointer->base, event->delta_x, event->delta_y);
 	//鼠标左下热区判断是否触发	
 	toggle_hotarea(cursor->x,cursor->y);	
 }
@@ -3230,7 +3231,7 @@ setup(void)
 	/* The Wayland display is managed by libwayland. It handles accepting
 	 * clients from the Unix socket, manging Wayland globals, and so on. */
 	dpy = wl_display_create();
-
+	pointer_manager = wlr_relative_pointer_manager_v1_create(dpy);
 	/* The backend is a wlroots feature which abstracts the underlying input and
 	 * output hardware. The autocreate option will choose the most suitable
 	 * backend based on the current environment, such as opening an X11 window
