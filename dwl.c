@@ -168,6 +168,7 @@ typedef struct {
 	struct wl_listener foreign_destroy;
 
 	unsigned int set_rule_size;
+	unsigned int ignore_clear_fullscreen;
 
 } Client;
 
@@ -268,6 +269,7 @@ typedef struct {
 	const char *title;
 	unsigned int tags;
 	int isfloating;
+	int isfullscreen;
 	int monitor;
 	unsigned int width;
 	unsigned int height;
@@ -704,6 +706,11 @@ applyrules(Client *c)
 				c->geom = setclient_coordinate_center(c->geom);
 				c->set_rule_size = 1;
 			}
+			if(r->isfullscreen){
+				c->isrealfullscreen =1;
+				c->isfullscreen =1;
+				c->ignore_clear_fullscreen = 1;
+			}
 		}
 	}
 
@@ -713,12 +720,12 @@ applyrules(Client *c)
 	Client *fc;
   	// 如果当前的tag中有新创建的非悬浮窗口,就让当前tag中的全屏窗口退出全屏参与平铺
 	wl_list_for_each(fc, &clients, link)
-  		if (fc && c->tags & fc->tags && ISFULLSCREEN(fc) && !c->isfloating ) {
+  		if (fc && !c->ignore_clear_fullscreen && c->tags & fc->tags && ISFULLSCREEN(fc) && !c->isfloating ) {
   		  	clear_fullscreen_flag(fc);
 			arrange(c->mon);
-  		}
-
-	resize(c,c->geom,0);
+  		}else if(c->ignore_clear_fullscreen && c->isrealfullscreen){
+			setrealfullscreen(c,1);
+		}
 
 	if(!(c->tags & ( 1 << (selmon->pertag->curtag - 1) ))){
 		view(&(Arg){.ui = c->tags});
@@ -2318,6 +2325,7 @@ mapnotify(struct wl_listener *listener, void *data)
 	c->geom = setclient_coordinate_center(c->geom);
 	//初始化窗口规则是否有设置标识
 	c->set_rule_size = 0;
+	c->ignore_clear_fullscreen = 0;
 
 	//nop
 	if (new_is_master)
@@ -2889,7 +2897,6 @@ setfakefullscreen(Client *c, int fakefullscreen)
 		resize(c, fakefullscreen_box, 0);
 		c->isfakefullscreen = 1;
 		c->isfloating = 0;
-		client_set_tiled(c,true);
 	} else {
 		/* restore previous size instead of arrange for floating windows since
 		 * client positions are set by the user and cannot be recalculated */
@@ -2918,7 +2925,6 @@ setrealfullscreen(Client *c, int realfullscreen)
 		resize(c, c->mon->m, 0);
 		c->isrealfullscreen = 1;
 		c->isfloating = 0;
-		client_set_tiled(c,true);
 	} else {
 		/* restore previous size instead of arrange for floating windows since
 		 * client positions are set by the user and cannot be recalculated */
@@ -2928,7 +2934,7 @@ setrealfullscreen(Client *c, int realfullscreen)
 		c->isfullscreen = 0;
 		c->isfakefullscreen = 0;
 		arrange(c->mon);
-		client_set_fullscreen(c, false);
+		// client_set_fullscreen(c, false);
 	}
 }
 
@@ -2946,7 +2952,6 @@ setfullscreen(Client *c, int realfullscreen) //用自定义全屏代理自带全
 		resize(c, c->mon->m, 0);
 		c->isrealfullscreen = 1;
 		c->isfloating = 0;
-		client_set_tiled(c,true);
 	} else {
 		/* restore previous size instead of arrange for floating windows since
 		 * client positions are set by the user and cannot be recalculated */
@@ -3479,7 +3484,6 @@ void overview_backup(Client *c) {
   c->overview_backup_bw = c->bw;
   if (c->isfloating) {
     c->isfloating = 0;
-	client_set_tiled(c,true);
   }
   if (c->isfullscreen || c->isfakefullscreen ||c->isrealfullscreen ) {
     // if (c->bw == 0) { // 真全屏窗口清除x11全屏属性
@@ -3505,7 +3509,6 @@ void overview_restore(Client *c, const Arg *arg) {
   c->overview_isrealfullscreenbak = 0;
   c->bw = c->overview_backup_bw;
   if (c->isfloating) {
-	client_set_tiled(c,false);
     // XRaiseWindow(dpy, c->win); // 提升悬浮窗口到顶层
     resizeclient(c, c->overview_backup_x, c->overview_backup_y, c->overview_backup_w,
            c->overview_backup_h, 1);
@@ -3559,7 +3562,7 @@ tile(Monitor *m,unsigned int gappo, unsigned int uappi)
 	Client *c;
 
 	wl_list_for_each(c, &clients, link)
-		if (VISIBLEON(c, m) && !c->isfloating && !c->isfullscreen)
+		if (VISIBLEON(c, m) && !c->isfloating && !c->isfullscreen && !c->isrealfullscreen && !c->isfakefullscreen)
 			n++;
 	if (n == 0)
 		return;

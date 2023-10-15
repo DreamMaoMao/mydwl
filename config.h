@@ -58,23 +58,23 @@ static const char *tags[] = {
 };
 
 static const Rule rules[] = {
-	/* app_id     title       tags mask     isfloating   monitor  width height */
+	/* app_id     title       tags mask     isfloating  isfullscreen  monitor  width height */
 	/* examples:
 	{ "Gimp",     NULL,       0,            1,           -1,800,600 },
 	*/
-	{ "Google-chrome",  NULL,       1 << 3,       0,           -1 ,0,0},
+	{ "Google-chrome",  NULL,       1 << 3,       0,           0,-1 ,0,0},
 	{ "Microsoft-edge-dev",  NULL,       1 << 4,       0,           -1 ,0,0},
-	{ "Clash for Windows",  NULL,       0,       1,           -1 ,1400,800},
-	{ "electron-netease-cloud-music",  NULL,       0,       1,           -1 ,1200,800},
-	{ NULL,  "图片查看器",       0,       1,           -1 ,0,0},
-	{ NULL,  "图片查看",       0,       1,           -1 ,0,0},
-	{ NULL,  "选择文件",       0,       1,           -1 ,1200,800},
-	{ "blueman-manager",  NULL,       0,       1,           -1 ,700,600},
-	{ "flameshot",  NULL,       0,       1,           -1 ,0,0},
-	{ "com.xunlei.download",  NULL,       0,       1,           -1 ,0,0},
-	{ "pavucontrol",  NULL,       0,       1,           -1 ,0,0},
-	{ "baidunetdisk",  NULL,       0,       1,           -1 ,1400,800},
-	{ "alixby3",  NULL,       0,       1,           -1 ,1400,800},
+	{ "Clash for Windows",  NULL,       0,       1,           0,-1 ,1400,800},
+	{ "electron-netease-cloud-music",  NULL,       0,       1,           0,-1 ,1200,800},
+	{ NULL,  "图片查看器",       0,       1,           0,-1 ,0,0},
+	{ NULL,  "图片查看",       0,       1,           0,-1 ,0,0},
+	{ NULL,  "选择文件",       0,       1,          0, -1 ,1200,800},
+	{ "blueman-manager",  NULL,       0,       1,           0,-1 ,700,600},
+	{ "flameshot",  NULL,       0,       0,           1,-1 ,0,0},
+	{ "com.xunlei.download",  NULL,       0,       1,           0,-1 ,0,0},
+	{ "pavucontrol",  NULL,       0,       1,           0,-1 ,0,0},
+	{ "baidunetdisk",  NULL,       0,       1,           0,-1 ,1400,800},
+	{ "alixby3",  NULL,       0,       1,           0,-1 ,1400,800},
 
 
 
@@ -179,7 +179,7 @@ static const Key keys[] = {
     { WLR_MODIFIER_LOGO,         			XKB_KEY_space, 			spawn, 						SHCMD("microsoft-edge") },
 	{ WLR_MODIFIER_CTRL,         			XKB_KEY_Return,         spawn, 						SHCMD("bash ~/tool/clash.sh") }, 
     { WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO,  XKB_KEY_Return, 		spawn, 						SHCMD("konsole -e /usr/local/bin/yazi") },  
-    { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,   XKB_KEY_a, 		 		spawn, 						SHCMD("grim -g \"$(slurp)\" - | swappy -f -") }, 
+    { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,   XKB_KEY_a, 		 		spawn, 						SHCMD("flameshot gui") }, 
 	{ WLR_MODIFIER_LOGO,         			XKB_KEY_l,          	spawn, 						SHCMD("swaylock -f -c 000000") }, 
 
 	{ WLR_MODIFIER_LOGO,                    XKB_KEY_Tab,          	focusstack,     			{.i = +1} },
