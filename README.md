@@ -53,9 +53,10 @@ sudo pacman -S meson ninja
 sudo pacman -S inetutils 
 sudo pacman -S networkmanager 
 sudo pacman -S gdm
+sudo pacman -S wl-clipboard
 
 yay -S blueman acpi mako jq alsa-utils polkit-gnome  light  nemo swappy swaybg lm_sensors  network-manager-applet playerctl python3  wlsunset  xorg-xinit xorg-xwayland wlroots wayland-protocols pavucontrol ttf-jetbrains-mono-nerd eww-wayland wofi xdg-desktop-portal-wlr xdg-desktop-portal-hyprland cpufrequtils
-
+clipman wl-clip-persist 
 
 ```
 
