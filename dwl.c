@@ -480,7 +480,7 @@ static struct wlr_scene_rect *locked_bg;
 static struct wlr_session_lock_v1 *cur_lock;
 static const int layermap[] = { LyrBg, LyrBottom, LyrTop, LyrOverlay };
 static struct wlr_scene_tree *drag_icon;
-static struct wlr_cursor_shape_manager_v1 *cursor_shape_mgr;
+// static struct wlr_cursor_shape_manager_v1 *cursor_shape_mgr; //这个跟steup obs影响对应
 
 
 static struct wlr_seat *seat;
@@ -2765,7 +2765,7 @@ resize(Client *c, struct wlr_box geo, int interact)
 	applybounds(c, bbox);//去掉这个推荐的窗口大小,因为有时推荐的窗口特别大导致平铺异常
 	surface = (struct wlr_box){.width = c->geom.width - 2 * c->bw,
 		.height = c->geom.height - 2 * c->bw};
-
+		
 	/* Update scene-graph, including borders */
 	wlr_scene_node_set_position(&c->scene->node, c->geom.x, c->geom.y);
 	wlr_scene_node_set_position(&c->scene_surface->node, c->bw, c->bw);
@@ -2858,9 +2858,12 @@ setcursor(struct wl_listener *listener, void *data)
 	 * use the provided surface as the cursor image. It will set the
 	 * hardware cursor on the output that it's currently on and continue to
 	 * do so as the cursor moves between outputs. */
-	if (event->seat_client == seat->pointer_state.focused_client)
+	if (event->seat_client == seat->pointer_state.focused_client){
 		wlr_cursor_set_surface(cursor, event->surface,
 				event->hotspot_x, event->hotspot_y);
+		// logtofile("jjj");
+	}
+
 }
 
 void //17
@@ -3272,8 +3275,9 @@ setup(void)
 	LISTEN_STATIC(&cursor->events.axis, axisnotify);
 	LISTEN_STATIC(&cursor->events.frame, cursorframe);
 
-	cursor_shape_mgr = wlr_cursor_shape_manager_v1_create(dpy, 1);
-	LISTEN_STATIC(&cursor_shape_mgr->events.request_set_shape, setcursorshape);
+	//这两句代码会造成obs窗口里的鼠标光标消失,不知道注释有什么影响
+	// cursor_shape_mgr = wlr_cursor_shape_manager_v1_create(dpy, 1);
+	// LISTEN_STATIC(&cursor_shape_mgr->events.request_set_shape, setcursorshape);
 
 	/*
 	 * Configures a seat, which is a single "seat" at which a user sits and
