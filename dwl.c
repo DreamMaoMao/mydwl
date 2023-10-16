@@ -83,7 +83,6 @@
 #define END(A)                  ((A) + LENGTH(A))
 #define TAGMASK                 ((1 << LENGTH(tags)) - 1)
 #define LISTEN(E, L, H)         wl_signal_add((E), ((L)->notify = (H), (L)))
-#define IDLE_NOTIFY_ACTIVITY    wlr_idle_notify_activity(idle, seat), wlr_idle_notifier_v1_notify_activity(idle_notifier, seat)
 #define ISFULLSCREEN(A)			((A)->isfullscreen || (A)->isfakefullscreen || (A)->isrealfullscreen || (A)->overview_isfakefullscreenbak || (A)->overview_isfullscreenbak || (A)->overview_isrealfullscreenbak)
 #define LISTEN_STATIC(E, H)     do { static struct wl_listener _l = {.notify = (H)}; wl_signal_add((E), &_l); } while (0)
 
@@ -945,6 +944,7 @@ axisnotify(struct wl_listener *listener, void *data)
 	uint32_t mods;
 	const Wheel *w;
 	// IDLE_NOTIFY_ACTIVITY;
+	wlr_idle_notifier_v1_notify_activity(idle_notifier, seat);
 	keyboard = wlr_seat_get_keyboard(seat);
 
 	//获取当前按键的mask,比如alt+super或者alt+ctrl
@@ -977,6 +977,7 @@ buttonpress(struct wl_listener *listener, void *data)
 	Client *c;
 	const Button *b;
 	// IDLE_NOTIFY_ACTIVITY;
+	wlr_idle_notifier_v1_notify_activity(idle_notifier, seat);
 
 	switch (event->state) {
 	case WLR_BUTTON_PRESSED:
