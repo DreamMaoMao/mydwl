@@ -15,11 +15,10 @@
         "icon-size": 30,
         "all-outputs": false,
         "tooltip-format": "{title}",
+        "markup": true,
         "on-click": "activate",
         "on-click-right": "close",
-        "ignore-list": [
-              "wofi"  
-                       ]
+        "ignore-list": []
       },
  "pulseaudio": {
         "interval":1,
@@ -31,7 +30,8 @@
         "format-icons": {
             "default": ["", "", ""]
         },
-        "on-click": "blueman-manager"
+        "on-click": "blueman-manager",
+        "on-click-right":"amixer set Master toggle",
     },
     "keyboard-state": {
         "interval":1,       
@@ -71,7 +71,7 @@
     "cpu": {
         "interval": 2,
         "format": "{load}% ",
-        "on-click":"gnome-system-monitor"
+        "on-click":"GDK_BACKEND=x11 gnome-system-monitor"
         // "on-click-right":"bash ~/.config/eww/scripts/launcher toggle_menu quicksettings",
         // "max-length": 10
     },
@@ -79,7 +79,7 @@
         "interval":2,
         "format": "{}% 󰍛",
         "on-click":"GDK_BACKEND=x11 nemo",
-        "on-click-right":"clipman pick -t rofi"
+        "on-click-right":"clipman pick -t wofi"
     },
     "temperature": {
         "thermal-zone": 2,
@@ -87,8 +87,8 @@
         "critical-threshold": 10,
         "format-critical": "{temperatureC}°C",
         "format": "",
-        "on-click":"rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/history.py",
-        "on-click-right":"rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/recentfile.py"
+        "on-click":"$DWL/wofi/history_wofi.py",
+        "on-click-right":"$DWL/wofi/recentfile_wofi.py"
     },
     "backlight": {
         "interval":2,
@@ -130,6 +130,6 @@
         "format-disconnected": "\uf071 Disconnected",
         "tooltip-format": "{ifname} {ipaddr}/{cidr} via {gwaddr}",
         "format-alt": "\uf1eb↓{bandwidthDownBytes} ↑{bandwidthUpBytes}",
-        "on-click-right":"~/.config/eww/System-Menu/scripts/networkmanager_dmenu"
+        "on-click-right":"~/.config/dwl/wofi/network/networkmanager_dmenu"
     }
 }
