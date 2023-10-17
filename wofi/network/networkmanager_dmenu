@@ -116,6 +116,7 @@ def dmenu_cmd(num_lines, prompt="Networks", active_lines=None):
                         "wofi": ['-P'],
                         "fuzzel": ['--password']}
         command.extend(pass_prompts.get(cmd_base, []))
+    print(command)
     return command
 
 
@@ -130,12 +131,12 @@ def choose_adapter(client):
     if len(devices) == 1:
         return devices[0]
     device_names = "\n".join([d.get_iface() for d in devices])
-    # sel = subprocess.run(dmenu_cmd(len(devices), "CHOOSE ADAPTER:"),
-    #                      capture_output=True,
-    #                      check=False,
-    #                      env=ENV,
-    #                      input=device_names,
-    #                      encoding=ENC).stdout
+    sel = subprocess.run(dmenu_cmd(len(devices), "CHOOSE ADAPTER:"),
+                         capture_output=True,
+                         check=False,
+                         env=ENV,
+                         input=device_names,
+                         encoding=ENC).stdout
     if not sel.strip():
         sys.exit()
     devices = [i for i in devices if i.get_iface() == sel.strip()]
