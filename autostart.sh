@@ -8,7 +8,8 @@ systemctl --user mask xdg-desktop-portal-gnome
 
 dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
 
-/usr/libexec/xdg-desktop-portal-hyprland &
+# /usr/lib/xdg-desktop-portal-wlr &
+/usr/lib/xdg-desktop-portal-hyprland &
 
 #mako &
 dunst -config ~/.config/dunst/dwl_dunstrc &
@@ -30,8 +31,8 @@ wl-clip-persist --clipboard regular &
 wl-paste -t text --watch clipman store --no-persist &
 blueman-applet &
 nm-applet &
-/usr/local/libexec/polkit-gnome-authentication-agent-1 &
+/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
 # numlockx on
-[ -e /dev/sda1 ] && udisksctl mount -b /dev/sda4
+[ -e /dev/sda1 ] && udisksctl mount -t ntfs -b /dev/sda4
 python3 ~/tool/sign.py &
 eww daemon &
