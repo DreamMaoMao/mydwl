@@ -1,8 +1,5 @@
 /* speedie's dwl config */
-#define COLOR(hex)    { ((hex >> 24) & 0xFF) / 255.0f, \
-                        ((hex >> 16) & 0xFF) / 255.0f, \
-                        ((hex >> 8) & 0xFF) / 255.0f, \
-                        (hex & 0xFF) / 255.0f }
+
 /* appearance */
 static const unsigned int new_is_master = 1; //新窗口是否插在头部
 /* logging */
@@ -22,7 +19,7 @@ static const float rootcolor[]             = { 0.3, 0.3, 0.3, 1.0 };
 static const float bordercolor[]           = { 0.2, 0.2, 0.2, 0.9 };
 static const float focuscolor[]            = { 0.6, 0.4, 0.1, 1 };
 static const float fakefullscreencolor[]   = { 0.1, 0.5, 0.2, 1 };
-static const float urgentcolor[]           = COLOR(0xff0000ff);
+static const float urgentcolor[]           = { 0.5, 0.1, 0.1, 1 };
 
 
 static const int overviewgappi = 24; /* overview时 窗口与边缘 缝隙大小 */
@@ -62,19 +59,20 @@ static const Rule rules[] = {
 	/* examples:
 	{ "Gimp",     NULL,       0,            1,           -1,800,600 },
 	*/
-	{ "Google-chrome",  NULL,       1 << 3,       0,           0,-1 ,0,0},
-	{ "Microsoft-edge-dev",  NULL,       1 << 4,       0,           -1 ,0,0},
-	{ "Clash for Windows",  NULL,       0,       1,           0,-1 ,1400,800},
-	{ "electron-netease-cloud-music",  NULL,       0,       1,           0,-1 ,1200,800},
-	{ NULL,  "图片查看器",       0,       1,           0,-1 ,0,0},
-	{ NULL,  "图片查看",       0,       1,           0,-1 ,0,0},
-	{ NULL,  "选择文件",       0,       1,          0, -1 ,1200,800},
-	{ "blueman-manager",  NULL,       0,       1,           0,-1 ,700,600},
-	{ "flameshot",  NULL,       0,       0,           1,-1 ,0,0},
-	{ "com.xunlei.download",  NULL,       0,       1,           0,-1 ,0,0},
-	{ "pavucontrol",  NULL,       0,       1,           0,-1 ,0,0},
-	{ "baidunetdisk",  NULL,       0,       1,           0,-1 ,1400,800},
-	{ "alixby3",  NULL,       0,       1,           0,-1 ,1400,800},
+	{ "Google-chrome",  NULL,       1 << 3,       0,           0,0,-1 ,0,0},
+	{ "Microsoft-edge-dev",  NULL,       1 << 4,       0,           0,-1 ,0,0},
+	{ "Clash for Windows",  NULL,       0,       1,           0,0,-1 ,1400,800},
+	{ "electron-netease-cloud-music",  NULL,       0,       1,           0,0,-1 ,1200,800},
+	{ NULL,  "图片查看器",       0,       1,           0,0,-1 ,0,0},
+	{ NULL,  "图片查看",       0,       1,           0,0,-1 ,0,0},
+	{ NULL,  "选择文件",       0,       1,          0, 0,-1 ,1200,800},
+	{ "blueman-manager",  NULL,       0,       1,           0,1,-1 ,700,600},
+	{ "Gnome-system-monitor",  NULL,       0,       0,           0,1,-1 ,700,600},
+	{ "flameshot",  NULL,       0,       0,           1,0,-1 ,0,0},
+	{ "com.xunlei.download",  NULL,       0,       1,           0,0,-1 ,0,0},
+	{ "pavucontrol",  NULL,       0,       1,           0,0,-1 ,0,0},
+	{ "baidunetdisk",  NULL,       0,       1,           0,0,-1 ,1400,800},
+	{ "alixby3",  NULL,       0,       1,           0,0,-1 ,1400,800},
 
 
 
@@ -167,14 +165,14 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
 /* commands */
-static const char *termcmd[] = { "konsole", NULL };
-static const char *menucmd[] = { "wofi", NULL };
+// static const char *termcmd[] = { "konsole", NULL };
+// static const char *menucmd[] = { "wofi --conf $DWL/wofi/config_menu", NULL };
 
 static const Key keys[] = {
 	/* Note that Shift changes certain key codes: c -> C, 2 -> at, etc. */
 	/* modifier                  			key                 	function        			argument */
-	{ MODKEY,					 			XKB_KEY_space,      	spawn,          			{.v = menucmd } },
-	{ MODKEY, 					 			XKB_KEY_Return,     	spawn,          			{.v = termcmd } },
+	{ MODKEY,					 			XKB_KEY_space,      	spawn,          			SHCMD("wofi --height 365 --width 600") },
+	{ MODKEY, 					 			XKB_KEY_Return,     	spawn,          			SHCMD("konsole") },
     { WLR_MODIFIER_LOGO,         			XKB_KEY_Return, 		spawn, 						SHCMD("google-chrome") },
     { WLR_MODIFIER_LOGO,         			XKB_KEY_space, 			spawn, 						SHCMD("microsoft-edge") },
 	{ WLR_MODIFIER_CTRL,         			XKB_KEY_Return,         spawn, 						SHCMD("bash ~/tool/clash.sh") }, 

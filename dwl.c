@@ -168,6 +168,7 @@ typedef struct {
 
 	unsigned int set_rule_size;
 	unsigned int ignore_clear_fullscreen;
+	int isclip;
 
 } Client;
 
@@ -269,6 +270,7 @@ typedef struct {
 	unsigned int tags;
 	int isfloating;
 	int isfullscreen;
+	int isclip;
 	int monitor;
 	unsigned int width;
 	unsigned int height;
@@ -692,6 +694,7 @@ applyrules(Client *c)
 		if ((!r->title || strstr(title, r->title))
 				&& (!r->id || strstr(appid, r->id))) {
 			c->isfloating = r->isfloating;
+			c->isclip = r->isclip;
 			newtags |= r->tags;
 			i = 0;
 			wl_list_for_each(m, &mons, link)
@@ -1916,7 +1919,7 @@ focusclient(Client *c, int lift)
 
 	if (!c) {
 		/* With no client, all we have left is to clear focus */
-		if(selmon->sel)
+		if(selmon && selmon->sel)
 			selmon->sel  = NULL; //这个很关键,因为很多地方用到当前窗口做计算,不重置成NULL就会到处有野指针
 		wlr_seat_keyboard_notify_clear_focus(seat);
 		return;
@@ -2763,29 +2766,37 @@ resize(Client *c, struct wlr_box geo, int interact)
 	client_set_bounds(c, geo.width, geo.height); //去掉这个推荐的窗口大小,因为有时推荐的窗口特别大导致平铺异常
 	c->geom = geo;
 	applybounds(c, bbox);//去掉这个推荐的窗口大小,因为有时推荐的窗口特别大导致平铺异常
-	surface = (struct wlr_box){.width = c->geom.width - 2 * c->bw,
-		.height = c->geom.height - 2 * c->bw};
+	surface = (struct wlr_box){	.x = 0,
+								.y = 0,
+								.width = c->geom.width - 2 * c->bw,
+								.height = c->geom.height - 2 * c->bw};
 		
 	/* Update scene-graph, including borders */
 	wlr_scene_node_set_position(&c->scene->node, c->geom.x, c->geom.y);
 	wlr_scene_node_set_position(&c->scene_surface->node, c->bw, c->bw);
 	wlr_scene_rect_set_size(c->border[0], c->geom.width, c->bw);
 	wlr_scene_rect_set_size(c->border[1], c->geom.width, c->bw);
-	// wlr_scene_rect_set_size(c->border[2], c->bw, c->geom.height - 2 * c->bw);
-	// wlr_scene_rect_set_size(c->border[3], c->bw, c->geom.height - 2 * c->bw);
-	wlr_scene_rect_set_size(c->border[2], c->bw, surface.height);
-	wlr_scene_rect_set_size(c->border[3], c->bw, surface.height);
+	if(c->isclip){
+		wlr_scene_rect_set_size(c->border[2], c->bw, surface.height);
+		wlr_scene_rect_set_size(c->border[3], c->bw, surface.height);
+	}else{
+		wlr_scene_rect_set_size(c->border[2], c->bw, c->geom.height - 2 * c->bw);
+		wlr_scene_rect_set_size(c->border[3], c->bw, c->geom.height - 2 * c->bw);
+	}
+
 	wlr_scene_node_set_position(&c->border[1]->node, 0, c->geom.height - c->bw);
 	wlr_scene_node_set_position(&c->border[2]->node, 0, c->bw);
 	wlr_scene_node_set_position(&c->border[3]->node, c->geom.width - c->bw, c->bw);
 
+	if(c->isclip){
+		//使用裁剪的窗口大小,避免窗口拒绝重置大小导致布局混乱
+		c->resize = client_set_size(c, surface.width, surface.height);
+		wlr_scene_subsurface_tree_set_clip(&c->scene_surface->node, &surface);
+	}else {
 	/* this is a no-op if size hasn't changed */
-	// c->resize = client_set_size(c, c->geom.width - 2 * c->bw,
-	// 		c->geom.height - 2 * c->bw);
-
-	//使用裁剪的窗口大小,避免窗口拒绝重置大小导致布局混乱
-	c->resize = client_set_size(c, surface.width, surface.height);
-	wlr_scene_subsurface_tree_set_clip(&c->scene_surface->node, &surface);
+	c->resize = client_set_size(c, c->geom.width - 2 * c->bw,
+			c->geom.height - 2 * c->bw);
+	}
 	setborder_color(c);
 
 }
@@ -3402,7 +3413,7 @@ tag(const Arg *arg) {
 	}
 
     focusclient(target_client,1);
-
+	printstatus();
 }
 
 
@@ -3858,8 +3869,7 @@ urgent(struct wl_listener *listener, void *data)
 	toplevel_from_wlr_surface(event->surface, &c, NULL);
 	if (!c || c == focustop(selmon))
 		return;
-
-	client_set_border_color(c, urgentcolor);
+	// client_set_border_color(c, urgentcolor);   //在使用窗口剪切补丁后,这里启动gdm-settings的字体更改那里点击就会崩溃
 	c->isurgent = 1;
 	printstatus();
 }
