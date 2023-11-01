@@ -55,7 +55,7 @@ static const char *tags[] = {
 };
 
 static const Rule rules[] = {
-	/* app_id     title       tags mask     isfloating  isfullscreen  monitor  width height */
+	/* app_id     title       tags mask     isfloating  isfullscreen isclip monitor  width height */
 	/* examples:
 	{ "Gimp",     NULL,       0,            1,           -1,800,600 },
 	*/
