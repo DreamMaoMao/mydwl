@@ -20,7 +20,7 @@ static const float bordercolor[]           = { 0.2, 0.2, 0.2, 0.9 };
 static const float focuscolor[]            = { 0.6, 0.4, 0.1, 1 };
 static const float fakefullscreencolor[]   = { 0.1, 0.5, 0.2, 1 };
 static const float urgentcolor[]           = { 0.5, 0.1, 0.1, 1 };
-
+static const char *cursor_theme = "Bibata-Modern-Ice";
 
 static const int overviewgappi = 24; /* overview时 窗口与边缘 缝隙大小 */
 static const int overviewgappo = 60; /* overview时 窗口与窗口 缝隙大小 */

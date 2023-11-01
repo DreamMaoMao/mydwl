@@ -482,7 +482,7 @@ static struct wlr_scene_rect *locked_bg;
 static struct wlr_session_lock_v1 *cur_lock;
 static const int layermap[] = { LyrBg, LyrBottom, LyrTop, LyrOverlay };
 static struct wlr_scene_tree *drag_icon;
-// static struct wlr_cursor_shape_manager_v1 *cursor_shape_mgr; //这个跟steup obs影响对应
+static struct wlr_cursor_shape_manager_v1 *cursor_shape_mgr; //这个跟steup obs影响对应
 
 
 static struct wlr_seat *seat;
@@ -3265,7 +3265,7 @@ setup(void)
 	 * Xcursor themes to source cursor images from and makes sure that cursor
 	 * images are available at all scale factors on the screen (necessary for
 	 * HiDPI support). Scaled cursors will be loaded with each output. */
-	cursor_mgr = wlr_xcursor_manager_create(NULL, 24);
+	cursor_mgr = wlr_xcursor_manager_create(cursor_theme, 24);
 	setenv("XCURSOR_SIZE", "24", 1);
 
 	/*
@@ -3287,8 +3287,8 @@ setup(void)
 	LISTEN_STATIC(&cursor->events.frame, cursorframe);
 
 	//这两句代码会造成obs窗口里的鼠标光标消失,不知道注释有什么影响
-	// cursor_shape_mgr = wlr_cursor_shape_manager_v1_create(dpy, 1);
-	// LISTEN_STATIC(&cursor_shape_mgr->events.request_set_shape, setcursorshape);
+	cursor_shape_mgr = wlr_cursor_shape_manager_v1_create(dpy, 1);
+	LISTEN_STATIC(&cursor_shape_mgr->events.request_set_shape, setcursorshape);
 
 	/*
 	 * Configures a seat, which is a single "seat" at which a user sits and
