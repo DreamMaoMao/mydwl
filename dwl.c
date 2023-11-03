@@ -26,7 +26,7 @@
 #include <wlr/types/wlr_export_dmabuf_v1.h>
 #include <wlr/types/wlr_gamma_control_v1.h>
 #include <wlr/types/wlr_relative_pointer_v1.h>
-#include <wlr/types/wlr_idle.h>
+// #include <wlr/types/wlr_idle.h>
 #include <wlr/types/wlr_idle_inhibit_v1.h>
 #include <wlr/types/wlr_idle_notify_v1.h>
 #include <wlr/types/wlr_input_device.h>
@@ -1878,6 +1878,12 @@ focusclient(Client *c, int lift)
 	if (c && client_surface(c) == old)
 		return;
 
+	if(selmon->sel && selmon->sel->foreign_toplevel)
+		wlr_foreign_toplevel_handle_v1_set_activated(selmon->sel->foreign_toplevel,false);
+	selmon->sel  = c;
+	if(c && c->foreign_toplevel)
+		wlr_foreign_toplevel_handle_v1_set_activated(c->foreign_toplevel,true);
+
 	/* Put the new client atop the focus stack and select its monitor */
 	if (c && !client_is_unmanaged(c)) {
 		wl_list_remove(&c->flink);
@@ -1885,13 +1891,9 @@ focusclient(Client *c, int lift)
 		selmon = c->mon;
 		c->isurgent = 0;
 		client_restack_surface(c);
-
+		setborder_color(c);
 		/* Don't change border color if there is an exclusive focus or we are
 		 * handling a drag operation */
-		if(c && selmon->sel != c){ //切换当前窗口记录为聚焦窗口
-			selmon->sel  = c;
-		}
-		setborder_color(c);
 	}
 
 	/* Deactivate old client if focus is changing */
@@ -2352,7 +2354,6 @@ mapnotify(struct wl_listener *listener, void *data)
 	} else {
 		applyrules(c); //窗口预设规则应用,全屏窗口自动退出判断也在里面
 	}
-	printstatus();
 
 	//创建外部顶层窗口的句柄,每一个顶层窗口都有一个
 	c->foreign_toplevel = wlr_foreign_toplevel_handle_v1_create(foreign_toplevel_manager);
@@ -2381,6 +2382,16 @@ mapnotify(struct wl_listener *listener, void *data)
 		wlr_foreign_toplevel_handle_v1_output_enter(
 				c->foreign_toplevel, selmon->wlr_output);
 	}
+
+
+	if(selmon->sel && selmon->sel->foreign_toplevel)
+		wlr_foreign_toplevel_handle_v1_set_activated(selmon->sel->foreign_toplevel,false);
+	selmon->sel  = c;
+	if(c->foreign_toplevel)
+		wlr_foreign_toplevel_handle_v1_set_activated(c->foreign_toplevel,true);
+
+	printstatus();
+
 
 }
 
