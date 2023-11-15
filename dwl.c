@@ -168,7 +168,7 @@ typedef struct {
 
 	unsigned int set_rule_size;
 	unsigned int ignore_clear_fullscreen;
-	int isclip;
+	int isnoclip;
 
 } Client;
 
@@ -270,7 +270,7 @@ typedef struct {
 	unsigned int tags;
 	int isfloating;
 	int isfullscreen;
-	int isclip;
+	int isnoclip;
 	int monitor;
 	unsigned int width;
 	unsigned int height;
@@ -694,7 +694,7 @@ applyrules(Client *c)
 		if ((!r->title || strstr(title, r->title))
 				&& (!r->id || strstr(appid, r->id))) {
 			c->isfloating = r->isfloating;
-			c->isclip = r->isclip;
+			c->isnoclip = r->isnoclip;
 			newtags |= r->tags;
 			i = 0;
 			wl_list_for_each(m, &mons, link)
@@ -2773,6 +2773,7 @@ resize(Client *c, struct wlr_box geo, int interact)
 {	
 
 	struct wlr_box *bbox = interact ? &sgeom : &c->mon->w;//去掉这个推荐的窗口大小,因为有时推荐的窗口特别大导致平铺异常
+	struct wlr_box clip;
 	struct wlr_box surface = {0};
 	client_set_bounds(c, geo.width, geo.height); //去掉这个推荐的窗口大小,因为有时推荐的窗口特别大导致平铺异常
 	c->geom = geo;
@@ -2787,7 +2788,7 @@ resize(Client *c, struct wlr_box geo, int interact)
 	wlr_scene_node_set_position(&c->scene_surface->node, c->bw, c->bw);
 	wlr_scene_rect_set_size(c->border[0], c->geom.width, c->bw);
 	wlr_scene_rect_set_size(c->border[1], c->geom.width, c->bw);
-	if(c->isclip){
+	if(!c->isnoclip){
 		wlr_scene_rect_set_size(c->border[2], c->bw, surface.height);
 		wlr_scene_rect_set_size(c->border[3], c->bw, surface.height);
 	}else{
@@ -2799,17 +2800,18 @@ resize(Client *c, struct wlr_box geo, int interact)
 	wlr_scene_node_set_position(&c->border[2]->node, 0, c->bw);
 	wlr_scene_node_set_position(&c->border[3]->node, c->geom.width - c->bw, c->bw);
 
-	if(c->isclip){
+	if(!c->isnoclip){
 		//使用裁剪的窗口大小,避免窗口拒绝重置大小导致布局混乱
-		c->resize = client_set_size(c, surface.width, surface.height);
-		wlr_scene_subsurface_tree_set_clip(&c->scene_surface->node, &surface);
+		c->resize = client_set_size(c, c->geom.width - 2 * c->bw,
+			c->geom.height - 2 * c->bw);
+		client_get_clip(c, &clip);
+		wlr_scene_subsurface_tree_set_clip(&c->scene_surface->node, &clip);
 	}else {
 	/* this is a no-op if size hasn't changed */
 	c->resize = client_set_size(c, c->geom.width - 2 * c->bw,
 			c->geom.height - 2 * c->bw);
 	}
 	setborder_color(c);
-
 }
 
 void //17
