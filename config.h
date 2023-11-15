@@ -2,6 +2,8 @@
 
 /* appearance */
 static const unsigned int new_is_master = 1; //新窗口是否插在头部
+/* logging */
+static int log_level = WLR_ERROR;
 static const unsigned int numlockon = 1; //是否打开右边小键盘
 static const unsigned int hotarea_size              = 10; //热区大小,10x10
 static const unsigned int enable_hotarea            = 1; //是否启用鼠标热区
@@ -14,9 +16,11 @@ static unsigned int gappov           = 10; /* vert outer gap between windows and
 static int bypass_surface_visibility = 0;  /* 1 means idle inhibitors will disable idle tracking even if it's surface isn't visible  */
 static unsigned int borderpx         = 5;  /* border pixel of windows */
 static const float rootcolor[]             = { 0.3, 0.3, 0.3, 1.0 };
-static const float bordercolor[]           = { 0, 0, 0, 0 };
+static const float bordercolor[]           = { 0.2, 0.2, 0.2, 0.9 };
 static const float focuscolor[]            = { 0.6, 0.4, 0.1, 1 };
 static const float fakefullscreencolor[]   = { 0.1, 0.5, 0.2, 1 };
+static const float urgentcolor[]           = { 0.5, 0.1, 0.1, 1 };
+// static const char *cursor_theme = "Bibata-Modern-Ice";
 
 static const int overviewgappi = 24; /* overview时 窗口与边缘 缝隙大小 */
 static const int overviewgappo = 60; /* overview时 窗口与窗口 缝隙大小 */
@@ -28,8 +32,11 @@ static int warpcursor = 0; /* Warp cursor to focused client */
 
 /* Autostart */
 static const char *const autostart[] = {
-    "/bin/sh", "-c", "$DWL/autostart.sh", NULL,
-    NULL,
+	"/bin/sh",
+	"-c",
+	"$DWL/autostart.sh",
+	NULL,
+	NULL,
 };
 
 /* tagging
@@ -48,23 +55,26 @@ static const char *tags[] = {
 };
 
 static const Rule rules[] = {
-	/* app_id     title       tags mask     isfloating   monitor  width height */
+	/* app_id     title       tags mask     isfloating  isfullscreen isnoclip monitor  width height */
 	/* examples:
 	{ "Gimp",     NULL,       0,            1,           -1,800,600 },
 	*/
-	{ "Google-chrome",  NULL,       1 << 3,       0,           -1 ,0,0},
-	{ "Microsoft-edge-dev",  NULL,       1 << 4,       0,           -1 ,0,0},
-	{ "Clash for Windows",  NULL,       0,       1,           -1 ,1400,800},
-	{ "electron-netease-cloud-music",  NULL,       0,       1,           -1 ,1200,800},
-	{ NULL,  "图片查看器",       0,       1,           -1 ,0,0},
-	{ NULL,  "图片查看",       0,       1,           -1 ,0,0},
-	{ NULL,  "选择文件",       0,       1,           -1 ,1200,800},
-	{ "blueman-manager",  NULL,       0,       1,           -1 ,0,0},
-	{ "flameshot",  NULL,       0,       1,           -1 ,0,0},
-	{ "com.xunlei.download",  NULL,       0,       1,           -1 ,0,0},
-	{ "pavucontrol",  NULL,       0,       1,           -1 ,0,0},
-	{ "baidunetdisk",  NULL,       0,       1,           -1 ,1400,800},
-	{ "alixby3",  NULL,       0,       1,           -1 ,1400,800},
+	{ "Google-chrome",  						NULL,       	1 << 3,       	0,   0, 	0,	-1, 0,0},
+	{ "Microsoft-edge-dev", 		 			NULL,       	1 << 4,       	0,   0, 	0,	-1, 0,0},
+	{ "Clash for Windows",  					NULL,       	0,       		1,   0, 	0,	-1, 1400,800},
+	{ "electron-netease-cloud-music",  			NULL,       	0,       		1,   0, 	0,	-1, 1200,800},
+	{ NULL,  									"图片查看器",   0,       		1,   0, 	0,	-1, 0,0},
+	{ NULL,  									"图片查看",     0,       		1,   0, 	0,	-1, 0,0},
+	{ NULL,  									"选择文件",     0,       		1,   0, 	0,	-1, 1200,800},
+	{ "polkit-gnome-authentication-agent-1",  	NULL,       	0,       		1,   0, 	0,	-1, 928,249},
+	{ "blueman-manager",  						NULL,       	0,       		1,   0, 	0,	-1, 700,600},
+	{ "Gnome-system-monitor",  					NULL,       	0,       		0,   0, 	0,	-1, 700,600},
+	{ "obs",  									NULL,       	1<<5,       	0,   0, 	0,	-1, 700,600},
+	{ "flameshot",  							NULL,       	0,       		0,   1, 	0,	-1, 0,0},
+	{ "com.xunlei.download",  					NULL,       	0,       		1,   0, 	0,	-1, 0,0},
+	{ "pavucontrol",  							NULL,       	0,       		1,   0, 	0,	-1, 0,0},
+	{ "baidunetdisk",  							NULL,       	0,       		1,   0, 	0,	-1, 1400,800},
+	{ "alixby3",  								NULL,       	0,       		1,   0, 	0,	-1, 1400,800},
 
 
 
@@ -87,7 +97,7 @@ static const MonitorRule monrules[] = {
 	{ "eDP-1",    0.5,  1,      2,    &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL },
 	*/
 	/* defaults */
-	{ NULL,       0.55, 1,      1,    NULL, WL_OUTPUT_TRANSFORM_NORMAL },
+	{ NULL,       0.55, 1,      1,    &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL,-1,-1 },
 };
 
 /* keyboard */
@@ -157,20 +167,20 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
 /* commands */
-static const char *termcmd[] = { "konsole", NULL };
-static const char *menucmd[] = { "wofi", NULL };
+// static const char *termcmd[] = { "konsole", NULL };
+// static const char *menucmd[] = { "wofi --conf $DWL/wofi/config_menu", NULL };
 
 static const Key keys[] = {
 	/* Note that Shift changes certain key codes: c -> C, 2 -> at, etc. */
 	/* modifier                  			key                 	function        			argument */
-	{ MODKEY,					 			XKB_KEY_space,      	spawn,          			{.v = menucmd } },
-	{ MODKEY, 					 			XKB_KEY_Return,     	spawn,          			{.v = termcmd } },
+	{ MODKEY,					 			XKB_KEY_space,      	spawn,          			SHCMD("wofi --height 365 --width 600") },
+	{ MODKEY, 					 			XKB_KEY_Return,     	spawn,          			SHCMD("konsole") },
     { WLR_MODIFIER_LOGO,         			XKB_KEY_Return, 		spawn, 						SHCMD("google-chrome") },
     { WLR_MODIFIER_LOGO,         			XKB_KEY_space, 			spawn, 						SHCMD("microsoft-edge") },
 	{ WLR_MODIFIER_CTRL,         			XKB_KEY_Return,         spawn, 						SHCMD("bash ~/tool/clash.sh") }, 
     { WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO,  XKB_KEY_Return, 		spawn, 						SHCMD("konsole -e /usr/local/bin/yazi") },  
     { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,   XKB_KEY_a, 		 		spawn, 						SHCMD("grim -g \"$(slurp)\" - | swappy -f -") }, 
-	{ WLR_MODIFIER_LOGO,         			XKB_KEY_h,          	spawn, 						SHCMD("bash ~/.config/hypr/scripts/hide_waybar.sh") }, 
+    { WLR_MODIFIER_LOGO,   					XKB_KEY_h, 		 		spawn, 						SHCMD("bash ~/tool/hide_waybar_dwl.sh") }, 
 	{ WLR_MODIFIER_LOGO,         			XKB_KEY_l,          	spawn, 						SHCMD("swaylock -f -c 000000") }, 
 
 	{ WLR_MODIFIER_LOGO,                    XKB_KEY_Tab,          	focusstack,     			{.i = +1} },

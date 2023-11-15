@@ -8,7 +8,7 @@ https://github.com/DreamMaoMao/superdwl/assets/30348075/7dbae8e6-b1f9-43b2-a670-
 
 
 
-# dwl - dwm for Wayland(暂时还不支持动画)
+# dwl - dwm for Wayland
 
 #改动日志
 - waybar支持
@@ -56,17 +56,24 @@ sudo pacman -S gdm
 sudo pacman -S wl-clipboard
 
 yay -S blueman acpi mako jq alsa-utils polkit-gnome  light  nemo swappy swaybg lm_sensors  network-manager-applet playerctl python3  wlsunset  xorg-xinit xorg-xwayland wlroots wayland-protocols pavucontrol ttf-jetbrains-mono-nerd eww-wayland wofi xdg-desktop-portal-wlr xdg-desktop-portal-hyprland cpufrequtils
-clipman wl-clip-persist 
+clipman wl-clip-persist waybar
 
 ```
 
+# 安装最新的wlroots(0.17.0-dev after 2023-11-15)
+```
+git clone https://gitlab.freedesktop.org/wlroots/wlroots.git
+cd wlroots
+meson build -Dprefix=/usr
+sudo ninja -C build install
+```
 
-# 拷贝相关配置dwm
+# 拷贝相关配置
 ```
 cd ~/.config
-git clone https://github.com/DreamMaoMao/dwl.git
+git clone https://github.com/DreamMaoMao/mydwl.git
 
-cd dwl
+cd mydwl
 
 //编译安装
 meson setup --buildtype=release build  -Dprefix=/usr/local
@@ -75,9 +82,10 @@ sudo ninja -C build install
 //拷贝配置
 cp mako -r ~/.config/
 cp fish -r ~/.config/
-cp wofi -r ~/.config/
+cp wofi - ~/.config/
 cp konsole -r ~/.local/share/
 cp eww -r ~/.config/
+cp waybar -r ~/.config/
 
 sed -i s#/home/user#$HOME#g dwl.desktop
 sudo cp dwl.desktop /usr/share/wayland-sessions/

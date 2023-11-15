@@ -2,6 +2,7 @@
 # DWL自启动脚本 仅作参考
 
 pkill xdg
+pkill clash
 
 systemctl --user unmask xdg-desktop-portal-hyprland
 systemctl --user mask xdg-desktop-portal-gnome
