@@ -35,8 +35,6 @@ executable('dwl',
   'wlr_foreign_toplevel_management_v1.h',
   'wlr-foreign-toplevel-management-unstable-v1-protocol.c',
   'wlr-foreign-toplevel-management-unstable-v1-protocol.h',
-  'wlr-foreign-toplevel-management-unstable-v1-protocol.c',
-  'wlr-foreign-toplevel-management-unstable-v1-protocol.h',
   wayland_sources,
   dependencies : [
     libm,
