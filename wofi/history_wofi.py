@@ -7,7 +7,7 @@ from sqlite3 import Connection
 import os
 import wofi
 
-os.environ["WAYLAND_DISPLAY"] = "wayland-1"
+os.environ["WAYLAND_DISPLAY"] = "wayland-0"
 os.environ["GDK_BACKEND"] = "wayland"
 # 创建一个 Wofi 对象
 w = wofi.Wofi()
