@@ -2950,6 +2950,13 @@ setfloating(Client *c, int floating)
 		return;
 	wlr_scene_node_reparent(&c->scene->node, layers[c->isfullscreen
 			? LyrFS : c->isfloating ? LyrFloat : LyrTile]);
+	if (floating == 1) {
+		c->geom.width = c->geom.width * 0.8;
+		c->geom.height =  c->geom.height * 0.8;
+		//重新计算居中的坐标
+		c->geom = setclient_coordinate_center(c->geom);
+		resize(c,c->geom,0);
+	}
 	arrange(c->mon);
 	printstatus();
 }
