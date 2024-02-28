@@ -63,7 +63,7 @@ static const Rule rules[] = {
 	{ "Google-chrome",  						NULL,       		1 << 3,       	0,   0, 	0,	-1, 0,0},
 	{ "Microsoft-edge-dev", 		 			NULL,       		1 << 4,       	0,   0, 	0,	-1, 0,0},
 	{ "Clash for Windows",  					NULL,       		0,       		1,   0, 	0,	-1, 1400,800},
-	{ "electron-netease-cloud-music",  			NULL,       		0,       		1,   0, 	0,	-1, 1200,800},
+	{ "electron-netease-cloud-music",  			NULL,       		0,       		1,   0, 	0,	-1, 1500,1000},
 	{ NULL,  									"图片查看器",   	0,       		1,   0, 	0,	-1, 0,0},
 	{ NULL,  									"图片查看",     	0,       		1,   0, 	0,	-1, 0,0},
 	{ NULL,  									"选择文件",     	0,       		1,   0, 	0,	-1, 1200,800},

@@ -433,6 +433,7 @@ static void clear_fullscreen_flag(Client *c);
 static Client *direction_select(const Arg *arg);
 static void focusdir(const Arg *arg);
 static void toggleoverview(const Arg *arg);
+unsigned int want_restore_fullscreen(Client *target_client);
 static void overview_restore(Client *c, const Arg *arg);
 static void overview_backup(Client *c);
 
@@ -3564,6 +3565,18 @@ void grid(Monitor *m, unsigned int gappo, unsigned int gappi) {
   }
 }
 
+// 目标窗口有其他窗口和它同个tag就返回0
+unsigned int want_restore_fullscreen(Client *target_client) {
+  Client *c = NULL;
+  wl_list_for_each(c, &clients, link){ 
+    if (c && c != target_client && c->tags == target_client->tags && c == selmon->sel) {
+      return 0;
+    }
+  }
+
+  return 1;
+}
+
 // 普通视图切换到overview时保存窗口的旧状态
 void overview_backup(Client *c) {
   c->overview_isfloatingbak = c->isfloating;
@@ -3607,9 +3620,14 @@ void overview_restore(Client *c, const Arg *arg) {
            c->overview_backup_h, 1);
   }
   if (c->isfullscreen ||c->isfakefullscreen ||c->isrealfullscreen) {
-
-    resizeclient(c, c->overview_backup_x, c->overview_backup_y,
-                 c->overview_backup_w, c->overview_backup_h,1);
+	if (want_restore_fullscreen(c)) { //如果同tag有其他窗口,且其他窗口是将要聚焦的,那么不恢复该窗口的全屏状态
+    	resizeclient(c, c->overview_backup_x, c->overview_backup_y,
+    	             c->overview_backup_w, c->overview_backup_h,1);
+	} else {
+		c->isfullscreen = 0;
+		c->isfakefullscreen = 0;
+		c->isrealfullscreen = 0;
+	}
   }
 }
 
