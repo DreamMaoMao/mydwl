@@ -38,7 +38,7 @@
         "markup": true,
         "on-click": "activate",
         "on-click-right": "close",
-        "ignore-list": []
+        "ignore-list": ["Rofi"]
       },
  "pulseaudio": {
         "interval":1,
