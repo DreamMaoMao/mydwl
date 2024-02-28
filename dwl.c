@@ -3943,11 +3943,18 @@ urgent(struct wl_listener *listener, void *data)
 	struct wlr_xdg_activation_v1_request_activate_event *event = data;
 	Client *c = NULL;
 	toplevel_from_wlr_surface(event->surface, &c, NULL);
-	if (!c || c == focustop(selmon))
+
+	if (!c || !c->foreign_toplevel)
 		return;
-	// client_set_border_color(c, urgentcolor);   //在使用窗口剪切补丁后,这里启动gdm-settings的字体更改那里点击就会崩溃
-	c->isurgent = 1;
-	printstatus();
+
+	if (focus_on_activate && c != selmon->sel) {
+		view(&(Arg){.ui = c->tags});
+		focusclient(c,1);
+	} else if(c != focustop(selmon)) {
+		client_set_border_color(c, urgentcolor);   //在使用窗口剪切补丁后,这里启动gdm-settings的字体更改那里点击就会崩溃
+		c->isurgent = 1;
+		printstatus();
+	}
 }
 
 void
@@ -4283,13 +4290,22 @@ void
 activatex11(struct wl_listener *listener, void *data)
 {
 	Client *c = wl_container_of(listener, c, activate);
-	if (focus_on_activate && c && c != selmon->sel && c->foreign_toplevel) {
-		view(&(Arg){.ui = c->tags});
-		focusclient(c,1);
-	}
+
 	/* Only "managed" windows can be activated */
 	if (c->type == X11Managed)
 		wlr_xwayland_surface_activate(c->surface.xwayland, 1);
+
+	if (!c || !c->foreign_toplevel)
+		return;
+
+	if (focus_on_activate && c != selmon->sel) {
+		view(&(Arg){.ui = c->tags});
+		focusclient(c,1);
+	} else if(c != focustop(selmon)) {
+		client_set_border_color(c, urgentcolor);   //在使用窗口剪切补丁后,这里启动gdm-settings的字体更改那里点击就会崩溃
+		c->isurgent = 1;
+		printstatus();
+	}
 }
 
 void
