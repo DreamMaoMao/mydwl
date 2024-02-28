@@ -60,24 +60,24 @@ static const Rule rules[] = {
 	/* examples:
 	{ "Gimp",     NULL,       0,            1,           -1,800,600 },
 	*/
-	{ "Google-chrome",  						NULL,       	1 << 3,       	0,   0, 	0,	-1, 0,0},
-	{ "Microsoft-edge-dev", 		 			NULL,       	1 << 4,       	0,   0, 	0,	-1, 0,0},
-	{ "Clash for Windows",  					NULL,       	0,       		1,   0, 	0,	-1, 1400,800},
-	{ "electron-netease-cloud-music",  			NULL,       	0,       		1,   0, 	0,	-1, 1200,800},
-	{ NULL,  									"图片查看器",   0,       		1,   0, 	0,	-1, 0,0},
-	{ NULL,  									"图片查看",     0,       		1,   0, 	0,	-1, 0,0},
-	{ NULL,  									"选择文件",     0,       		1,   0, 	0,	-1, 1200,800},
-	{ "polkit-gnome-authentication-agent-1",  	NULL,       	0,       		1,   0, 	0,	-1, 928,249},
-	{ "blueman-manager",  						NULL,       	0,       		1,   0, 	0,	-1, 700,600},
-	{ "Gnome-system-monitor",  					NULL,       	0,       		0,   0, 	0,	-1, 700,600},
-	{ "obs",  									NULL,       	1<<5,       	0,   0, 	0,	-1, 700,600},
-	{ "flameshot",  							NULL,       	0,       		0,   1, 	0,	-1, 0,0},
-	{ "com.xunlei.download",  					NULL,       	0,       		1,   0, 	0,	-1, 0,0},
-	{ "pavucontrol",  							NULL,       	0,       		1,   0, 	0,	-1, 0,0},
-	{ "baidunetdisk",  							NULL,       	0,       		1,   0, 	0,	-1, 1400,800},
-	{ "alixby3",  								NULL,       	0,       		1,   0, 	0,	-1, 1400,800},
-
-
+	{ "Google-chrome",  						NULL,       		1 << 3,       	0,   0, 	0,	-1, 0,0},
+	{ "Microsoft-edge-dev", 		 			NULL,       		1 << 4,       	0,   0, 	0,	-1, 0,0},
+	{ "Clash for Windows",  					NULL,       		0,       		1,   0, 	0,	-1, 1400,800},
+	{ "electron-netease-cloud-music",  			NULL,       		0,       		1,   0, 	0,	-1, 1200,800},
+	{ NULL,  									"图片查看器",   	0,       		1,   0, 	0,	-1, 0,0},
+	{ NULL,  									"图片查看",     	0,       		1,   0, 	0,	-1, 0,0},
+	{ NULL,  									"选择文件",     	0,       		1,   0, 	0,	-1, 1200,800},
+	{ "polkit-gnome-authentication-agent-1",  	NULL,       		0,       		1,   0, 	0,	-1, 928,249},
+	{ "blueman-manager",  						NULL,       		0,       		1,   0, 	0,	-1, 700,600},
+	{ "Gnome-system-monitor",  					NULL,       		0,       		0,   0, 	0,	-1, 700,600},
+	{ "obs",  									NULL,       		1<<5,       	0,   0, 	0,	-1, 700,600},
+	{ "flameshot",  							NULL,       		0,       		0,   1, 	0,	-1, 0,0},
+	{ "com.xunlei.download",  					NULL,       		0,       		1,   0, 	0,	-1, 0,0},
+	{ "pavucontrol",  							NULL,       		0,       		1,   0, 	0,	-1, 0,0},
+	{ "baidunetdisk",  							NULL,       		0,       		1,   0, 	0,	-1, 1400,800},
+	{ "alixby3",  								NULL,       		0,       		1,   0, 	0,	-1, 1400,800},
+	{ NULL,  									"rofi - website",   0,       		1,   0, 	0,	-1, 850,530},
+	{ "Rofi",  									NULL,       		0,       		1,   0, 	0,	-1, 1200,1050},
 
 };
 
@@ -184,6 +184,10 @@ static const Key keys[] = {
     { WLR_MODIFIER_LOGO,   					XKB_KEY_h, 		 		spawn, 						SHCMD("bash ~/tool/hide_waybar_dwl.sh") }, 
 	{ WLR_MODIFIER_LOGO,         			XKB_KEY_l,          	spawn, 						SHCMD("swaylock -f -c 000000") }, 
     { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,   XKB_KEY_Return, 		spawn, 						SHCMD("konsole -e \"zellij -s temp --config /home/wrq/.config/zellij/tempconfigwayland.kdl\"") },  
+    { WLR_MODIFIER_LOGO,   					XKB_KEY_space, 			spawn, 						SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show website") },  
+    { WLR_MODIFIER_LOGO|WLR_MODIFIER_ALT,   XKB_KEY_Return, 		spawn, 						SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/tool/movie.py") },  
+    { WLR_MODIFIER_CTRL,   					XKB_KEY_space, 			spawn, 						SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/search.py") },  
+
 
 	{ WLR_MODIFIER_LOGO,                    XKB_KEY_Tab,          	focusstack,     			{.i = +1} },
 	{ WLR_MODIFIER_LOGO|WLR_MODIFIER_SHIFT, XKB_KEY_Tab,          	focusstack,     			{.i = -1} },

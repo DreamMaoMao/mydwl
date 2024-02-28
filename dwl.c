@@ -713,6 +713,7 @@ applyrules(Client *c)
 				c->isfullscreen =1;
 				c->ignore_clear_fullscreen = 1;
 			}
+			break;
 		}
 	}
 
