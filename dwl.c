@@ -89,7 +89,7 @@
 /* enums */
 /* enums */
 enum { CurNormal, CurPressed, CurMove, CurResize }; /* cursor */
-enum { XDGShell, LayerShell, X11Managed, X11Unmanaged }; /* client types */
+enum { XDGShell, LayerShell, X11 }; /* client types */
 enum { LyrBg, LyrBottom, LyrTile, LyrFloat, LyrFS, LyrTop, LyrOverlay, LyrBlock, NUM_LAYERS }; /* scene layers */
 #ifdef XWAYLAND
 enum { NetWMWindowTypeDialog, NetWMWindowTypeSplash, NetWMWindowTypeToolbar,
@@ -169,7 +169,7 @@ typedef struct {
 	unsigned int set_rule_size;
 	unsigned int ignore_clear_fullscreen;
 	int isnoclip;
-
+	struct wlr_box bounds;
 } Client;
 
 typedef struct {
@@ -548,27 +548,17 @@ applybounds(Client *c, struct wlr_box *bbox)
 	if (!c->isfloating || c->set_rule_size) { //只设置悬浮窗口或者没有规则限制的窗口
 		return;
 	}
-	if (!c->isfullscreen) {
-		struct wlr_box min = {0}, max = {0};
-		client_get_size_hints(c, &max, &min);
-		/* try to set size hints */
-		c->geom.width = MAX(min.width + (2 * (int)c->bw), c->geom.width);
-		c->geom.height = MAX(min.height + (2 * (int)c->bw), c->geom.height);
-		/* Some clients set their max size to INT_MAX, which does not violate the
-		 * protocol but it's unnecesary, as they can set their max size to zero. */
-		if (max.width > 0 && !(2 * c->bw > INT_MAX - max.width)) /* Checks for overflow */
-			c->geom.width = MIN(max.width + (2 * c->bw), c->geom.width);
-		if (max.height > 0 && !(2 * c->bw > INT_MAX - max.height)) /* Checks for overflow */
-			c->geom.height = MIN(max.height + (2 * c->bw), c->geom.height);
-	}
+	/* set minimum possible */
+	c->geom.width = MAX(1 + 2 * (int)c->bw, c->geom.width);
+	c->geom.height = MAX(1 + 2 * (int)c->bw, c->geom.height);
 
 	if (c->geom.x >= bbox->x + bbox->width)
 		c->geom.x = bbox->x + bbox->width - c->geom.width;
 	if (c->geom.y >= bbox->y + bbox->height)
 		c->geom.y = bbox->y + bbox->height - c->geom.height;
-	if (c->geom.x + c->geom.width + 2 * c->bw <= bbox->x)
+	if (c->geom.x + c->geom.width + 2 * (int)c->bw <= bbox->x)
 		c->geom.x = bbox->x;
-	if (c->geom.y + c->geom.height + 2 * c->bw <= bbox->y)
+	if (c->geom.y + c->geom.height + 2 * (int)c->bw <= bbox->y)
 		c->geom.y = bbox->y;
 }
 
@@ -4311,7 +4301,7 @@ activatex11(struct wl_listener *listener, void *data)
 	Client *c = wl_container_of(listener, c, activate);
 
 	/* Only "managed" windows can be activated */
-	if (c->type == X11Managed)
+	if (!client_is_unmanaged(c))
 		wlr_xwayland_surface_activate(c->surface.xwayland, 1);
 
 	if (!c || !c->foreign_toplevel)
@@ -4335,7 +4325,7 @@ configurex11(struct wl_listener *listener, void *data)
 	struct wlr_xwayland_surface_configure_event *event = data;
 	if (!c->mon)
 		return;
-	if (c->isfloating || c->type == X11Unmanaged){
+	if (c->isfloating || client_is_unmanaged(c)){
 		resize(c, (struct wlr_box){.x = event->x, .y = event->y,
 				.width = event->width, .height = event->height}, 0);
 	}
@@ -4354,7 +4344,7 @@ createnotifyx11(struct wl_listener *listener, void *data)
 	/* Allocate a Client for this surface */
 	c = xsurface->data = ecalloc(1, sizeof(*c));
 	c->surface.xwayland = xsurface;
-	c->type = xsurface->override_redirect ? X11Unmanaged : X11Managed;
+	c->type = X11;
 	c->bw = borderpx;
 
 	/* Listen to the various events it can emit */

@@ -1,6 +1,13 @@
 {
     "files.associations": {
-        "random": "c"
+        "random": "c",
+        "*.tcc": "c",
+        "deque": "c",
+        "forward_list": "c",
+        "list": "c",
+        "string": "c",
+        "vector": "c",
+        "valarray": "c"
     },
     "mesonbuild.configureOnOpen": false
 }
