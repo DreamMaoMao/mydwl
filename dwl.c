@@ -169,6 +169,9 @@ typedef struct {
 	unsigned int set_rule_size;
 	unsigned int ignore_clear_fullscreen;
 	int isnoclip;
+	int isnoborder;
+	unsigned int bindtags;
+	Monitor *bindmon;
 
 } Client;
 
@@ -272,6 +275,7 @@ typedef struct {
 	int isfullscreen;
 	int isnoclip;
 	int monitor;
+	int isnoborder;
 	unsigned int width;
 	unsigned int height;
 } Rule;
@@ -577,7 +581,8 @@ void clear_fullscreen_flag(Client *c) {
     c->isfullscreen = 0;
     c->isfakefullscreen = 0;
     c->isrealfullscreen = 0;
-    c->bw = borderpx;
+	c->bw = c->isnoborder? 0 : borderpx;
+    
 	client_set_fullscreen(c, false);
   }
 }
@@ -680,9 +685,10 @@ applyrules(Client *c)
 {
 	/* rule matching */
 	const char *appid, *title;
-	uint32_t i, newtags = 0;
+	Monitor *m;
 	const Rule *r;
-	Monitor *mon = selmon, *m;
+	int i = 0;
+	c->bindmon = selmon;
 
 	c->isfloating = client_is_float_type(c);
 	if (!(appid = client_get_appid(c)))
@@ -695,12 +701,13 @@ applyrules(Client *c)
 				&& (!r->id || strstr(appid, r->id))) {
 			c->isfloating = r->isfloating;
 			c->isnoclip = r->isnoclip;
-			newtags |= r->tags;
-			i = 0;
+			c->isnoborder = r->isnoborder;
+			c->bindtags |= r->tags;
+
 			wl_list_for_each(m, &mons, link)
 				if (r->monitor == i++)
-					mon = m;
-					
+					c->bindmon = m;
+				break;
 			if(c->isfloating && r->width != 0 && r->height != 0){
 				c->geom.width = r->width;
 				c->geom.height =  r->height;
@@ -713,25 +720,7 @@ applyrules(Client *c)
 				c->isfullscreen =1;
 				c->ignore_clear_fullscreen = 1;
 			}
-			break;
 		}
-	}
-
-	wlr_scene_node_reparent(&c->scene->node, layers[c->isfloating ? LyrFloat : LyrTile]);
-	setmon(c, mon, newtags);
-
-	Client *fc;
-  	// 如果当前的tag中有新创建的非悬浮窗口,就让当前tag中的全屏窗口退出全屏参与平铺
-	wl_list_for_each(fc, &clients, link)
-  		if (fc && !c->ignore_clear_fullscreen && c->tags & fc->tags && ISFULLSCREEN(fc) && !c->isfloating ) {
-  		  	clear_fullscreen_flag(fc);
-			arrange(c->mon);
-  		}else if(c->ignore_clear_fullscreen && c->isrealfullscreen){
-			setrealfullscreen(c,1);
-		}
-
-	if(!(c->tags & ( 1 << (selmon->pertag->curtag - 1) ))){
-		view(&(Arg){.ui = c->tags});
 	}
 }
 
@@ -1526,7 +1515,6 @@ createnotify(struct wl_listener *listener, void *data)
 	/* Allocate a Client for this surface */
 	c = xdg_surface->data = ecalloc(1, sizeof(*c));
 	c->surface.xdg = xdg_surface;
-	c->bw = borderpx;
 
 	wlr_xdg_toplevel_set_wm_capabilities(xdg_surface->toplevel,
 			WLR_XDG_TOPLEVEL_WM_CAPABILITIES_FULLSCREEN);
@@ -2340,7 +2328,7 @@ mapnotify(struct wl_listener *listener, void *data)
 { //x11和wayland窗口的创建都会出发来这里初始化相关窗口元素
 	Client *p, *c = wl_container_of(listener, c, map);
 
-	int i;
+	int i,bodersize;
 
 	/* Create scene tree for this client and its border */
 	c->scene = client_surface(c)->data = wlr_scene_tree_create(layers[LyrTile]);
@@ -2350,13 +2338,16 @@ mapnotify(struct wl_listener *listener, void *data)
 			: wlr_scene_subsurface_tree_create(c->scene, client_surface(c));
 	c->scene->node.data = c->scene_surface->node.data = c;
 
+	applyrules(c);
+	bodersize = c->isnoborder?0:borderpx;
+
 	/* Handle unmanaged clients first so we can return prior create borders */
 	if (client_is_unmanaged(c)) {
 		client_get_geometry(c, &c->geom);
 		/* Unmanaged clients always are floating */
 		wlr_scene_node_reparent(&c->scene->node, layers[LyrFloat]);
-		wlr_scene_node_set_position(&c->scene->node, c->geom.x + borderpx,
-			c->geom.y + borderpx);
+		wlr_scene_node_set_position(&c->scene->node, c->geom.x + bodersize,
+			c->geom.y + bodersize);
 		if (client_wants_focus(c)) {
 			focusclient(c, 1);
 			exclusive_focus = c;
@@ -2373,7 +2364,7 @@ mapnotify(struct wl_listener *listener, void *data)
 	client_get_geometry(c, &c->geom);
 	c->geom.width += 2 * c->bw;
 	c->geom.height += 2 * c->bw;
-	c->bw = borderpx;
+	c->bw = c->isnoborder? 0 : borderpx; 
 	c->isfakefullscreen = 0;
 	c->isrealfullscreen = 0;	
 	c->oldgeom.width = 1200;
@@ -2405,7 +2396,25 @@ mapnotify(struct wl_listener *listener, void *data)
 		wlr_scene_node_reparent(&c->scene->node, layers[LyrFloat]); //设置登录框浮动
 		setmon(c, p->mon, p->tags);
 	} else {
-		applyrules(c); //窗口预设规则应用,全屏窗口自动退出判断也在里面
+
+		wlr_scene_node_reparent(&c->scene->node, layers[c->isfloating ? LyrFloat : LyrTile]);
+	
+		setmon(c, c->bindmon, c->bindtags);
+
+
+		Client *fc;
+  		// 如果当前的tag中有新创建的非悬浮窗口,就让当前tag中的全屏窗口退出全屏参与平铺
+		wl_list_for_each(fc, &clients, link)
+  			if (fc && !c->ignore_clear_fullscreen && c->tags & fc->tags && ISFULLSCREEN(fc) && !c->isfloating ) {
+  			  	clear_fullscreen_flag(fc);
+				arrange(c->mon);
+  			}else if(c->ignore_clear_fullscreen && c->isrealfullscreen){
+				setrealfullscreen(c,1);
+			}
+	
+		if(!(c->tags & ( 1 << (selmon->pertag->curtag - 1) ))){
+			view(&(Arg){.ui = c->tags});
+		}
 	}
 
 	//创建外部顶层窗口的句柄,每一个顶层窗口都有一个
@@ -2973,10 +2982,6 @@ setfakefullscreen(Client *c, int fakefullscreen)
 	struct wlr_box  fakefullscreen_box;
 	if (!c->mon)
 		return;
-	// c->bw = fullscreen ? 0 : borderpx;
-	// client_set_fullscreen(c, fullscreen);
-	// wlr_scene_node_reparent(&c->scene->node, layers[fullscreen
-	// 		? LyrFS : c->isfloating ? LyrFloat : LyrTile]);
 
 	if (fakefullscreen) {
 		c->prev = c->geom;
@@ -2992,7 +2997,7 @@ setfakefullscreen(Client *c, int fakefullscreen)
 		/* restore previous size instead of arrange for floating windows since
 		 * client positions are set by the user and cannot be recalculated */
 		// resize(c, c->prev, 0);
-		c->bw = borderpx;
+		c->bw = c->isnoborder? 0 : borderpx; 
 		c->isfakefullscreen = 0;
 		c->isfullscreen = 0;
 		c->isrealfullscreen = 0;
@@ -3020,7 +3025,7 @@ setrealfullscreen(Client *c, int realfullscreen)
 		/* restore previous size instead of arrange for floating windows since
 		 * client positions are set by the user and cannot be recalculated */
 		// resize(c, c->prev, 0);
-		c->bw = borderpx;
+		c->bw = c->isnoborder? 0 : borderpx; 
 		c->isrealfullscreen = 0;
 		c->isfullscreen = 0;
 		c->isfakefullscreen = 0;
@@ -3047,7 +3052,7 @@ setfullscreen(Client *c, int realfullscreen) //用自定义全屏代理自带全
 		/* restore previous size instead of arrange for floating windows since
 		 * client positions are set by the user and cannot be recalculated */
 		// resize(c, c->prev, 0);
-		c->bw = borderpx;
+		c->bw = c->isnoborder? 0 : borderpx; 
 		c->isrealfullscreen = 0;
 		c->isfullscreen = 0;
 		c->isfakefullscreen = 0;
@@ -4337,7 +4342,6 @@ createnotifyx11(struct wl_listener *listener, void *data)
 	c = xsurface->data = ecalloc(1, sizeof(*c));
 	c->surface.xwayland = xsurface;
 	c->type = xsurface->override_redirect ? X11Unmanaged : X11Managed;
-	c->bw = borderpx;
 
 	/* Listen to the various events it can emit */
 	LISTEN(&xsurface->events.associate, &c->associate, associatex11);

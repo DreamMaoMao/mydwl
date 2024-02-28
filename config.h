@@ -56,28 +56,28 @@ static const char *tags[] = {
 };
 
 static const Rule rules[] = {
-	/* app_id     title       tags mask     isfloating  isfullscreen isnoclip monitor  width height */
+	/* app_id     title       tags mask     isfloating  isfullscreen isnoclip monitor isnoborder width height */
 	/* examples:
 	{ "Gimp",     NULL,       0,            1,           -1,800,600 },
 	*/
-	{ "Google-chrome",  						NULL,       		1 << 3,       	0,   0, 	0,	-1, 0,0},
-	{ "Microsoft-edge-dev", 		 			NULL,       		1 << 4,       	0,   0, 	0,	-1, 0,0},
-	{ "Clash for Windows",  					NULL,       		0,       		1,   0, 	0,	-1, 1400,800},
-	{ "electron-netease-cloud-music",  			NULL,       		0,       		1,   0, 	0,	-1, 1200,800},
-	{ NULL,  									"图片查看器",   	0,       		1,   0, 	0,	-1, 0,0},
-	{ NULL,  									"图片查看",     	0,       		1,   0, 	0,	-1, 0,0},
-	{ NULL,  									"选择文件",     	0,       		1,   0, 	0,	-1, 1200,800},
-	{ "polkit-gnome-authentication-agent-1",  	NULL,       		0,       		1,   0, 	0,	-1, 928,249},
-	{ "blueman-manager",  						NULL,       		0,       		1,   0, 	0,	-1, 700,600},
-	{ "Gnome-system-monitor",  					NULL,       		0,       		0,   0, 	0,	-1, 700,600},
-	{ "obs",  									NULL,       		1<<5,       	0,   0, 	0,	-1, 700,600},
-	{ "flameshot",  							NULL,       		0,       		0,   1, 	0,	-1, 0,0},
-	{ "com.xunlei.download",  					NULL,       		0,       		1,   0, 	0,	-1, 0,0},
-	{ "pavucontrol",  							NULL,       		0,       		1,   0, 	0,	-1, 0,0},
-	{ "baidunetdisk",  							NULL,       		0,       		1,   0, 	0,	-1, 1400,800},
-	{ "alixby3",  								NULL,       		0,       		1,   0, 	0,	-1, 1400,800},
-	{ NULL,  									"rofi - website",   0,       		1,   0, 	0,	-1, 850,530},
-	{ "Rofi",  									NULL,       		0,       		1,   0, 	0,	-1, 1200,1050},
+	{ "Google-chrome",  						NULL,       		1 << 3,       	0,   0, 	0,	-1,0, 0,0},
+	{ "Microsoft-edge-dev", 		 			NULL,       		1 << 4,       	0,   0, 	0,	-1,0, 0,0},
+	{ "Clash for Windows",  					NULL,       		0,       		1,   0, 	0,	-1,0, 1400,800},
+	{ "electron-netease-cloud-music",  			NULL,       		0,       		1,   0, 	0,	-1,0, 1200,800},
+	{ NULL,  									"图片查看器",   	0,       		1,   0, 	0,	-1,0, 0,0},
+	{ NULL,  									"图片查看",     	0,       		1,   0, 	0,	-1,0, 0,0},
+	{ NULL,  									"选择文件",     	0,       		1,   0, 	0,	-1,0, 1200,800},
+	{ "polkit-gnome-authentication-agent-1",  	NULL,       		0,       		1,   0, 	0,	-1,0, 928,249},
+	{ "blueman-manager",  						NULL,       		0,       		1,   0, 	0,	-1,0, 700,600},
+	{ "Gnome-system-monitor",  					NULL,       		0,       		0,   0, 	0,	-1,0, 700,600},
+	{ "obs",  									NULL,       		1<<5,       	0,   0, 	0,	-1,0, 700,600},
+	{ "flameshot",  							NULL,       		0,       		0,   1, 	0,	-1,0, 0,0},
+	{ "com.xunlei.download",  					NULL,       		0,       		1,   0, 	0,	-1,0, 0,0},
+	{ "pavucontrol",  							NULL,       		0,       		1,   0, 	0,	-1,0, 0,0},
+	{ "baidunetdisk",  							NULL,       		0,       		1,   0, 	0,	-1,0, 1400,800},
+	{ "alixby3",  								NULL,       		0,       		1,   0, 	0,	-1,0, 1400,800},
+	{ NULL,  									"rofi - website",   0,       		1,   0, 	0,	-1,1, 850,530},
+	{ "Rofi",  									NULL,       		0,       		1,   0, 	0,	-1,1, 1200,1050},
 
 };
 
