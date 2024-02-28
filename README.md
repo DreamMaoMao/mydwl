@@ -6,7 +6,8 @@
 https://github.com/DreamMaoMao/superdwl/assets/30348075/7dbae8e6-b1f9-43b2-a670-58d94f36a3af
 
 
-
+> [!NOTE]
+> 该dwl目前基于wlroots-0.17.1 release 其他wlroots版本可能编译不过去
 
 # dwl - dwm for Wayland
 
@@ -35,6 +36,8 @@ https://github.com/DreamMaoMao/superdwl/assets/30348075/7dbae8e6-b1f9-43b2-a670-
 - 增加鼠标扩展监控支持,修复原版dwl不支持在xwayland窗口移动鼠标的同时使用滚轮
 - 添加网格布局为常规可切换布局
 - foreign-toplevel协议支持,支持dunst和waybar的taskbar模块
+- 支持客户端激活请求自动跳转和手动跳转的waybar 工作区模块urgen提示
+
 
 # 运行需要的相关工具包
 ```
@@ -60,9 +63,9 @@ clipman wl-clip-persist waybar
 
 ```
 
-# 安装最新的wlroots(0.17.0-dev after 2023-11-15)
+# 安装wlroots(0.17.1)
 ```
-git clone https://gitlab.freedesktop.org/wlroots/wlroots.git
+git clone -b 0.17.1 https://gitlab.freedesktop.org/wlroots/wlroots.git 
 cd wlroots
 meson build -Dprefix=/usr
 sudo ninja -C build install
