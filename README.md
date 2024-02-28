@@ -80,9 +80,10 @@ meson setup --buildtype=release build  -Dprefix=/usr/local
 sudo ninja -C build install
 
 //拷贝配置
-cp mako -r ~/.config/
+cp swaync -r ~/.config/
 cp fish -r ~/.config/
 cp wofi - ~/.config/
+cp rofi - ~/.config/
 cp konsole -r ~/.local/share/
 cp eww -r ~/.config/
 cp waybar -r ~/.config/
