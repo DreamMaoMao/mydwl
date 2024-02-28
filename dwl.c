@@ -4283,7 +4283,10 @@ void
 activatex11(struct wl_listener *listener, void *data)
 {
 	Client *c = wl_container_of(listener, c, activate);
-
+	if (focus_on_activate && c && c != selmon->sel && c->foreign_toplevel) {
+		view(&(Arg){.ui = c->tags});
+		focusclient(c,1);
+	}
 	/* Only "managed" windows can be activated */
 	if (c->type == X11Managed)
 		wlr_xwayland_surface_activate(c->surface.xwayland, 1);

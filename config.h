@@ -1,6 +1,7 @@
 /* speedie's dwl config */
 
 /* appearance */
+static const unsigned int focus_on_activate = 1; //收到窗口激活请求是否自动跳转聚焦
 static const unsigned int new_is_master = 1; //新窗口是否插在头部
 /* logging */
 static int log_level = WLR_ERROR;
