@@ -76,9 +76,6 @@ static const Rule rules[] = {
 	{ "pavucontrol",  							NULL,       		0,       		1,   0, 	0,	-1, 0,0},
 	{ "baidunetdisk",  							NULL,       		0,       		1,   0, 	0,	-1, 1400,800},
 	{ "alixby3",  								NULL,       		0,       		1,   0, 	0,	-1, 1400,800},
-	{ NULL,  									"rofi - website",   0,       		1,   0, 	0,	-1, 850,530},
-	{ "Rofi",  									NULL,       		0,       		1,   0, 	0,	-1, 1200,1050},
-
 };
 
 /* layout(s) */
