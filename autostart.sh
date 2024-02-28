@@ -13,7 +13,8 @@ dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
 /usr/lib/xdg-desktop-portal-hyprland &
 
 #mako &
-dunst -config ~/.config/dunst/dwl_dunstrc &
+# dunst -config ~/.config/dunst/dwl_dunstrc &
+swaync &
 wlsunset -T 3501 -t 3500 &
 swaybg -i $DWL/wallpaper/caoyuan.jpg & # 壁纸
 waybar -c $DWL/waybar/config -s $DWL/waybar/style.css &
