@@ -187,14 +187,11 @@ static const Key keys[] = {
     { WLR_MODIFIER_LOGO,   					XKB_KEY_space, 			spawn, 						SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show website") },  
     { WLR_MODIFIER_LOGO|WLR_MODIFIER_ALT,   XKB_KEY_Return, 		spawn, 						SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/tool/movie.py") },  
     { WLR_MODIFIER_CTRL,   					XKB_KEY_space, 			spawn, 						SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/search.py") },  
-
+    { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,   XKB_KEY_t, 			spawn, 						SHCMD("bash ~/tool/shotTranslate.sh shot") },  
 
 	{ WLR_MODIFIER_LOGO,                    XKB_KEY_Tab,          	focusstack,     			{.i = +1} },
 	{ WLR_MODIFIER_LOGO|WLR_MODIFIER_SHIFT, XKB_KEY_Tab,          	focusstack,     			{.i = -1} },
-  	{ WLR_MODIFIER_ALT,                  	XKB_KEY_k,            	focusdir,         			{.i = UP } },              /* alt k              | 二维聚焦窗口 */
-  	{ WLR_MODIFIER_ALT,                  	XKB_KEY_j,            	focusdir,         			{.i = DOWN } },            /* alt j              | 二维聚焦窗口 */
-  	{ WLR_MODIFIER_ALT,                  	XKB_KEY_h,            	focusdir,         			{.i = LEFT } },            /* alt h              | 二维聚焦窗口 */
-  	{ WLR_MODIFIER_ALT,                  	XKB_KEY_l,            	focusdir,         			{.i = RIGHT } },           /* alt l              | 二维聚焦窗口 */
+
     { WLR_MODIFIER_ALT,                  	XKB_KEY_Left,         	focusdir,         			{.i = LEFT } },            /* alt left           |  本tag内切换聚焦窗口 */
     { WLR_MODIFIER_ALT,                  	XKB_KEY_Right,        	focusdir,         			{.i = RIGHT } },           /* alt right          |  本tag内切换聚焦窗口 */
     { WLR_MODIFIER_ALT,                  	XKB_KEY_Up,           	focusdir,         			{.i = UP } },              /* alt up             |  本tag内切换聚焦窗口 */
