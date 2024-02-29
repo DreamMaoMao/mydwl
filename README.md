@@ -8,6 +8,7 @@ https://github.com/DreamMaoMao/superdwl/assets/30348075/7dbae8e6-b1f9-43b2-a670-
 
 > [!NOTE]
 > 该dwl目前基于wlroots-0.17.1 release 其他wlroots版本可能编译不过去
+> waybar要使用下面推荐地定制waybar,不然协议可能不通用
 
 # dwl - dwm for Wayland
 
@@ -67,6 +68,14 @@ clipman wl-clip-persist waybar
 ```
 git clone -b 0.17.1 https://gitlab.freedesktop.org/wlroots/wlroots.git 
 cd wlroots
+meson build -Dprefix=/usr
+sudo ninja -C build install
+```
+
+# 安装waybar
+```
+git clone https://github.com/DreamMaoMao/mywaybar.git
+cd mywaybar
 meson build -Dprefix=/usr
 sudo ninja -C build install
 ```
