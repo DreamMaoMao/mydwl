@@ -3668,7 +3668,7 @@ void overview_restore(Client *c, const Arg *arg) {
 	}
   }
 
-  if(c->bw == 0 && !c->isrealfullscreen) {
+  if(c->bw == 0 && !c->isrealfullscreen) { //如果是在ov模式中创建的窗口,没有bw记录
 	c->bw = borderpx;
   }
 
@@ -3681,8 +3681,19 @@ void toggleoverview(const Arg *arg) {
 	Client *c;
 	selmon->isoverview ^= 1;
 	unsigned int target;
+	unsigned int visible_client_number = 0;
+
 	if(selmon->isoverview){
-		target = ~0;
+		wl_list_for_each(c, &clients, link)
+		if (c && VISIBLEON(c, c->mon)){
+			visible_client_number++;
+		}
+		if(visible_client_number > 0) {
+			target = ~0;
+		} else {
+			selmon->isoverview ^= 1;
+			return;
+		}
   	}else if(!selmon->isoverview && selmon->sel) {
 		target = get_tags_first_tag(selmon->sel->tags);
   	} else if (!selmon->isoverview && !selmon->sel) {
