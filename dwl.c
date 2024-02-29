@@ -3693,7 +3693,7 @@ void toggleoverview(const Arg *arg) {
 
 	if(selmon->isoverview){
 		wl_list_for_each(c, &clients, link)
-		if (c && VISIBLEON(c, c->mon)){
+		if (c && c->mon == selmon){
 			visible_client_number++;
 		}
 		if(visible_client_number > 0) {
