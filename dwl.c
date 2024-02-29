@@ -2336,13 +2336,13 @@ maplayersurfacenotify(struct wl_listener *listener, void *data)
 	motionnotify(0);
 }
 
-
-
-void
+void //old fix to 0.5
 mapnotify(struct wl_listener *listener, void *data)
-{ //x11和wayland窗口的创建都会出发来这里初始化相关窗口元素
-	Client *p, *c = wl_container_of(listener, c, map);
-
+{
+	/* Called when the surface is mapped, or ready to display on-screen. */
+	Client *p = NULL;
+	Client *w, *c = wl_container_of(listener, c, map);
+	Monitor *m;
 	int i;
 
 	/* Create scene tree for this client and its border */
@@ -2353,38 +2353,33 @@ mapnotify(struct wl_listener *listener, void *data)
 			: wlr_scene_subsurface_tree_create(c->scene, client_surface(c));
 	c->scene->node.data = c->scene_surface->node.data = c;
 
+	client_get_geometry(c, &c->geom);
+
 	/* Handle unmanaged clients first so we can return prior create borders */
 	if (client_is_unmanaged(c)) {
-		client_get_geometry(c, &c->geom);
 		/* Unmanaged clients always are floating */
 		wlr_scene_node_reparent(&c->scene->node, layers[LyrFloat]);
 		wlr_scene_node_set_position(&c->scene->node, c->geom.x + borderpx,
-			c->geom.y + borderpx);
+				c->geom.y + borderpx);
 		if (client_wants_focus(c)) {
 			focusclient(c, 1);
 			exclusive_focus = c;
 		}
 		return;
 	}
-	
+
 	for (i = 0; i < 4; i++) {
-		c->border[i] = wlr_scene_rect_create(c->scene, 0, 0, bordercolor);
+		c->border[i] = wlr_scene_rect_create(c->scene, 0, 0,
+				c->isurgent ? urgentcolor : bordercolor);
 		c->border[i]->node.data = c;
 	}
 
 	/* Initialize client geometry with room for border */
-	client_get_geometry(c, &c->geom);
+	client_set_tiled(c, WLR_EDGE_TOP | WLR_EDGE_BOTTOM | WLR_EDGE_LEFT | WLR_EDGE_RIGHT);
 	c->geom.width += 2 * c->bw;
 	c->geom.height += 2 * c->bw;
-	c->bw = borderpx;
 	c->isfakefullscreen = 0;
 	c->isrealfullscreen = 0;	
-	c->oldgeom.width = 1200;
-	c->oldgeom.height = 800;
-
-	//根据宽高让坐标屏幕居中
-	c->oldgeom = setclient_coordinate_center(c->oldgeom);
-	c->geom = setclient_coordinate_center(c->geom);
 	//初始化窗口规则是否有设置标识
 	c->set_rule_size = 0;
 	c->ignore_clear_fullscreen = 0;
@@ -2397,18 +2392,15 @@ mapnotify(struct wl_listener *listener, void *data)
 		wl_list_insert(clients.prev, &c->link); //尾部入栈
 	wl_list_insert(&fstack, &c->flink);
 
-
 	/* Set initial monitor, tags, floating status, and focus:
 	 * we always consider floating, clients that have parent and thus
 	 * we set the same tags and monitor than its parent, if not
 	 * try to apply rules for them */
-	 /* TODO: https://github.com/djpohly/dwl/pull/334#issuecomment-1330166324 */
-	if (c->type == XDGShell && (p = client_get_parent(c))) {
+	if ((p = client_get_parent(c))) {
 		c->isfloating = 1;
-		wlr_scene_node_reparent(&c->scene->node, layers[LyrFloat]); //设置登录框浮动
 		setmon(c, p->mon, p->tags);
 	} else {
-		applyrules(c); //窗口预设规则应用,全屏窗口自动退出判断也在里面
+		applyrules(c);
 	}
 
 	//创建外部顶层窗口的句柄,每一个顶层窗口都有一个
@@ -2439,7 +2431,6 @@ mapnotify(struct wl_listener *listener, void *data)
 				c->foreign_toplevel, selmon->wlr_output);
 	}
 
-
 	if(selmon->sel && selmon->sel->foreign_toplevel)
 		wlr_foreign_toplevel_handle_v1_set_activated(selmon->sel->foreign_toplevel,false);
 	selmon->sel  = c;
@@ -2447,7 +2438,6 @@ mapnotify(struct wl_listener *listener, void *data)
 		wlr_foreign_toplevel_handle_v1_set_activated(c->foreign_toplevel,true);
 
 	printstatus();
-
 
 }
 
@@ -2859,7 +2849,10 @@ resizeclient(Client *c,int x,int y,int w,int h, int interact)
 
 void setborder_color(Client *c){
 	unsigned int i;
-	if(c->isfakefullscreen){
+	if (c->isurgent) {
+		for (i = 0; i < 4; i++)
+		wlr_scene_rect_set_color(c->border[i], urgentcolor);	
+	} else if(c->isfakefullscreen){
 		for (i = 0; i < 4; i++)
 		wlr_scene_rect_set_color(c->border[i], fakefullscreencolor);
 	} else if(c == selmon->sel) {
@@ -4016,7 +4009,8 @@ urgent(struct wl_listener *listener, void *data)
 		view(&(Arg){.ui = c->tags});
 		focusclient(c,1);
 	} else if(c != focustop(selmon)) {
-		client_set_border_color(c, urgentcolor);   //在使用窗口剪切补丁后,这里启动gdm-settings的字体更改那里点击就会崩溃
+		if (client_surface(c)->mapped)
+			client_set_border_color(c, urgentcolor);   //在使用窗口剪切补丁后,这里启动gdm-settings的字体更改那里点击就会崩溃
 		c->isurgent = 1;
 		printstatus();
 	}
@@ -4367,7 +4361,8 @@ activatex11(struct wl_listener *listener, void *data)
 		view(&(Arg){.ui = c->tags});
 		focusclient(c,1);
 	} else if(c != focustop(selmon)) {
-		client_set_border_color(c, urgentcolor);   //在使用窗口剪切补丁后,这里启动gdm-settings的字体更改那里点击就会崩溃,增加过滤条件为是toplevel窗口后似乎已经解决
+		if (client_surface(c)->mapped)
+			client_set_border_color(c, urgentcolor);   //在使用窗口剪切补丁后,这里启动gdm-settings的字体更改那里点击就会崩溃,增加过滤条件为是toplevel窗口后似乎已经解决
 		c->isurgent = 1;
 		printstatus();
 	}
