@@ -19,7 +19,7 @@ static unsigned int borderpx         = 5;  /* border pixel of windows */
 static const float rootcolor[]             = { 0.3, 0.3, 0.3, 1.0 };
 static const float bordercolor[]           = { 0.2, 0.2, 0.2, 0.9 };
 static const float focuscolor[]            = { 0.6, 0.4, 0.1, 1 };
-static const float fakefullscreencolor[]   = { 0.1, 0.5, 0.2, 1 };
+static const float fakefullscreencolor[]   = { 0.3, 0.5, 0.3, 1 };
 static const float urgentcolor[]           = { 0.5, 0.1, 0.1, 1 };
 // static const char *cursor_theme = "Bibata-Modern-Ice";
 
@@ -63,16 +63,16 @@ static const Rule rules[] = {
 	{ "Google-chrome",  						NULL,       		1 << 3,       	0,   0, 	0,	-1, 0,0},
 	{ "Microsoft-edge-dev", 		 			NULL,       		1 << 4,       	0,   0, 	0,	-1, 0,0},
 	{ "Clash for Windows",  					NULL,       		0,       		1,   0, 	0,	-1, 1400,800},
-	{ "electron-netease-cloud-music",  			NULL,       		0,       		1,   0, 	0,	-1, 1500,1000},
+	{ "electron-netease-cloud-music",  			NULL,       		0,       		1,   0, 	0,	-1, 1300,900},
 	{ NULL,  									"图片查看器",   	0,       		1,   0, 	0,	-1, 0,0},
 	{ NULL,  									"图片查看",     	0,       		1,   0, 	0,	-1, 0,0},
 	{ NULL,  									"选择文件",     	0,       		1,   0, 	0,	-1, 1200,800},
-	{ "polkit-gnome-authentication-agent-1",  	NULL,       		0,       		1,   0, 	0,	-1, 928,249},
+	{ "polkit-gnome-authentication-agent-1",  	NULL,       		0,       		1,   0, 	0,	-1, 0,0},
 	{ "blueman-manager",  						NULL,       		0,       		1,   0, 	0,	-1, 700,600},
 	{ "Gnome-system-monitor",  					NULL,       		0,       		0,   0, 	0,	-1, 700,600},
 	{ "obs",  									NULL,       		1<<5,       	0,   0, 	0,	-1, 700,600},
 	{ "flameshot",  							NULL,       		0,       		0,   1, 	0,	-1, 0,0},
-	{ "com.xunlei.download",  					NULL,       		0,       		1,   0, 	0,	-1, 0,0},
+	{ "com.xunlei.download",  					NULL,       		0,       		1,   0, 	0,	-1, 600,800},
 	{ "pavucontrol",  							NULL,       		0,       		1,   0, 	0,	-1, 0,0},
 	{ "baidunetdisk",  							NULL,       		0,       		1,   0, 	0,	-1, 1400,800},
 	{ "alixby3",  								NULL,       		0,       		1,   0, 	0,	-1, 1400,800},

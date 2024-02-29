@@ -92,7 +92,8 @@
     "cpu": {
         "interval": 2,
         "format": "{load}% ",
-        "on-click-right":"gnome-system-monitor"
+        "on-click-right":"gnome-system-monitor",
+        "on-click":"nwg-drawer -ovl"
         // "on-click-right":"bash ~/.config/eww/scripts/launcher toggle_menu quicksettings",
         // "max-length": 10
     },
@@ -100,7 +101,8 @@
         "interval":2,
         "format": "{}% 󰍛",
         "on-click":"GDK_BACKEND=x11 nemo",
-        "on-click-right":"clipman pick -t wofi"
+        "on-click-right":"clipman pick -t rofi"
+        // "on-click-right":"clipman pick -t wofi"
     },
     "temperature": {
         "thermal-zone": 2,
@@ -108,8 +110,10 @@
         "critical-threshold": 10,
         "format-critical": "{temperatureC}°C",
         "format": "",
-        "on-click":"$DWL/wofi/history_wofi.py",
-        "on-click-right":"$DWL/wofi/recentfile_wofi.py"
+        "on-click":"rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/history.py",
+        "on-click-right":"rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/recentfile.py"
+        // "on-click":"$DWL/wofi/history_wofi.py",
+        // "on-click-right":"$DWL/wofi/recentfile_wofi.py"
     },
     "backlight": {
         "interval":2,
