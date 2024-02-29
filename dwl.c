@@ -2341,8 +2341,7 @@ mapnotify(struct wl_listener *listener, void *data)
 {
 	/* Called when the surface is mapped, or ready to display on-screen. */
 	Client *p = NULL;
-	Client *w, *c = wl_container_of(listener, c, map);
-	Monitor *m;
+	Client *c = wl_container_of(listener, c, map);
 	int i;
 
 	/* Create scene tree for this client and its border */
