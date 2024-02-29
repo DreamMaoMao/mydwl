@@ -3667,6 +3667,11 @@ void overview_restore(Client *c, const Arg *arg) {
 		c->isrealfullscreen = 0;
 	}
   }
+
+  if(c->bw == 0 && !c->isrealfullscreen) {
+	c->bw = borderpx;
+  }
+
 }
 
 
