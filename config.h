@@ -172,7 +172,7 @@ static const Key keys[] = {
 	/* Note that Shift changes certain key codes: c -> C, 2 -> at, etc. */
 	/* modifier                  			key                 	function        			argument */
 	{ MODKEY,					 			XKB_KEY_space,      	spawn,          			SHCMD("wofi --height 365 --width 600") },
-	{ MODKEY, 					 			XKB_KEY_Return,     	spawn,          			SHCMD("konsole") },
+	{ MODKEY, 					 			XKB_KEY_Return,     	spawn,          			SHCMD("xfce4-terminal") },
     { WLR_MODIFIER_LOGO,         			XKB_KEY_Return, 		spawn, 						SHCMD("google-chrome") },
     { WLR_MODIFIER_LOGO,         			XKB_KEY_space, 			spawn, 						SHCMD("microsoft-edge") },
 	{ WLR_MODIFIER_CTRL,         			XKB_KEY_Return,         spawn, 						SHCMD("bash ~/tool/clash.sh") }, 
@@ -184,10 +184,9 @@ static const Key keys[] = {
     { WLR_MODIFIER_LOGO,   					XKB_KEY_space, 			spawn, 						SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show website") },  
     { WLR_MODIFIER_LOGO|WLR_MODIFIER_ALT,   XKB_KEY_Return, 		spawn, 						SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/tool/movie.py") },  
     { WLR_MODIFIER_CTRL,   					XKB_KEY_space, 			spawn, 						SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/search.py") },  
-    { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,   XKB_KEY_t, 			spawn, 						SHCMD("bash ~/tool/shotTranslate.sh shot") },  
+    { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,   XKB_KEY_t, 				spawn, 						SHCMD("bash ~/tool/shotTranslate.sh shot") },  
 
 	{ WLR_MODIFIER_LOGO,                    XKB_KEY_Tab,          	focusstack,     			{.i = +1} },
-	{ WLR_MODIFIER_LOGO|WLR_MODIFIER_SHIFT, XKB_KEY_Tab,          	focusstack,     			{.i = -1} },
 
     { WLR_MODIFIER_ALT,                  	XKB_KEY_Left,         	focusdir,         			{.i = LEFT } },            /* alt left           |  本tag内切换聚焦窗口 */
     { WLR_MODIFIER_ALT,                  	XKB_KEY_Right,        	focusdir,         			{.i = RIGHT } },           /* alt right          |  本tag内切换聚焦窗口 */
@@ -207,8 +206,8 @@ static const Key keys[] = {
     { WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO,  XKB_KEY_Left,         	tagtoleft,        			{0} },                     /* ctrl alt left      |  将本窗口移动到左边tag */
     { WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO,  XKB_KEY_Right,        	tagtoright,       			{0} }, 
 	{ MODKEY,					 			XKB_KEY_q,          	killclient,     			{0} },
-	{ MODKEY,                    			XKB_KEY_t,          	setlayout,      			{.v = &layouts[0]} },
-	{ MODKEY,                    			XKB_KEY_g,          	setlayout,      			{.v = &layouts[1]} },
+	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO,  XKB_KEY_t,          	setlayout,      			{.v = &layouts[0]} },
+	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO,  XKB_KEY_g,          	setlayout,      			{.v = &layouts[1]} },
 	{ WLR_MODIFIER_LOGO,                    XKB_KEY_n,          	switch_layout,      		{0} },
 	{ WLR_MODIFIER_ALT, 					XKB_KEY_backslash,      togglefloating, 			{0} },
 	{ MODKEY,                    			XKB_KEY_a,          	togglefakefullscreen, 		{0} },
