@@ -38,7 +38,9 @@ https://github.com/DreamMaoMao/mydwl/assets/30348075/1975cdae-0a04-4b1a-9f0e-fef
 - 添加网格布局为常规可切换布局
 - foreign-toplevel协议支持,支持dunst和waybar的taskbar模块
 - 支持客户端激活请求自动跳转和手动跳转的waybar 工作区模块urgen提示
-
+- 支持在waybar上隐藏未使用的tag
+- 支持在waybar上点击隐藏和显示窗口
+- 支持快捷键隐藏和显示窗口
 
 # 运行需要的相关工具包
 ```
