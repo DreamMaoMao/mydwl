@@ -151,9 +151,9 @@ typedef struct {
 	struct wl_listener set_hints;
 #endif
 	unsigned int bw;
-	unsigned int tags;
+	unsigned int tags,oldtags;
 	struct wlr_foreign_toplevel_handle_v1 *foreign_toplevel;
-	int isfloating, isurgent, isfullscreen, istiled;
+	int isfloating, isurgent, isfullscreen, istiled, isminied;
 	int isfakefullscreen,isrealfullscreen;
   	int overview_backup_x, overview_backup_y, overview_backup_w,
   	    overview_backup_h, overview_backup_bw;
@@ -444,6 +444,7 @@ unsigned int want_restore_fullscreen(Client *target_client);
 static void overview_restore(Client *c, const Arg *arg);
 static void overview_backup(Client *c);
 static void applyrulesgeom(Client *c);
+static void set_active_minized(Client *c);
 
 static void handle_foreign_activate_request(struct wl_listener *listener, void *data);
 static void handle_foreign_fullscreen_request(struct wl_listener *listener, void *data);
@@ -2493,6 +2494,15 @@ maximizenotify(struct wl_listener *listener, void *data)
 	togglefakefullscreen(&(Arg){0});
 }
 
+void set_active_minized(Client *c) {
+	c->oldtags = selmon->sel->tags;
+	c->tags = 0;
+	c->isminied = 1;
+	arrange(c->mon);
+	wlr_foreign_toplevel_handle_v1_set_activated(c->foreign_toplevel,false);
+	wlr_foreign_toplevel_handle_v1_set_minimized(c->foreign_toplevel,true);
+}
+
 void //0.5
 minimizenotify(struct wl_listener *listener, void *data)
 {
@@ -2508,7 +2518,10 @@ minimizenotify(struct wl_listener *listener, void *data)
 	// if (wl_resource_get_version(c->surface.xdg->toplevel->resource)
 	// 		< XDG_TOPLEVEL_WM_CAPABILITIES_SINCE_VERSION)
 	// 	wlr_xdg_surface_schedule_configure(c->surface.xdg);
-	togglefakefullscreen(&(Arg){0});
+	// togglefakefullscreen(&(Arg){0});
+	if(selmon->sel) {
+		set_active_minized(selmon->sel);
+	}
 }
 
 
@@ -3276,15 +3289,24 @@ get_tags_first_tag(unsigned int tags){
 void
 handle_foreign_activate_request(struct wl_listener *listener, void *data) {
 	Client *c = wl_container_of(listener, c, foreign_activate_request);
-	unsigned int target;
-	if(c && (1<<(selmon->pertag->curtag - 1)) & c->tags ){
-		focusclient(c,1);
-	}else if(c && !((1<<(selmon->pertag->curtag - 1)) & c->tags)) {
-		target = get_tags_first_tag(c->tags); 
-		view(&(Arg){.ui = target});
-		focusclient(c,1);
+
+	if(c && !c->isminied && c == selmon->sel) {
+		set_active_minized(c);
+		return;
 	}
-	
+
+	if(c->isminied) {
+		c->tags = c->oldtags;
+		c->isminied = 0;
+		wlr_foreign_toplevel_handle_v1_set_minimized(c->foreign_toplevel,false);
+	}
+
+	unsigned int target;
+	target = get_tags_first_tag(c->tags); 
+	view(&(Arg){.ui = target});
+	focusclient(c,1);
+	wlr_foreign_toplevel_handle_v1_set_activated(c->foreign_toplevel,true);
+
 }
 
 void
