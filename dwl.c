@@ -137,6 +137,7 @@ typedef struct {
 	struct wl_listener commit;
 	struct wl_listener map;
 	struct wl_listener maximize;
+	struct wl_listener minimize;
 	struct wl_listener unmap;
 	struct wl_listener destroy;
 	struct wl_listener set_title;
@@ -366,6 +367,7 @@ static void locksession(struct wl_listener *listener, void *data);
 static void maplayersurfacenotify(struct wl_listener *listener, void *data);
 static void mapnotify(struct wl_listener *listener, void *data);
 static void maximizenotify(struct wl_listener *listener, void *data);
+static void minimizenotify(struct wl_listener *listener, void *data);
 static void monocle(Monitor *m);
 static void motionabsolute(struct wl_listener *listener, void *data);
 static void motionnotify(uint32_t time);
@@ -1561,6 +1563,8 @@ createnotify(struct wl_listener *listener, void *data)
 			fullscreennotify);
 	LISTEN(&xdg_surface->toplevel->events.request_maximize, &c->maximize,
 			maximizenotify);
+	LISTEN(&xdg_surface->toplevel->events.request_minimize, &c->minimize,
+			minimizenotify);
 }
 
 void //17
@@ -2488,6 +2492,26 @@ maximizenotify(struct wl_listener *listener, void *data)
 	// 	wlr_xdg_surface_schedule_configure(c->surface.xdg);
 	togglefakefullscreen(&(Arg){0});
 }
+
+void //0.5
+minimizenotify(struct wl_listener *listener, void *data)
+{
+	/* This event is raised when a client would like to maximize itself,
+	 * typically because the user clicked on the maximize button on
+	 * client-side decorations. dwl doesn't support maximization, but
+	 * to conform to xdg-shell protocol we still must send a configure.
+	 * Since xdg-shell protocol v5 we should ignore request of unsupported
+	 * capabilities, just schedule a empty configure when the client uses <5
+	 * protocol version
+	 * wlr_xdg_surface_schedule_configure() is used to send an empty reply. */
+	// Client *c = wl_container_of(listener, c, maximize);
+	// if (wl_resource_get_version(c->surface.xdg->toplevel->resource)
+	// 		< XDG_TOPLEVEL_WM_CAPABILITIES_SINCE_VERSION)
+	// 	wlr_xdg_surface_schedule_configure(c->surface.xdg);
+	togglefakefullscreen(&(Arg){0});
+}
+
+
 
 void //17
 monocle(Monitor *m)
