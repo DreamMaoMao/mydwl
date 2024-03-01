@@ -2521,9 +2521,11 @@ void set_minized(Client *c) {
 	c->oldtags = selmon->sel->tags;
 	c->tags = 0;
 	c->isminied = 1;
+	focusclient(focustop(selmon), 1);
 	arrange(c->mon);
 	wlr_foreign_toplevel_handle_v1_set_activated(c->foreign_toplevel,false);
 	wlr_foreign_toplevel_handle_v1_set_minimized(c->foreign_toplevel,true);
+
 }
 
 void //0.5
@@ -3071,7 +3073,6 @@ setcursor(struct wl_listener *listener, void *data)
 	if (event->seat_client == seat->pointer_state.focused_client){
 		wlr_cursor_set_surface(cursor, event->surface,
 				event->hotspot_x, event->hotspot_y);
-		// logtofile("jjj");
 	}
 
 }
