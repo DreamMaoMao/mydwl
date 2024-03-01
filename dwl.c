@@ -444,7 +444,11 @@ unsigned int want_restore_fullscreen(Client *target_client);
 static void overview_restore(Client *c, const Arg *arg);
 static void overview_backup(Client *c);
 static void applyrulesgeom(Client *c);
-static void set_active_minized(Client *c);
+static void set_minized(Client *c);
+static void minized(const Arg *arg);
+static void restore_minized(const Arg *arg);
+static void show_hide_client(Client *c);
+static void tag_client(const Arg *arg, Client *target_client);
 
 static void handle_foreign_activate_request(struct wl_listener *listener, void *data);
 static void handle_foreign_fullscreen_request(struct wl_listener *listener, void *data);
@@ -595,6 +599,23 @@ setgamma(struct wl_listener *listener, void *data)
 
 	wlr_output_commit_state(event->output, &state);
 	wlr_output_schedule_frame(event->output);
+}
+
+void minized(const Arg *arg) {
+	if(selmon->sel && !selmon->sel->isminied) {
+		set_minized(selmon->sel);
+	}
+}
+
+void restore_minized(const Arg *arg) {
+	Client *c;
+	wl_list_for_each(c, &clients, link) {
+		if (c->isminied) {
+			show_hide_client(c);
+			break;
+		}
+	}
+
 }
 
 void  //0.5
@@ -2496,7 +2517,7 @@ maximizenotify(struct wl_listener *listener, void *data)
 	togglefakefullscreen(&(Arg){0});
 }
 
-void set_active_minized(Client *c) {
+void set_minized(Client *c) {
 	c->oldtags = selmon->sel->tags;
 	c->tags = 0;
 	c->isminied = 1;
@@ -2522,7 +2543,7 @@ minimizenotify(struct wl_listener *listener, void *data)
 	// 	wlr_xdg_surface_schedule_configure(c->surface.xdg);
 	// togglefakefullscreen(&(Arg){0});
 	if(selmon->sel) {
-		set_active_minized(selmon->sel);
+		set_minized(selmon->sel);
 	}
 }
 
@@ -3288,23 +3309,27 @@ get_tags_first_tag(unsigned int tags){
 	return target;
 }
 
+void show_hide_client(Client *c) {
+	unsigned int target = get_tags_first_tag(c->oldtags); 
+	tag_client(&(Arg){.ui = target},c);
+	// c->tags = c->oldtags;
+	c->isminied = 0;
+	wlr_foreign_toplevel_handle_v1_set_minimized(c->foreign_toplevel,false);
+	focusclient(c,1);
+	wlr_foreign_toplevel_handle_v1_set_activated(c->foreign_toplevel,true);	
+}
+
 void
 handle_foreign_activate_request(struct wl_listener *listener, void *data) {
 	Client *c = wl_container_of(listener, c, foreign_activate_request);
 	unsigned int target;
 	if(c && !c->isminied && c == selmon->sel) {
-		set_active_minized(c);
+		set_minized(c);
 		return;
 	}
 
 	if(c->isminied) {
-		target = get_tags_first_tag(c->oldtags); 
-		tag_client(&(Arg){.ui = target},c);
-		// c->tags = c->oldtags;
-		c->isminied = 0;
-		wlr_foreign_toplevel_handle_v1_set_minimized(c->foreign_toplevel,false);
-		focusclient(c,1);
-		wlr_foreign_toplevel_handle_v1_set_activated(c->foreign_toplevel,true);
+		show_hide_client(c);
 		return;
 	}
 

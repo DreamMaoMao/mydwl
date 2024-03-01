@@ -201,7 +201,7 @@ static const Key keys[] = {
     { WLR_MODIFIER_ALT,                  	XKB_KEY_Down,         	focusdir,         			{.i = DOWN } },    
 
 	{ WLR_MODIFIER_LOGO,                    XKB_KEY_e,          	incnmaster,     			{.i = +1} },
-	{ WLR_MODIFIER_LOGO,                    XKB_KEY_i,          	incnmaster,     			{.i = -1} },
+	{ WLR_MODIFIER_LOGO,                    XKB_KEY_t,          	incnmaster,     			{.i = -1} },
 	{ WLR_MODIFIER_LOGO, 					XKB_KEY_comma,          setmfact,       			{.f = -0.05} },
 	{ WLR_MODIFIER_LOGO, 					XKB_KEY_period,         setmfact,       			{.f = +0.05} },
 	{ MODKEY,                    			XKB_KEY_s,          	zoom,           			{0} },
@@ -219,6 +219,8 @@ static const Key keys[] = {
 	{ WLR_MODIFIER_ALT, 					XKB_KEY_backslash,      togglefloating, 			{0} },
 	{ MODKEY,                    			XKB_KEY_a,          	togglefakefullscreen, 		{0} },
 	{ MODKEY,                    			XKB_KEY_f,          	togglerealfullscreen, 		{0} },
+	{ WLR_MODIFIER_LOGO,                    XKB_KEY_i,          	minized, 					{0} },
+	{ WLR_MODIFIER_LOGO|WLR_MODIFIER_SHIFT, XKB_KEY_I,          	restore_minized, 			{0} },
 	{ WLR_MODIFIER_CTRL,                    XKB_KEY_KP_0,          	view,           			{.ui = ~0} },
 	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO, 	XKB_KEY_KP_0, 			tag,            			{.ui = ~0} },
 	{ MODKEY,                    			XKB_KEY_comma,      	focusmon,       			{.i = WLR_DIRECTION_LEFT} },
