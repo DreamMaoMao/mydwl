@@ -152,7 +152,7 @@ typedef struct {
 	unsigned int bw;
 	unsigned int tags;
 	struct wlr_foreign_toplevel_handle_v1 *foreign_toplevel;
-	int isfloating, isurgent, isfullscreen;
+	int isfloating, isurgent, isfullscreen, istiled;
 	int isfakefullscreen,isrealfullscreen;
   	int overview_backup_x, overview_backup_y, overview_backup_w,
   	    overview_backup_h, overview_backup_bw;
@@ -169,7 +169,6 @@ typedef struct {
 	struct wl_listener set_decoration_mode;
 	struct wl_listener destroy_decoration;	
 
-	unsigned int set_rule_size;
 	unsigned int ignore_clear_fullscreen;
 	int isnoclip;
 	struct wlr_box bounds;
@@ -442,6 +441,7 @@ static void toggleoverview(const Arg *arg);
 unsigned int want_restore_fullscreen(Client *target_client);
 static void overview_restore(Client *c, const Arg *arg);
 static void overview_backup(Client *c);
+static void applyrulesgeom(Client *c);
 
 static void handle_foreign_activate_request(struct wl_listener *listener, void *data);
 static void handle_foreign_fullscreen_request(struct wl_listener *listener, void *data);
@@ -665,6 +665,29 @@ void lognumtofile(unsigned int num) {
   system(cmd);
 }
 
+void // 0.5
+applyrulesgeom(Client *c)
+{
+	/* rule matching */
+	const char *appid, *title;
+	const Rule *r;
+
+	if (!(appid = client_get_appid(c)))
+		appid = broken;
+	if (!(title = client_get_title(c)))
+		title = broken;
+
+	for (r = rules; r < END(rules); r++) {
+		if ((!r->title || strstr(title, r->title))
+				&& (!r->id || strstr(appid, r->id))) {	
+			c->geom.width = r->width;
+			c->geom.height =  r->height;
+			//重新计算居中的坐标
+			c->geom = setclient_coordinate_center(c->geom);
+			break;
+		}
+	}
+}
 
 void // 17
 applyrules(Client *c)
@@ -697,7 +720,6 @@ applyrules(Client *c)
 				c->geom.height =  r->height;
 				//重新计算居中的坐标
 				c->geom = setclient_coordinate_center(c->geom);
-				c->set_rule_size = 1;
 			}
 			if(r->isfullscreen){
 				c->isrealfullscreen =1;
@@ -2387,8 +2409,7 @@ mapnotify(struct wl_listener *listener, void *data)
 	c->geom.height += 2 * c->bw;
 	c->isfakefullscreen = 0;
 	c->isrealfullscreen = 0;	
-	//初始化窗口规则是否有设置标识
-	c->set_rule_size = 0;
+	c->istiled = 0;
 	c->ignore_clear_fullscreen = 0;
 
 	//nop
@@ -2995,20 +3016,31 @@ setcursor(struct wl_listener *listener, void *data)
 
 void //0.5
 setfloating(Client *c, int floating)
-{
+{	
+
 	Client *p = client_get_parent(c);
 	c->isfloating = floating;
+
 	if (!c->mon)
 		return;
 	wlr_scene_node_reparent(&c->scene->node, layers[c->isfullscreen ||
 			(p && p->isfullscreen) ? LyrFS
 			: c->isfloating ? LyrFloat : LyrTile]);
+
 	if (floating == 1) { 
-		applyrules(c);
+		if(c->istiled) {
+			c->geom.height = c->geom.height * 0.8;
+			c->geom.width = c->geom.width * 0.8;
+		}
 		//重新计算居中的坐标
 		c->geom = setclient_coordinate_center(c->geom);
+		applyrulesgeom(c);
 		resize(c,c->geom,0);
+		c->istiled = 0; 
+	} else {
+		c->istiled = 1; 
 	}
+
 	arrange(c->mon);
 	printstatus();
 }
@@ -4018,7 +4050,7 @@ updatetitle(struct wl_listener *listener, void *data)
 
 }
 
-void //17
+void //17 fix to 0.5
 urgent(struct wl_listener *listener, void *data)
 {
 	struct wlr_xdg_activation_v1_request_activate_event *event = data;
@@ -4033,7 +4065,7 @@ urgent(struct wl_listener *listener, void *data)
 		focusclient(c,1);
 	} else if(c != focustop(selmon)) {
 		if (client_surface(c)->mapped)
-			client_set_border_color(c, urgentcolor);   //在使用窗口剪切补丁后,这里启动gdm-settings的字体更改那里点击就会崩溃
+			client_set_border_color(c, urgentcolor);
 		c->isurgent = 1;
 		printstatus();
 	}
