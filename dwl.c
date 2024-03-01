@@ -2482,10 +2482,11 @@ maximizenotify(struct wl_listener *listener, void *data)
 	 * capabilities, just schedule a empty configure when the client uses <5
 	 * protocol version
 	 * wlr_xdg_surface_schedule_configure() is used to send an empty reply. */
-	Client *c = wl_container_of(listener, c, maximize);
-	if (wl_resource_get_version(c->surface.xdg->toplevel->resource)
-			< XDG_TOPLEVEL_WM_CAPABILITIES_SINCE_VERSION)
-		wlr_xdg_surface_schedule_configure(c->surface.xdg);
+	// Client *c = wl_container_of(listener, c, maximize);
+	// if (wl_resource_get_version(c->surface.xdg->toplevel->resource)
+	// 		< XDG_TOPLEVEL_WM_CAPABILITIES_SINCE_VERSION)
+	// 	wlr_xdg_surface_schedule_configure(c->surface.xdg);
+	togglefakefullscreen(&(Arg){0});
 }
 
 void //17
