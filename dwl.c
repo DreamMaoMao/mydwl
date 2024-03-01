@@ -1715,6 +1715,8 @@ destroynotify(struct wl_listener *listener, void *data)
 	wl_list_remove(&c->destroy.link);
 	wl_list_remove(&c->set_title.link);
 	wl_list_remove(&c->fullscreen.link);
+	wl_list_remove(&c->maximize.link);
+	wl_list_remove(&c->minimize.link);
 #ifdef XWAYLAND
 	if (c->type != XDGShell) {
 		wl_list_remove(&c->activate.link);
@@ -4510,6 +4512,8 @@ createnotifyx11(struct wl_listener *listener, void *data)
 	LISTEN(&xsurface->events.set_title, &c->set_title, updatetitle);
 	LISTEN(&xsurface->events.destroy, &c->destroy, destroynotify);
 	LISTEN(&xsurface->events.request_fullscreen, &c->fullscreen, fullscreennotify);
+	LISTEN(&xsurface->events.request_maximize, &c->maximize, maximizenotify);
+	LISTEN(&xsurface->events.request_minimize, &c->minimize, minimizenotify);
 }
 
 Atom
