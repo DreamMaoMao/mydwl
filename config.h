@@ -186,6 +186,13 @@ static const Key keys[] = {
     { WLR_MODIFIER_CTRL,   					XKB_KEY_space, 			spawn, 						SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/search.py") },  
     { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,   XKB_KEY_t, 				spawn, 						SHCMD("bash ~/tool/shotTranslate.sh shot") },  
 
+    { WLR_MODIFIER_CTRL,   					XKB_KEY_comma, 			spawn, 						SHCMD("~/.config/hypr/scripts/brightness.sh down") },  
+    { WLR_MODIFIER_CTRL,   					XKB_KEY_period, 		spawn, 						SHCMD("~/.config/hypr/scripts/brightness.sh up") },  
+    { WLR_MODIFIER_ALT,   					XKB_KEY_comma, 			spawn, 						SHCMD("~/.config/hypr/scripts/volume.sh down") },  
+    { WLR_MODIFIER_ALT,   					XKB_KEY_period, 		spawn, 						SHCMD("~/.config/hypr/scripts/volume.sh up") },  
+    { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,   XKB_KEY_backslash, 		spawn, 						SHCMD("swaync-client -t") },  
+    { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,   XKB_KEY_BackSpace, 		spawn, 						SHCMD("swaync-client -C") },  
+
 	{ WLR_MODIFIER_LOGO,                    XKB_KEY_Tab,          	focusstack,     			{.i = +1} },
 
     { WLR_MODIFIER_ALT,                  	XKB_KEY_Left,         	focusdir,         			{.i = LEFT } },            /* alt left           |  本tag内切换聚焦窗口 */

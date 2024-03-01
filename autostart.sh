@@ -20,6 +20,7 @@ swaybg -i $DWL/wallpaper/caoyuan.jpg & # 壁纸
 waybar -c $DWL/waybar/config -s $DWL/waybar/style.css &
 echo "Xft.dpi: 140" | xrdb -merge #dpi缩放
 cp ~/.local/share/wayland/konsole -r ~/.local/share/
+cp ~/.config/zellij/configwayland.kdl ~/.config/zellij/config.kdl
 cp ~/.config/fcitx/dwm_profile ~/.config/fcitx/profile -f
 # 开启输入法
 fcitx &
@@ -38,3 +39,8 @@ nm-applet &
 [ -e /dev/sda1 ] && udisksctl mount -t ntfs -b /dev/sda4
 python3 ~/tool/sign.py &
 eww daemon &
+
+~/.config/hypr/scripts/idle.sh &
+sway-audio-idle-inhibit &
+swayosd-server &
+

@@ -6,6 +6,7 @@
 
     "margin-bottom":-11,
     "modules-left": ["dwl/tags","wlr/taskbar"],
+    "modules-center": ["hyprland/window"],
     "modules-right": ["custom/notification","tray","network","cpu","temperature","memory","clock","pulseaudio","backlight","battery"],
     "dwl/tags": {
         "num-tags":9,
