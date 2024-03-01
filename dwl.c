@@ -1964,9 +1964,11 @@ focusclient(Client *c, int lift)
 	if (c && client_surface(c) == old)
 		return;
 
-	if(selmon->sel && selmon->sel->foreign_toplevel)
+	if(selmon && selmon->sel && selmon->sel->foreign_toplevel)
 		wlr_foreign_toplevel_handle_v1_set_activated(selmon->sel->foreign_toplevel,false);
-	selmon->sel  = c;
+
+	if(selmon)
+		selmon->sel  = c;
 	if(c && c->foreign_toplevel)
 		wlr_foreign_toplevel_handle_v1_set_activated(c->foreign_toplevel,true);
 
@@ -2775,11 +2777,10 @@ printstatus(void)
 	fflush(stdout);
 }
 
-void
+void //0.5
 quit(const Arg *arg)
-{	
-	cleanup();
-	// wl_display_terminate(dpy); //这个会在系统日志里引发崩溃异常,所以换成cleanup
+{
+	wl_display_terminate(dpy);
 }
 
 void
