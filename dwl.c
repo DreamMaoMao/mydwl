@@ -3291,19 +3291,23 @@ get_tags_first_tag(unsigned int tags){
 void
 handle_foreign_activate_request(struct wl_listener *listener, void *data) {
 	Client *c = wl_container_of(listener, c, foreign_activate_request);
-
+	unsigned int target;
 	if(c && !c->isminied && c == selmon->sel) {
 		set_active_minized(c);
 		return;
 	}
 
 	if(c->isminied) {
-		c->tags = c->oldtags;
+		target = get_tags_first_tag(c->oldtags); 
+		tag_client(&(Arg){.ui = target},c);
+		// c->tags = c->oldtags;
 		c->isminied = 0;
 		wlr_foreign_toplevel_handle_v1_set_minimized(c->foreign_toplevel,false);
+		focusclient(c,1);
+		wlr_foreign_toplevel_handle_v1_set_activated(c->foreign_toplevel,true);
+		return;
 	}
 
-	unsigned int target;
 	target = get_tags_first_tag(c->tags); 
 	view(&(Arg){.ui = target});
 	focusclient(c,1);
@@ -3601,9 +3605,7 @@ startdrag(struct wl_listener *listener, void *data)
 }
 
 
-void
-tag(const Arg *arg) {
-	Client *target_client = selmon->sel;
+void tag_client(const Arg *arg, Client *target_client) {
 	Client *fc;
   	if (target_client  && arg->ui & TAGMASK) {
 		target_client->tags = arg->ui & TAGMASK;
@@ -3619,7 +3621,13 @@ tag(const Arg *arg) {
 	}
 
     focusclient(target_client,1);
-	printstatus();
+	printstatus();	
+}
+
+void
+tag(const Arg *arg) {
+	Client *target_client = selmon->sel;
+	tag_client(arg,target_client);
 }
 
 
