@@ -3897,9 +3897,18 @@ void
 togglefloating(const Arg *arg)
 {
 	Client *sel = focustop(selmon);
+
+	if(!sel)
+		return;
+
+  	if (sel->isfullscreen || sel->isfakefullscreen ||sel->isrealfullscreen ) {
+  		sel->isfullscreen = 0; // 清除窗口全屏标志
+		sel->isfakefullscreen = 0;
+		sel->isrealfullscreen = 0;
+		sel->bw = borderpx; // 恢复非全屏的border
+  	}
 	/* return if fullscreen */
-	if (sel && !sel->isfullscreen)
-		setfloating(sel, !sel->isfloating);
+	setfloating(sel, !sel->isfloating);
 }
 
 void
