@@ -3915,17 +3915,24 @@ void
 togglefullscreen(const Arg *arg)
 {
 	Client *sel = focustop(selmon);
-	if (sel)
-		setfullscreen(sel, !sel->isfullscreen);
+	if (!sel)
+		return;
+	if(sel->isfloating)
+		setfloating(sel, 0);
+
+	setfullscreen(sel, !sel->isfullscreen);
 }
 
 void
 togglefakefullscreen(const Arg *arg)
 {
 	Client *sel = focustop(selmon);
-	if(!sel){
+	if(!sel)
 		return;
-	}
+
+	if(sel->isfloating)
+		setfloating(sel, 0);
+
 	if (sel->isfullscreen || sel->isfakefullscreen || sel->isrealfullscreen)
 		setfakefullscreen(sel, 0);
 	else
@@ -3937,9 +3944,12 @@ void
 togglerealfullscreen(const Arg *arg)
 {
 	Client *sel = focustop(selmon);
-	if(!sel){
+	if(!sel)
 		return;
-	}
+
+	if(sel->isfloating)
+		setfloating(sel, 0);
+
 	if (sel->isfullscreen || sel->isfakefullscreen || sel->isrealfullscreen)
 		setrealfullscreen(sel, 0);
 	else
