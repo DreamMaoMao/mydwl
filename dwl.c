@@ -50,6 +50,7 @@
 #include <wlr/types/wlr_subcompositor.h>
 #include <wlr/types/wlr_viewporter.h>
 #include <wlr/types/wlr_virtual_keyboard_v1.h>
+#include <wlr/types/wlr_virtual_pointer_v1.h>
 #include <wlr/types/wlr_xcursor_manager.h>
 #include <wlr/types/wlr_xdg_activation_v1.h>
 #include <wlr/types/wlr_xdg_decoration_v1.h>
@@ -431,6 +432,7 @@ static void handlesig(int signo);
 static void tagtoleft(const Arg *arg);
 static void tagtoright(const Arg *arg); 
 static void virtualkeyboard(struct wl_listener *listener, void *data);
+static void virtualpointer(struct wl_listener *listener, void *data);
 static void warp_cursor(const Client *c);
 static Monitor *xytomon(double x, double y);
 static void xytonode(double x, double y, struct wlr_surface **psurface,
@@ -486,6 +488,7 @@ static struct wlr_idle_inhibit_manager_v1 *idle_inhibit_mgr;
 static struct wlr_layer_shell_v1 *layer_shell;
 static struct wlr_output_manager_v1 *output_mgr;
 static struct wlr_virtual_keyboard_manager_v1 *virtual_keyboard_mgr;
+static struct wlr_virtual_pointer_manager_v1 *virtual_pointer_mgr;
 
 static struct wlr_cursor *cursor;
 static struct wlr_xcursor_manager *cursor_mgr;
@@ -3536,6 +3539,9 @@ setup(void)
 	LISTEN_STATIC(&backend->events.new_input, inputdevice);
 	virtual_keyboard_mgr = wlr_virtual_keyboard_manager_v1_create(dpy);
 	LISTEN_STATIC(&virtual_keyboard_mgr->events.new_virtual_keyboard, virtualkeyboard);
+	virtual_pointer_mgr = wlr_virtual_pointer_manager_v1_create(dpy);
+	LISTEN_STATIC(&virtual_pointer_mgr->events.new_virtual_pointer, virtualpointer);
+
 	seat = wlr_seat_create(dpy, "seat0");
 	LISTEN_STATIC(&seat->events.request_set_cursor, setcursor);
 	LISTEN_STATIC(&seat->events.request_set_selection, setsel);
@@ -4411,6 +4417,17 @@ warp_cursor(const Client *c) {
 			  NULL,
 			  c->geom.x + c->geom.width / 2.0,
 			  c->geom.y + c->geom.height / 2.0);
+}
+
+void
+virtualpointer(struct wl_listener *listener, void *data)
+{
+	struct wlr_virtual_pointer_v1_new_pointer_event *event = data;
+	struct wlr_pointer pointer = event->new_pointer->pointer;
+
+	wlr_cursor_attach_input_device(cursor, &pointer.base);
+	if (event->suggested_output)
+		wlr_cursor_map_input_to_output(cursor, &pointer.base, event->suggested_output);
 }
 
 Monitor *

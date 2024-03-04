@@ -8,7 +8,8 @@
         "string": "c",
         "vector": "c",
         "valarray": "c",
-        "wlr_layer_shell_v1.h": "c"
+        "wlr_layer_shell_v1.h": "c",
+        "wlr_virtual_keyboard_v1.h": "c"
     },
     "mesonbuild.configureOnOpen": false
 }
