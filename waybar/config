@@ -135,7 +135,8 @@
         "format": "{capacity}% {icon}",   
         "format-icons": ["", "", "", "", ""],
         "on-click-right":"~/.config/eww/System-Menu/launch",
-        "on-click":"/usr/local/bin/eww open-many --toggle background-closer powermenu"
+        "on-click":"wlogout --protocol layer-shell -b 6"
+        // "on-click":"/usr/local/bin/eww open-many --toggle background-closer powermenu"
         // "max-length": 25
     },
     "disk": {
