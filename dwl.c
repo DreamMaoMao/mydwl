@@ -173,6 +173,9 @@ typedef struct {
 
 	unsigned int ignore_clear_fullscreen;
 	int isnoclip;
+	int is_in_scratchpad;
+	int is_scratchpad_show;
+	int scratchpad_priority;
 	struct wlr_box bounds;
 } Client;
 
@@ -449,6 +452,8 @@ static void applyrulesgeom(Client *c);
 static void set_minized(Client *c);
 static void minized(const Arg *arg);
 static void restore_minized(const Arg *arg);
+static void toggle_scratchpad(const Arg *arg);
+static void show_scratchpad(Client *c);
 static void show_hide_client(Client *c);
 static void tag_client(const Arg *arg, Client *target_client);
 
@@ -615,8 +620,85 @@ void restore_minized(const Arg *arg) {
 	wl_list_for_each(c, &clients, link) {
 		if (c->isminied) {
 			show_hide_client(c);
+			c->is_scratchpad_show = 0;
+			c->is_in_scratchpad = 0;
+			c->scratchpad_priority = 0;
 			break;
 		}
+	}
+
+}
+
+void show_scratchpad(Client *c) {
+	c->is_scratchpad_show = 1;
+	c->geom.width =  c->mon->w.width * 0.7;
+	c->geom.height =  c->mon->w.height * 0.9;		
+	//重新计算居中的坐标
+	c->geom = setclient_coordinate_center(c->geom);	
+  	if (c->isfullscreen || c->isfakefullscreen ||c->isrealfullscreen ) {
+  		c->isfullscreen = 0; // 清除窗口全屏标志
+		c->isfakefullscreen = 0;
+		c->isrealfullscreen = 0;
+		c->bw = borderpx; // 恢复非全屏的border
+  	}
+	/* return if fullscreen */
+	setfloating(c, 1);	
+	c->geom.width =  c->mon->w.width * 0.5;
+	c->geom.height =  c->mon->w.height * 0.8;		
+	//重新计算居中的坐标
+	c->geom = setclient_coordinate_center(c->geom);		
+	resize(c, c->geom, 0);
+	c->oldtags = selmon->tagset[selmon->seltags];
+	show_hide_client(c);
+	setborder_color(c);
+}
+
+void toggle_scratchpad(const Arg *arg) {
+	Client *c,*target_show_client=NULL;
+	Client *tempClients[100],*tempbackup; //只支持100个在便利签中的客户端
+	int  z,j,k,i = 0;
+	int is_hide_anction = 0;
+	wl_list_for_each(c, &clients, link) {
+		if(c->is_in_scratchpad && c->is_scratchpad_show && (selmon->tagset[selmon->seltags] & c->tags) == 0 ) {
+			unsigned int target = get_tags_first_tag(selmon->tagset[selmon->seltags]); 
+			tag_client(&(Arg){.ui = target},c);
+			return;
+		} else if (c->is_in_scratchpad && c->is_scratchpad_show && (selmon->tagset[selmon->seltags] & c->tags) != 0) {
+			c->is_scratchpad_show = 0;
+			c->scratchpad_priority = c->scratchpad_priority + 10;
+			set_minized(c);
+			is_hide_anction = 1;
+		} else if (c->is_in_scratchpad && !c->is_scratchpad_show) {
+			if (target_show_client != NULL) {
+				if (c->scratchpad_priority < target_show_client->scratchpad_priority)
+					target_show_client = c;
+			} else {
+				target_show_client = c;
+			}
+		} 
+
+		if(c->is_in_scratchpad) {
+			tempClients[i] = c;
+			i++;
+		}
+	}
+
+	if(is_hide_anction) {
+		for(j=0;j<i-1;j++) //把优先级从左到右排序
+			for(k=j+1;k<i;k++) {
+				if(tempClients[j]->scratchpad_priority > tempClients[k]->scratchpad_priority) {
+					tempbackup = tempClients[j];
+					tempClients[j] = tempClients[k];
+					tempClients[k] = tempbackup;
+				}
+			}
+		for(z=0;z<i;z++) { //重新根据排序设置优先级的值,以免上面优先级做加法过多溢出
+			tempClients[z]->scratchpad_priority = z;
+		}
+	} else {
+		if(!target_show_client)
+			return;
+		show_scratchpad(target_show_client);
 	}
 
 }
@@ -2524,6 +2606,8 @@ void set_minized(Client *c) {
 	c->oldtags = selmon->sel->tags;
 	c->tags = 0;
 	c->isminied = 1;
+	c->is_in_scratchpad = 1;
+	c->is_scratchpad_show = 0;
 	focusclient(focustop(selmon), 1);
 	arrange(c->mon);
 	wlr_foreign_toplevel_handle_v1_set_activated(c->foreign_toplevel,false);
@@ -2947,6 +3031,9 @@ void setborder_color(Client *c){
 	if (c->isurgent) {
 		for (i = 0; i < 4; i++)
 		wlr_scene_rect_set_color(c->border[i], urgentcolor);	
+	} if (c->is_in_scratchpad) {
+		for (i = 0; i < 4; i++)
+		wlr_scene_rect_set_color(c->border[i], scratchpadcolor);		
 	} else if(c->isfakefullscreen){
 		for (i = 0; i < 4; i++)
 		wlr_scene_rect_set_color(c->border[i], fakefullscreencolor);
@@ -3105,6 +3192,9 @@ setfloating(Client *c, int floating)
 		c->istiled = 0; 
 	} else {
 		c->istiled = 1; 
+		c->is_scratchpad_show = 0;
+		c->is_in_scratchpad = 0;
+		c->scratchpad_priority = 0;
 	}
 
 	arrange(c->mon);
@@ -3909,6 +3999,7 @@ togglefloating(const Arg *arg)
   	}
 	/* return if fullscreen */
 	setfloating(sel, !sel->isfloating);
+	setborder_color(sel);
 }
 
 void
@@ -3920,6 +4011,9 @@ togglefullscreen(const Arg *arg)
 	if(sel->isfloating)
 		setfloating(sel, 0);
 
+	sel->is_scratchpad_show = 0;
+	sel->is_in_scratchpad = 0;
+	sel->scratchpad_priority = 0;
 	setfullscreen(sel, !sel->isfullscreen);
 }
 
@@ -3937,7 +4031,10 @@ togglefakefullscreen(const Arg *arg)
 		setfakefullscreen(sel, 0);
 	else
 		setfakefullscreen(sel, 1);
-	
+
+	sel->is_scratchpad_show = 0;
+	sel->is_in_scratchpad = 0;
+	sel->scratchpad_priority = 0;
 }
 
 void
@@ -3954,6 +4051,10 @@ togglerealfullscreen(const Arg *arg)
 		setrealfullscreen(sel, 0);
 	else
 		setrealfullscreen(sel, 1);
+
+	sel->is_scratchpad_show = 0;
+	sel->is_in_scratchpad = 0;
+	sel->scratchpad_priority = 0;
 }
 
 void

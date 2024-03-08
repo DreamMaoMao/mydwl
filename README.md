@@ -41,6 +41,7 @@ https://github.com/DreamMaoMao/mydwl/assets/30348075/1975cdae-0a04-4b1a-9f0e-fef
 - 支持在waybar上隐藏未使用的tag
 - 支持在waybar上点击隐藏和显示窗口
 - 支持快捷键隐藏和显示窗口
+- 添加sway的便签功能
 
 # 运行需要的相关工具包
 ```

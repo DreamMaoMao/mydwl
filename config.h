@@ -21,6 +21,7 @@ static const float bordercolor[]           = { 0.2, 0.2, 0.2, 0.9 };
 static const float focuscolor[]            = { 0.6, 0.4, 0.1, 1 };
 static const float fakefullscreencolor[]   = { 0.3, 0.5, 0.3, 1 };
 static const float urgentcolor[]           = { 0.5, 0.1, 0.1, 1 };
+static const float scratchpadcolor[]       = { 0.3, 0.4, 0.6, 1 };
 // static const char *cursor_theme = "Bibata-Modern-Ice";
 
 static const int overviewgappi = 24; /* overview时 窗口与边缘 缝隙大小 */
@@ -223,8 +224,9 @@ static const Key keys[] = {
 	{ WLR_MODIFIER_ALT, 					XKB_KEY_backslash,      togglefloating, 			{0} },
 	{ MODKEY,                    			XKB_KEY_a,          	togglefakefullscreen, 		{0} },
 	{ MODKEY,                    			XKB_KEY_f,          	togglerealfullscreen, 		{0} },
-	{ WLR_MODIFIER_LOGO,                    XKB_KEY_i,          	minized, 					{0} },
+	{ WLR_MODIFIER_LOGO,                    XKB_KEY_i,          	minized, 					{0} },  //最小化,放入便签
 	{ WLR_MODIFIER_LOGO|WLR_MODIFIER_SHIFT, XKB_KEY_I,          	restore_minized, 			{0} },
+	{ WLR_MODIFIER_ALT, 					XKB_KEY_z,          	toggle_scratchpad, 			{0} },  //便签循环切换
 	{ WLR_MODIFIER_CTRL,                    XKB_KEY_KP_0,          	view,           			{.ui = ~0} },
 	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO, 	XKB_KEY_KP_0, 			tag,            			{.ui = ~0} },
 	{ MODKEY,                    			XKB_KEY_comma,      	focusmon,       			{.i = WLR_DIRECTION_LEFT} },
