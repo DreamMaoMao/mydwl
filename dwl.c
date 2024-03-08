@@ -623,6 +623,7 @@ void restore_minized(const Arg *arg) {
 			c->is_scratchpad_show = 0;
 			c->is_in_scratchpad = 0;
 			c->scratchpad_priority = 0;
+			setborder_color(c);
 			break;
 		}
 	}
@@ -3421,6 +3422,10 @@ handle_foreign_activate_request(struct wl_listener *listener, void *data) {
 	}
 
 	if(c->isminied) {
+		c->is_in_scratchpad = 0;
+		c->is_scratchpad_show = 0;
+		c->scratchpad_priority = 0;
+		setborder_color(c);
 		show_hide_client(c);
 		return;
 	}
