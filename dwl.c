@@ -631,10 +631,6 @@ void restore_minized(const Arg *arg) {
 
 void show_scratchpad(Client *c) {
 	c->is_scratchpad_show = 1;
-	c->geom.width =  c->mon->w.width * 0.7;
-	c->geom.height =  c->mon->w.height * 0.9;		
-	//重新计算居中的坐标
-	c->geom = setclient_coordinate_center(c->geom);	
   	if (c->isfullscreen || c->isfakefullscreen ||c->isrealfullscreen ) {
   		c->isfullscreen = 0; // 清除窗口全屏标志
 		c->isfakefullscreen = 0;
@@ -642,13 +638,15 @@ void show_scratchpad(Client *c) {
 		c->bw = borderpx; // 恢复非全屏的border
   	}
 	/* return if fullscreen */
-	setfloating(c, 1);	
-	c->geom.width =  c->mon->w.width * 0.5;
-	c->geom.height =  c->mon->w.height * 0.8;		
-	//重新计算居中的坐标
-	c->geom = setclient_coordinate_center(c->geom);		
-	resize(c, c->geom, 0);
-	c->oldtags = selmon->tagset[selmon->seltags];
+	if(!c->isfloating) {
+		setfloating(c, 1);	
+		c->geom.width =  c->mon->w.width * 0.5;
+		c->geom.height =  c->mon->w.height * 0.8;		
+		//重新计算居中的坐标
+		c->geom = setclient_coordinate_center(c->geom);		
+		resize(c, c->geom, 0);
+		c->oldtags = selmon->tagset[selmon->seltags];
+	}
 	show_hide_client(c);
 	setborder_color(c);
 }
