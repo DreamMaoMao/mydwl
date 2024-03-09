@@ -588,7 +588,7 @@ void clear_fullscreen_flag(Client *c) {
   }
 }
 
-void
+void //升级忽略
 setgamma(struct wl_listener *listener, void *data)
 {
 	struct wlr_gamma_control_manager_v1_set_gamma_event *event = data;
@@ -741,7 +741,7 @@ void toggle_hotarea(int x_root, int y_root) {
   }
 }
 
-struct wlr_box
+struct wlr_box //计算客户端居中坐标
 setclient_coordinate_center(struct wlr_box geom){
 	struct wlr_box tempbox;
 	tempbox.x = selmon->w.x + (selmon->w.width - geom.width) / 2;
@@ -1227,7 +1227,7 @@ checkidleinhibitor(struct wlr_surface *exclude)
 	wlr_idle_notifier_v1_set_inhibited(idle_notifier, inhibited);
 }
 
-void
+void //0.5
 setcursorshape(struct wl_listener *listener, void *data)
 {
 	struct wlr_cursor_shape_manager_v1_request_set_shape_event *event = data;
@@ -1238,7 +1238,7 @@ setcursorshape(struct wl_listener *listener, void *data)
 	 * use the provided cursor shape. */
 	if (event->seat_client == seat->pointer_state.focused_client)
 		wlr_cursor_set_xcursor(cursor, cursor_mgr,
-							   wlr_cursor_shape_v1_name(event->shape));
+				wlr_cursor_shape_v1_name(event->shape));
 }
 
 
@@ -1363,13 +1363,6 @@ commitnotify(struct wl_listener *listener, void *data)
 	if (c->resize && c->resize <= c->surface.xdg->current.configure_serial)
 		c->resize = 0;
 }
-
-// void //17
-// createdecoration(struct wl_listener *listener, void *data)
-// {
-// 	struct wlr_xdg_toplevel_decoration_v1 *dec = data;
-// 	wlr_xdg_toplevel_decoration_v1_set_mode(dec, WLR_XDG_TOPLEVEL_DECORATION_V1_MODE_SERVER_SIDE);
-// }
 
 void //0.5
 destroydecoration(struct wl_listener *listener, void *data)
@@ -1717,7 +1710,7 @@ createpointer(struct wlr_pointer *pointer)
 	wlr_cursor_attach_input_device(cursor, &pointer->base);
 }
 
-void //17
+void //0.5
 cursorframe(struct wl_listener *listener, void *data)
 {
 	/* This event is forwarded by the cursor when a pointer emits an frame
