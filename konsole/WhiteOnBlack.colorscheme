@@ -26,13 +26,13 @@ Color=101,0,0
 Color=255,84,84
 
 [Color2]
-Color=24,178,24
+Color=10,75,10
 
 [Color2Faint]
 Color=0,101,0
 
 [Color2Intense]
-Color=65,201,65
+Color=62,195,62
 
 [Color3]
 Color=178,104,24

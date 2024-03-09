@@ -6,13 +6,13 @@ end
 
 function fish_greeting
 end
-set -g fish_color_autosuggestion purple
-
+set -U fish_color_autosuggestion purple
+set -U fish_color_command 'D48E01'
+set -g fish_color_selection red
 
 alias ys='yay -Sy'
 alias yr='yay -R'
 alias s='sudo'
-alias z='zellij'
 alias y='yazi'
 export PATH=:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/wrq/.local/bin:
 
