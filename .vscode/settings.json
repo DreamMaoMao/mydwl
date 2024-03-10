@@ -9,7 +9,8 @@
         "vector": "c",
         "valarray": "c",
         "wlr_layer_shell_v1.h": "c",
-        "wlr_virtual_keyboard_v1.h": "c"
+        "wlr_virtual_keyboard_v1.h": "c",
+        "cstdlib": "cpp"
     },
     "mesonbuild.configureOnOpen": false
 }

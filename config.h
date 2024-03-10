@@ -76,6 +76,7 @@ static const Rule rules[] = {
 	{ NULL,  									"选择文件",     	0,       		1,   0, 	0,	-1, 1200,800},
 	{ "polkit-gnome-authentication-agent-1",  	NULL,       		0,       		1,   0, 	0,	-1, 0,0},
 	{ "blueman-manager",  						NULL,       		0,       		1,   0, 	0,	-1, 700,600},
+	{ "clash-verge",  							NULL,       		0,       		1,   0, 	0,	-1, 1200,800},
 	{ "Gnome-system-monitor",  					NULL,       		0,       		0,   0, 	0,	-1, 700,600},
 	{ "obs",  									NULL,       		1<<5,       	0,   0, 	0,	-1, 700,600},
 	{ "flameshot",  							NULL,       		0,       		0,   1, 	0,	-1, 0,0},
