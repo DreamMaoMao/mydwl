@@ -211,6 +211,10 @@ static const Key keys[] = {
 	{ WLR_MODIFIER_LOGO, 					XKB_KEY_comma,          setmfact,       			{.f = -0.05} },
 	{ WLR_MODIFIER_LOGO, 					XKB_KEY_period,         setmfact,       			{.f = +0.05} },
 	{ MODKEY,                    			XKB_KEY_s,          	zoom,           			{0} },
+    { WLR_MODIFIER_LOGO|WLR_MODIFIER_SHIFT, XKB_KEY_Up,           	exchange_client,  			{.i = UP } },              /* super shift up       | 二维交换窗口 (仅平铺) */
+    { WLR_MODIFIER_LOGO|WLR_MODIFIER_SHIFT, XKB_KEY_Down,         	exchange_client,  			{.i = DOWN } },            /* super shift down     | 二维交换窗口 (仅平铺) */
+    { WLR_MODIFIER_LOGO|WLR_MODIFIER_SHIFT, XKB_KEY_Left,         	exchange_client,  			{.i = LEFT} },             /* super shift left     | 二维交换窗口 (仅平铺) */
+    { WLR_MODIFIER_LOGO|WLR_MODIFIER_SHIFT, XKB_KEY_Right,        	exchange_client,  			{.i = RIGHT } },  		   /* super shift right     | 二维交换窗口 (仅平铺) */
 	{ WLR_MODIFIER_LOGO,                    XKB_KEY_g,          	toggleglobal,           	{0} },
 	{ MODKEY,                    			XKB_KEY_Tab,        	toggleoverview,         	{0} },
 	{ WLR_MODIFIER_LOGO,                    XKB_KEY_Left,        	viewtoleft,           		{0} },

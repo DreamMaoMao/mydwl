@@ -379,6 +379,8 @@ static void motionabsolute(struct wl_listener *listener, void *data);
 static void motionnotify(uint32_t time);
 static void motionrelative(struct wl_listener *listener, void *data);
 static void moveresize(const Arg *arg);
+static void exchange_client(const Arg *arg);
+static void exchange_two_client(Client *c1, Client *c2);
 static void outputmgrapply(struct wl_listener *listener, void *data);
 static void outputmgrapplyortest(struct wlr_output_configuration_v1 *config, int test);
 static void outputmgrtest(struct wl_listener *listener, void *data);
@@ -3046,6 +3048,59 @@ void setborder_color(Client *c){
 		wlr_scene_rect_set_color(c->border[i], bordercolor);		
 	}
 }
+
+void exchange_two_client(Client *c1, Client *c2) {
+  if (c1 == NULL || c2 == NULL || c1->mon != c2->mon) {
+    return;
+  }
+
+  struct wl_list *tmp1_prev = c1->link.prev;
+  struct wl_list *tmp2_prev = c2->link.prev;
+  struct wl_list *tmp1_next = c1->link.next;
+  struct wl_list *tmp2_next = c2->link.next;
+
+  // wl_list 是双向链表,其中clients是头部节点,它的下一个节点是第一个客户端的链表节点
+  //最后一个客户端的链表节点的下一个节点也指向clients,但clients本身不是客户端的链表节点
+  //客户端遍历从clients的下一个节点开始,到检测到客户端节点的下一个是clients结束
+  
+  // 当c1和c2为相邻节点时
+  if (c1->link.next == &c2->link) {
+    c1->link.next = c2->link.next;
+	c1->link.prev = &c2->link;
+    c2->link.next = &c1->link;
+	c2->link.prev = tmp1_prev;
+    tmp1_prev->next = &c2->link;
+	tmp2_next->prev = &c1->link;
+  } else if (c2->link.next == &c1->link) {
+    c2->link.next = c1->link.next;
+	c2->link.prev = &c1->link;
+    c1->link.next = &c2->link;
+	c1->link.prev = tmp2_prev;
+    tmp2_prev->next = &c1->link;
+	tmp1_next->prev = &c2->link;
+  } else { // 不为相邻节点
+    c2->link.next = tmp1_next;
+	c2->link.prev = tmp1_prev;
+    c1->link.next = tmp2_next;
+	c1->link.prev = tmp2_prev;
+
+	tmp1_prev->next = &c2->link;
+	tmp1_next->prev = &c2->link;
+	tmp2_prev->next = &c1->link;
+	tmp2_next->prev = &c1->link;
+  }
+
+  arrange(c1->mon);
+  focusclient(c1,0);
+}
+
+void exchange_client(const Arg *arg) {
+  Client *c = selmon->sel;
+  if (!c || c->isfloating || c->isfullscreen || c->isfakefullscreen || c->isrealfullscreen)
+    return;
+  exchange_two_client(c, direction_select(arg));
+}
+
 
 void
 resize(Client *c, struct wlr_box geo, int interact)
