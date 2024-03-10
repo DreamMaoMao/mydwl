@@ -176,6 +176,7 @@ typedef struct {
 	int is_in_scratchpad;
 	int is_scratchpad_show;
 	int scratchpad_priority;
+	int isglobal;
 	struct wlr_box bounds;
 } Client;
 
@@ -362,6 +363,7 @@ static void incivgaps(const Arg *arg);
 static void incogaps(const Arg *arg);
 static void incohgaps(const Arg *arg);
 static void incovgaps(const Arg *arg);
+static void toggleglobal(const Arg *arg);
 static void inputdevice(struct wl_listener *listener, void *data);
 static int keybinding(uint32_t mods, xkb_keysym_t sym);
 static void keypress(struct wl_listener *listener, void *data);
@@ -2595,6 +2597,10 @@ maximizenotify(struct wl_listener *listener, void *data)
 }
 
 void set_minized(Client *c) {
+  	if (c->isglobal) {
+  	  c->isglobal = 0;
+  	  selmon->sel->tags = selmon->tagset[selmon->seltags];
+  	}
 	c->oldtags = selmon->sel->tags;
 	c->tags = 0;
 	c->isminied = 1;
@@ -3026,6 +3032,9 @@ void setborder_color(Client *c){
 	} if (c->is_in_scratchpad) {
 		for (i = 0; i < 4; i++)
 		wlr_scene_rect_set_color(c->border[i], scratchpadcolor);		
+	} else if(c->isglobal){
+		for (i = 0; i < 4; i++)
+		wlr_scene_rect_set_color(c->border[i], globalcolor);
 	} else if(c->isfakefullscreen){
 		for (i = 0; i < 4; i++)
 		wlr_scene_rect_set_color(c->border[i], fakefullscreencolor);
@@ -4582,6 +4591,21 @@ xytonode(double x, double y, struct wlr_surface **psurface,
 	if (psurface) *psurface = surface;
 	if (pc) *pc = c;
 	if (pl) *pl = l;
+}
+
+void toggleglobal(const Arg *arg) {
+  if (!selmon->sel)
+    return;
+  if (selmon->sel->is_in_scratchpad) {
+    selmon->sel->is_in_scratchpad = 0;
+    selmon->sel->is_scratchpad_show = 0;
+    selmon->sel->scratchpad_priority = 0;
+  } 
+  selmon->sel->isglobal ^= 1;
+  selmon->sel->tags =
+      selmon->sel->isglobal ? TAGMASK : selmon->tagset[selmon->seltags];
+  focustop(selmon);
+  setborder_color(selmon->sel);
 }
 
 void

@@ -22,6 +22,7 @@ static const float focuscolor[]            = { 0.6, 0.4, 0.1, 1 };
 static const float fakefullscreencolor[]   = { 0.3, 0.5, 0.3, 1 };
 static const float urgentcolor[]           = { 0.5, 0.1, 0.1, 1 };
 static const float scratchpadcolor[]       = { 0.3, 0.4, 0.6, 1 };
+static const float globalcolor[]       	   = { 0.7, 0.3, 0.6, 1 };
 // static const char *cursor_theme = "Bibata-Modern-Ice";
 
 static const int overviewgappi = 24; /* overview时 窗口与边缘 缝隙大小 */
@@ -210,6 +211,7 @@ static const Key keys[] = {
 	{ WLR_MODIFIER_LOGO, 					XKB_KEY_comma,          setmfact,       			{.f = -0.05} },
 	{ WLR_MODIFIER_LOGO, 					XKB_KEY_period,         setmfact,       			{.f = +0.05} },
 	{ MODKEY,                    			XKB_KEY_s,          	zoom,           			{0} },
+	{ WLR_MODIFIER_LOGO,                    XKB_KEY_g,          	toggleglobal,           	{0} },
 	{ MODKEY,                    			XKB_KEY_Tab,        	toggleoverview,         	{0} },
 	{ WLR_MODIFIER_LOGO,                    XKB_KEY_Left,        	viewtoleft,           		{0} },
 	{ WLR_MODIFIER_CTRL,                    XKB_KEY_Left,        	viewtoleft_have_client, 	{0} },
