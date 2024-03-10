@@ -35,7 +35,7 @@ ENV = os.environ.copy()
 ENC = locale.getpreferredencoding()
 
 CONF = configparser.ConfigParser()
-CONF.read(expanduser("~/.config/rofi/networkmanager-dmenu/config.ini"))
+CONF.read(expanduser("~/.config/dwl/rofi/networkmanager-dmenu/config.ini"))
 
 
 def cli_args():

@@ -63,29 +63,31 @@ static const char *tags[] = {
 };
 
 static const Rule rules[] = {
-	/* app_id     title       tags mask     isfloating  isfullscreen isnoclip monitor  width height */
+	/* app_id     title       tags mask     isfloating  isfullscreen isnoclip isnoborder monitor  width height */
 	/* examples:
 	{ "Gimp",     NULL,       0,            1,           -1,800,600 },
 	*/
-	{ "Google-chrome",  						NULL,       		1 << 3,       	0,   0, 	0,	-1, 0,0},
-	{ "Microsoft-edge-dev", 		 			NULL,       		1 << 4,       	0,   0, 	0,	-1, 0,0},
-	{ "Clash for Windows",  					NULL,       		0,       		1,   0, 	0,	-1, 1400,800},
-	{ "electron-netease-cloud-music",  			NULL,       		0,       		1,   0, 	0,	-1, 1300,900},
-	{ NULL,  									"图片查看器",   	0,       		1,   0, 	0,	-1, 600,800},
-	{ NULL,  									"图片查看",     	0,       		1,   0, 	0,	-1, 0,0},
-	{ NULL,  									"选择文件",     	0,       		1,   0, 	0,	-1, 1200,800},
-	{ "polkit-gnome-authentication-agent-1",  	NULL,       		0,       		1,   0, 	0,	-1, 0,0},
-	{ "blueman-manager",  						NULL,       		0,       		1,   0, 	0,	-1, 700,600},
-	{ "clash-verge",  							NULL,       		0,       		1,   0, 	0,	-1, 1200,800},
-	{ "Gnome-system-monitor",  					NULL,       		0,       		0,   0, 	0,	-1, 700,600},
-	{ "obs",  									NULL,       		1<<5,       	0,   0, 	0,	-1, 700,600},
-	{ "flameshot",  							NULL,       		0,       		0,   1, 	0,	-1, 0,0},
-	{ "com.xunlei.download",  					NULL,       		0,       		1,   0, 	0,	-1, 600,800},
-	{ "pavucontrol",  							NULL,       		0,       		1,   0, 	0,	-1, 0,0},
-	{ "baidunetdisk",  							NULL,       		0,       		1,   0, 	0,	-1, 1400,800},
-	{ "alixby3",  								NULL,       		0,       		1,   0, 	0,	-1, 1400,800},
-	{ "qxdrag.py",  							NULL,       		0,       		1,   0, 	0,	-1, 400,300},
-	{ NULL,  									"qxdrag.py",        0,       		1,   0, 	0,	-1, 400,300},
+	{ "Google-chrome",  						NULL,       		1 << 3,       	0,   0, 	0,	0,-1, 0,0},
+	{ "Microsoft-edge-dev", 		 			NULL,       		1 << 4,       	0,   0, 	0,	0,-1, 0,0},
+	{ "Clash for Windows",  					NULL,       		0,       		1,   0, 	0,	0,-1, 1400,800},
+	{ "electron-netease-cloud-music",  			NULL,       		0,       		1,   0, 	0,	0,-1, 1300,900},
+	{ NULL,  									"图片查看器",   	0,       		1,   0, 	0,	0,-1, 600,800},
+	{ NULL,  									"图片查看",     	0,       		1,   0, 	0,	0,-1, 0,0},
+	{ NULL,  									"选择文件",     	0,       		1,   0, 	0,	0,-1, 1200,800},
+	{ "polkit-gnome-authentication-agent-1",  	NULL,       		0,       		1,   0, 	0,	0,-1, 0,0},
+	{ "blueman-manager",  						NULL,       		0,       		1,   0, 	0,	0,-1, 700,600},
+	{ "clash-verge",  							NULL,       		0,       		1,   0, 	0,	0,-1, 1200,800},
+	{ "Gnome-system-monitor",  					NULL,       		0,       		0,   0, 	0,	0,-1, 700,600},
+	{ "obs",  									NULL,       		1<<5,       	0,   0, 	0,	0,-1, 700,600},
+	{ "flameshot",  							NULL,       		0,       		0,   1, 	0,	0,-1, 0,0},
+	{ "com.xunlei.download",  					NULL,       		0,       		1,   0, 	0,	0,-1, 600,800},
+	{ "pavucontrol",  							NULL,       		0,       		1,   0, 	0,	0,-1, 0,0},
+	{ "baidunetdisk",  							NULL,       		0,       		1,   0, 	0,	0,-1, 1400,800},
+	{ "alixby3",  								NULL,       		0,       		1,   0, 	0,	0,-1, 1400,800},
+	{ "qxdrag.py",  							NULL,       		0,       		1,   0, 	0,	0,-1, 400,300},
+	{ NULL,  									"qxdrag.py",        0,       		1,   0, 	0,	0,-1, 400,300},
+	{ NULL,  									"rofi - Networks",  0,       		1,   0, 	1,	1,-1, 400,400},
+	{ "Rofi",  									NULL,        		0,       		1,   0, 	1,	1,-1, 900,900},
 
 };
 
@@ -182,7 +184,7 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 static const Key keys[] = {
 	/* Note that Shift changes certain key codes: c -> C, 2 -> at, etc. */
 	/* modifier                  			key                 	function        			argument */
-	{ MODKEY,					 			XKB_KEY_space,      	spawn,          			SHCMD("wofi --height 365 --width 600") },
+	{ MODKEY,					 			XKB_KEY_space,      	spawn,          			SHCMD("wofi -c $DWL/wofi/config_menu -s $DWL/wofi/style.css") },
 	{ MODKEY, 					 			XKB_KEY_Return,     	spawn,          			SHCMD("xfce4-terminal") },
     { WLR_MODIFIER_LOGO,         			XKB_KEY_Return, 		spawn, 						SHCMD("google-chrome") },
     { WLR_MODIFIER_LOGO,         			XKB_KEY_space, 			spawn, 						SHCMD("microsoft-edge") },
@@ -194,8 +196,8 @@ static const Key keys[] = {
     { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,   XKB_KEY_Return, 		spawn, 						SHCMD("konsole -e \"~/tool/ter-multiplexer.sh\"") },  
     // { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,   XKB_KEY_Return, 		spawn, 						SHCMD("konsole -e \"zellij -s temp --config /home/wrq/.config/zellij/tempconfigwayland.kdl\"") },  
     { WLR_MODIFIER_LOGO,   					XKB_KEY_space, 			spawn, 						SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show website") },  
-    { WLR_MODIFIER_LOGO|WLR_MODIFIER_ALT,   XKB_KEY_Return, 		spawn, 						SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/tool/movie.py") },  
-    { WLR_MODIFIER_CTRL,   					XKB_KEY_space, 			spawn, 						SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/search.py") },  
+    { WLR_MODIFIER_LOGO|WLR_MODIFIER_ALT,   XKB_KEY_Return, 		spawn, 						SHCMD("rofi -normal-window -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/tool/movie.py") },  
+    { WLR_MODIFIER_CTRL,   					XKB_KEY_space, 			spawn, 						SHCMD("rofi -normal-window -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/search.py") },  
     { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,   XKB_KEY_t, 				spawn, 						SHCMD("bash ~/tool/shotTranslate.sh shot") },  
 
     { WLR_MODIFIER_CTRL,   					XKB_KEY_comma, 			spawn, 						SHCMD("~/.config/hypr/scripts/brightness.sh down") },  

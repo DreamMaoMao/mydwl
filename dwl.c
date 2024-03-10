@@ -177,6 +177,7 @@ typedef struct {
 	int is_scratchpad_show;
 	int scratchpad_priority;
 	int isglobal;
+	int isnoborder;
 	struct wlr_box bounds;
 } Client;
 
@@ -280,6 +281,7 @@ typedef struct {
 	int isfloating;
 	int isfullscreen;
 	int isnoclip;
+	int isnoborder;
 	int monitor;
 	unsigned int width;
 	unsigned int height;
@@ -821,6 +823,7 @@ applyrules(Client *c)
 				&& (!r->id || strstr(appid, r->id))) {
 			c->isfloating = r->isfloating;
 			c->isnoclip = r->isnoclip;
+			c->isnoborder = r->isnoborder;
 			newtags |= r->tags;
 			i = 0;
 			wl_list_for_each(m, &mons, link)
@@ -3112,9 +3115,16 @@ resize(Client *c, struct wlr_box geo, int interact)
 	struct wlr_box *bbox = interact ? &sgeom : &c->mon->w;//去掉这个推荐的窗口大小,因为有时推荐的窗口特别大导致平铺异常
 	struct wlr_box clip;
 	struct wlr_box surface = {0};
+	
 	client_set_bounds(c, geo.width, geo.height); //去掉这个推荐的窗口大小,因为有时推荐的窗口特别大导致平铺异常
 	c->geom = geo;
 	applybounds(c, bbox);//去掉这个推荐的窗口大小,因为有时推荐的窗口特别大导致平铺异常
+
+
+	if(c->isnoborder) {
+		c->bw = 0;
+	}
+
 	surface = (struct wlr_box){	.x = 0,
 								.y = 0,
 								.width = c->geom.width - 2 * c->bw,

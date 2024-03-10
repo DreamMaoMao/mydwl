@@ -99,11 +99,8 @@ sudo ninja -C build install
 //拷贝配置
 cp swaync -r ~/.config/
 cp fish -r ~/.config/
-cp wofi - ~/.config/
-cp rofi - ~/.config/
 cp konsole -r ~/.local/share/
 cp eww -r ~/.config/
-cp waybar -r ~/.config/
 
 sed -i s#/home/user#$HOME#g dwl.desktop
 sudo cp dwl.desktop /usr/share/wayland-sessions/
