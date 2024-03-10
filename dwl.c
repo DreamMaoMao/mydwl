@@ -865,6 +865,9 @@ arrange(Monitor *m)
 {
 	Client *c;
 	wl_list_for_each(c, &clients, link) {
+		if(c->mon == m && c->isglobal) {
+			c->tags =  m->tagset[m->seltags];
+		}
 		if (c->mon == m) {
 			wlr_scene_node_set_enabled(&c->scene->node, VISIBLEON(c, m));
 			client_set_suspended(c, !VISIBLEON(c, m));
@@ -4657,9 +4660,9 @@ void toggleglobal(const Arg *arg) {
     selmon->sel->scratchpad_priority = 0;
   } 
   selmon->sel->isglobal ^= 1;
-  selmon->sel->tags =
-      selmon->sel->isglobal ? TAGMASK : selmon->tagset[selmon->seltags];
-  focustop(selmon);
+//   selmon->sel->tags =
+//       selmon->sel->isglobal ? TAGMASK : selmon->tagset[selmon->seltags];
+//   focustop(selmon);
   setborder_color(selmon->sel);
 }
 
