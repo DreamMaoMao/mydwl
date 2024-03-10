@@ -157,6 +157,6 @@
         "format-disconnected": "\uf071 Disconnected",
         "tooltip-format": "{ifname} {ipaddr}/{cidr} via {gwaddr}",
         "format-alt": "\uf1eb↓{bandwidthDownBytes} ↑{bandwidthUpBytes}",
-        "on-click-right":"~/.config/dwl/wofi/network/networkmanager_dmenu"
+        "on-click-right":"~/.config/rofi/networkmanager_dmenu"
     }
 }
