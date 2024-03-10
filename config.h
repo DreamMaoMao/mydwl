@@ -1,5 +1,10 @@
 /* speedie's dwl config */
 
+#define COLOR(hex)    { ((hex >> 24) & 0xFF) / 255.0f, \
+                        ((hex >> 16) & 0xFF) / 255.0f, \
+                        ((hex >> 8) & 0xFF) / 255.0f, \
+                        (hex & 0xFF) / 255.0f }
+
 /* appearance */
 static const unsigned int focus_on_activate = 0; //收到窗口激活请求是否自动跳转聚焦
 static const unsigned int new_is_master = 1; //新窗口是否插在头部
@@ -16,13 +21,13 @@ static unsigned int gappoh           = 10; /* horiz outer gap between windows an
 static unsigned int gappov           = 10; /* vert outer gap between windows and screen edge */
 static int bypass_surface_visibility = 0;  /* 1 means idle inhibitors will disable idle tracking even if it's surface isn't visible  */
 static unsigned int borderpx         = 5;  /* border pixel of windows */
-static const float rootcolor[]             = { 0.3, 0.3, 0.3, 1.0 };
-static const float bordercolor[]           = { 0.2, 0.2, 0.2, 0.9 };
-static const float focuscolor[]            = { 0.6, 0.4, 0.1, 1 };
-static const float fakefullscreencolor[]   = { 0.3, 0.5, 0.3, 1 };
-static const float urgentcolor[]           = { 0.5, 0.1, 0.1, 1 };
-static const float scratchpadcolor[]       = { 0.3, 0.4, 0.6, 1 };
-static const float globalcolor[]       	   = { 0.7, 0.3, 0.6, 1 };
+static const float rootcolor[]             = COLOR(0x323232ff);
+static const float bordercolor[]           = COLOR(0x444444ff);
+static const float focuscolor[]            = COLOR(0xad741fff);
+static const float fakefullscreencolor[]   = COLOR(0x5d8e5dff);
+static const float urgentcolor[]           = COLOR(0xad401fff);
+static const float scratchpadcolor[]       = COLOR(0x516c93ff);
+static const float globalcolor[]       	   = COLOR(0xb153a7ff);
 // static const char *cursor_theme = "Bibata-Modern-Ice";
 
 static const int overviewgappi = 24; /* overview时 窗口与边缘 缝隙大小 */
