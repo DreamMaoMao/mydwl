@@ -3,6 +3,16 @@
     font-size: 20px;
 }
 
+tooltip {
+    background: #3C3A38;
+    border: 2px solid #85796F;
+    border-radius: 10px;
+}
+  
+tooltip label {
+  color: #EBDBB2;
+}
+
 window#waybar {
     background-color: transparent;
 }
