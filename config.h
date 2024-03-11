@@ -198,7 +198,6 @@ static const Key keys[] = {
     { WLR_MODIFIER_LOGO,   					XKB_KEY_space, 			spawn, 						SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show website") },  
     { WLR_MODIFIER_LOGO|WLR_MODIFIER_ALT,   XKB_KEY_Return, 		spawn, 						SHCMD("rofi -normal-window -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/tool/movie.py") },  
     { WLR_MODIFIER_CTRL,   					XKB_KEY_space, 			spawn, 						SHCMD("rofi -normal-window -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/search.py") },  
-    { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,   XKB_KEY_t, 				spawn, 						SHCMD("bash ~/tool/shotTranslate.sh shot") },  
 
     { WLR_MODIFIER_CTRL,   					XKB_KEY_comma, 			spawn, 						SHCMD("~/.config/hypr/scripts/brightness.sh down") },  
     { WLR_MODIFIER_CTRL,   					XKB_KEY_period, 		spawn, 						SHCMD("~/.config/hypr/scripts/brightness.sh up") },  
@@ -272,6 +271,7 @@ static const Button buttons[] = {
 	{ WLR_MODIFIER_LOGO, 	BTN_LEFT,   	moveresize,     			{.ui = CurMove } },
 	{ 0, 					BTN_MIDDLE, 	togglefakefullscreen, 		{0} }, //中键触发假全屏
 	{ WLR_MODIFIER_LOGO, 	BTN_RIGHT,  	moveresize,     			{.ui = CurResize } },
+	{ WLR_MODIFIER_ALT, 	BTN_LEFT,  		spawn,						SHCMD("bash ~/tool/shotTranslate.sh shot")},
 	{ 0, 					BTN_LEFT,  		toggleoverview,     		{0} },
 	{ 0, 					BTN_RIGHT,  	killclient,     			{0} },
 };
