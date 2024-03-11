@@ -650,8 +650,8 @@ void show_scratchpad(Client *c) {
 		//重新计算居中的坐标
 		c->geom = setclient_coordinate_center(c->geom);		
 		resize(c, c->geom, 0);
-		c->oldtags = selmon->tagset[selmon->seltags];
 	}
+	c->oldtags = selmon->tagset[selmon->seltags];
 	show_hide_client(c);
 	setborder_color(c);
 }

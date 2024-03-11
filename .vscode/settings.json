@@ -10,7 +10,9 @@
         "valarray": "c",
         "wlr_layer_shell_v1.h": "c",
         "wlr_virtual_keyboard_v1.h": "c",
-        "cstdlib": "cpp"
+        "cstdlib": "cpp",
+        "complex": "c",
+        "format": "c"
     },
     "mesonbuild.configureOnOpen": false
 }
