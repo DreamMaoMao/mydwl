@@ -689,7 +689,7 @@ void toggle_scratchpad(const Arg *arg) {
 	}
 
 	if(is_hide_anction) {
-		for(j=0;j<i-1;j++) //把优先级从左到右排序
+		for(j=0;j<i-1;j++) { //把优先级从左到右排序
 			for(k=j+1;k<i;k++) {
 				if(tempClients[j]->scratchpad_priority > tempClients[k]->scratchpad_priority) {
 					tempbackup = tempClients[j];
@@ -697,9 +697,12 @@ void toggle_scratchpad(const Arg *arg) {
 					tempClients[k] = tempbackup;
 				}
 			}
-		for(z=0;z<i;z++) { //重新根据排序设置优先级的值,以免上面优先级做加法过多溢出
-			tempClients[z]->scratchpad_priority = z;
+			tempClients[j]->scratchpad_priority = j;
 		}
+		tempClients[i - 1]->scratchpad_priority = i - 1;
+		// for(z=0;z<i;z++) { //重新根据排序设置优先级的值,以免上面优先级做加法过多溢出
+		// 	tempClients[z]->scratchpad_priority = z;
+		// }
 	} else {
 		if(!target_show_client)
 			return;
