@@ -102,7 +102,7 @@
         "interval":2,
         "format": "{}% 󰍛",
         "on-click":"GDK_BACKEND=x11 nemo",
-        "on-click-right":"clipman pick -t wofi"
+        "on-click-right":"cliphist list | rofi -dmenu -normal-window | cliphist decode | wl-copy"
         // "on-click-right":"clipman pick -t wofi"
     },
     "temperature": {

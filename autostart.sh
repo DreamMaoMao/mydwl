@@ -31,7 +31,8 @@ systemctl --user mask xdg-desktop-portal-hyprland
 # mako & # 开启通知server
 
 wl-clip-persist --clipboard regular &
-wl-paste -t text --watch clipman store --no-persist &
+# wl-paste -t text --watch clipman store --no-persist &
+wl-paste --type text --watch cliphist store & 
 blueman-applet &
 nm-applet &
 /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
