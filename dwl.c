@@ -888,6 +888,10 @@ Client *direction_select(const Arg *arg) {
 	Client *c,*tempClients[100];
 	Client *tc = selmon->sel;
 	int last = -1;
+
+	if(!tc)
+		return NULL;
+
 	if (tc &&
 	    (tc->isfullscreen || tc->isfakefullscreen || tc->isrealfullscreen )) /* no support for focusstack with fullscreen windows */
 	  return NULL;
