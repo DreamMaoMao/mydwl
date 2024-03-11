@@ -175,7 +175,6 @@ typedef struct {
 	int isnoclip;
 	int is_in_scratchpad;
 	int is_scratchpad_show;
-	int scratchpad_priority;
 	int isglobal;
 	int isnoborder;
 	struct wlr_box bounds;
@@ -628,7 +627,6 @@ void restore_minized(const Arg *arg) {
 			show_hide_client(c);
 			c->is_scratchpad_show = 0;
 			c->is_in_scratchpad = 0;
-			c->scratchpad_priority = 0;
 			setborder_color(c);
 			break;
 		}
@@ -667,7 +665,6 @@ void toggle_scratchpad(const Arg *arg) {
 			return;
 		} else if (c->is_in_scratchpad && c->is_scratchpad_show && (selmon->tagset[selmon->seltags] & c->tags) != 0) {
 			c->is_scratchpad_show = 0;
-			c->scratchpad_priority = c->scratchpad_priority + 10;
 			set_minized(c);
 			wl_list_remove(&c->link);            //从原来位置移除
 			wl_list_insert(clients.prev, &c->link); //插入尾部
@@ -3234,7 +3231,6 @@ setfloating(Client *c, int floating)
 		c->istiled = 1; 
 		c->is_scratchpad_show = 0;
 		c->is_in_scratchpad = 0;
-		c->scratchpad_priority = 0;
 	}
 
 	arrange(c->mon);
@@ -3465,7 +3461,6 @@ handle_foreign_activate_request(struct wl_listener *listener, void *data) {
 	if(c->isminied) {
 		c->is_in_scratchpad = 0;
 		c->is_scratchpad_show = 0;
-		c->scratchpad_priority = 0;
 		setborder_color(c);
 		show_hide_client(c);
 		return;
@@ -4057,7 +4052,6 @@ togglefullscreen(const Arg *arg)
 
 	sel->is_scratchpad_show = 0;
 	sel->is_in_scratchpad = 0;
-	sel->scratchpad_priority = 0;
 	setfullscreen(sel, !sel->isfullscreen);
 }
 
@@ -4078,7 +4072,6 @@ togglefakefullscreen(const Arg *arg)
 
 	sel->is_scratchpad_show = 0;
 	sel->is_in_scratchpad = 0;
-	sel->scratchpad_priority = 0;
 }
 
 void
@@ -4098,7 +4091,6 @@ togglerealfullscreen(const Arg *arg)
 
 	sel->is_scratchpad_show = 0;
 	sel->is_in_scratchpad = 0;
-	sel->scratchpad_priority = 0;
 }
 
 void
@@ -4638,7 +4630,6 @@ void toggleglobal(const Arg *arg) {
   if (selmon->sel->is_in_scratchpad) {
     selmon->sel->is_in_scratchpad = 0;
     selmon->sel->is_scratchpad_show = 0;
-    selmon->sel->scratchpad_priority = 0;
   } 
   selmon->sel->isglobal ^= 1;
 //   selmon->sel->tags =
