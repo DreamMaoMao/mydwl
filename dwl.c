@@ -838,6 +838,7 @@ arrange(Monitor *m)
 	wl_list_for_each(c, &clients, link) {
 		if(c->mon == m && c->isglobal) {
 			c->tags =  m->tagset[m->seltags];
+			focusclient(c,1);
 		}
 		if (c->mon == m) {
 			wlr_scene_node_set_enabled(&c->scene->node, VISIBLEON(c, m));
