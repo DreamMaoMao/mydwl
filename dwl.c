@@ -659,10 +659,7 @@ void show_scratchpad(Client *c) {
 }
 
 void toggle_scratchpad(const Arg *arg) {
-	Client *c,*target_show_client=NULL;
-	Client *tempClients[100],*tempbackup; //只支持100个在便利签中的客户端
-	int  z,j,k,i = 0;
-	int is_hide_anction = 0;
+	Client *c;
 	wl_list_for_each(c, &clients, link) {
 		if(c->is_in_scratchpad && c->is_scratchpad_show && (selmon->tagset[selmon->seltags] & c->tags) == 0 ) {
 			unsigned int target = get_tags_first_tag(selmon->tagset[selmon->seltags]); 
@@ -672,43 +669,14 @@ void toggle_scratchpad(const Arg *arg) {
 			c->is_scratchpad_show = 0;
 			c->scratchpad_priority = c->scratchpad_priority + 10;
 			set_minized(c);
-			is_hide_anction = 1;
-		} else if (c->is_in_scratchpad && !c->is_scratchpad_show) {
-			if (target_show_client != NULL) {
-				if (c->scratchpad_priority < target_show_client->scratchpad_priority)
-					target_show_client = c;
-			} else {
-				target_show_client = c;
-			}
-		} 
-
-		if(c->is_in_scratchpad) {
-			tempClients[i] = c;
-			i++;
-		}
-	}
-
-	if(is_hide_anction) {
-		for(j=0;j<i-1;j++) { //把优先级从左到右排序
-			for(k=j+1;k<i;k++) {
-				if(tempClients[j]->scratchpad_priority > tempClients[k]->scratchpad_priority) {
-					tempbackup = tempClients[j];
-					tempClients[j] = tempClients[k];
-					tempClients[k] = tempbackup;
-				}
-			}
-			tempClients[j]->scratchpad_priority = j;
-		}
-		tempClients[i - 1]->scratchpad_priority = i - 1;
-		// for(z=0;z<i;z++) { //重新根据排序设置优先级的值,以免上面优先级做加法过多溢出
-		// 	tempClients[z]->scratchpad_priority = z;
-		// }
-	} else {
-		if(!target_show_client)
+			wl_list_remove(&c->link);            //从原来位置移除
+			wl_list_insert(clients.prev, &c->link); //插入尾部
 			return;
-		show_scratchpad(target_show_client);
+		} else if ( c && c->is_in_scratchpad && !c->is_scratchpad_show) {
+			show_scratchpad(c);
+			return;
+		} 
 	}
-
 }
 
 void  //0.5
