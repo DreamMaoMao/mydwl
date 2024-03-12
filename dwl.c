@@ -1516,25 +1516,34 @@ createmon(struct wl_listener *listener, void *data)
 	m->sel = NULL;
 	m->is_in_hotarea = 0;
 	m->tagset[0] = m->tagset[1] = 1;
+	int scale = 1;
+	m->mfact = 0.5;
+	m->nmaster = 1;
+	enum wl_output_transform rr = WL_OUTPUT_TRANSFORM_NORMAL;
+
+	if(LENGTH(layouts) > 1){
+		m->lt[0] = &layouts[0]; //默认就有两个布局
+		m->lt[1] = &layouts[1];
+	}else{
+		m->lt[0] = m->lt[1] = &layouts[0];
+	}	
 	for (r = monrules; r < END(monrules); r++) {
 		if (!r->name || strstr(wlr_output->name, r->name)) {
 			m->mfact = r->mfact;
 			m->nmaster = r->nmaster;
-			wlr_output_set_scale(wlr_output, r->scale);
-			wlr_xcursor_manager_load(cursor_mgr, r->scale);
+			m->m.x = r->x;
+			m->m.y = r->y;
 			if(r->lt)
 				m->lt[0] = m->lt[1] = r->lt;
-			else if(LENGTH(layouts) > 1){
-				m->lt[0] = &layouts[0]; //默认就有两个布局
-				m->lt[1] = &layouts[1];
-			}else{
-				m->lt[0] = m->lt[1] = &layouts[0];
-			}
-			wlr_output_set_transform(wlr_output, r->rr);
+			scale = r->scale;
+			rr = r->rr;
 			break;
 		}
 	}
 
+	wlr_output_set_scale(wlr_output,scale);
+	wlr_xcursor_manager_load(cursor_mgr, scale);
+	wlr_output_set_transform(wlr_output, rr);
 	/* The mode is a tuple of (width, height, refresh rate), and each
 	 * monitor supports only a specific set of modes. We just pick the
 	 * monitor's preferred mode; a more sophisticated compositor would let
