@@ -242,13 +242,13 @@ static const Key keys[] = {
 	{ WLR_MODIFIER_ALT, 					XKB_KEY_z,          	toggle_scratchpad, 			{0} },  //便签循环切换
 	{ WLR_MODIFIER_CTRL,                    XKB_KEY_KP_0,          	view,           			{.ui = ~0} },
 	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO, 	XKB_KEY_KP_0, 			tag,            			{.ui = ~0} },
-	{ MODKEY,                    			XKB_KEY_comma,      	focusmon,       			{.i = WLR_DIRECTION_LEFT} },
-	{ MODKEY,                    			XKB_KEY_period,     	focusmon,       			{.i = WLR_DIRECTION_RIGHT} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, 			XKB_KEY_less,       	tagmon,         			{.i = WLR_DIRECTION_LEFT} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, 			XKB_KEY_greater,    	tagmon,         			{.i = WLR_DIRECTION_RIGHT} },
+	{ WLR_MODIFIER_LOGO,                    XKB_KEY_bracketleft,    focusmon,       			{.i = WLR_DIRECTION_LEFT} },  //super + [
+	{ WLR_MODIFIER_LOGO,                    XKB_KEY_bracketright,   focusmon,       			{.i = WLR_DIRECTION_RIGHT} }, // suepr + ]
+	{ WLR_MODIFIER_LOGO|WLR_MODIFIER_SHIFT, XKB_KEY_bracketleft,    tagmon,         			{.i = WLR_DIRECTION_LEFT} },
+	{ WLR_MODIFIER_LOGO|WLR_MODIFIER_SHIFT, XKB_KEY_bracketright,   tagmon,         			{.i = WLR_DIRECTION_RIGHT} },
     { MODKEY|WLR_MODIFIER_SHIFT, 			XKB_KEY_X,          	incgaps,        			{.i = +1 } },
 	{ MODKEY|WLR_MODIFIER_SHIFT, 			XKB_KEY_Z,          	incgaps,        			{.i = -1 } },
-	{ MODKEY|WLR_MODIFIER_SHIFT, 			XKB_KEY_KP_0,          	togglegaps,     			{0} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, 			XKB_KEY_R,          	togglegaps,     			{0} },
 	TAGKEYS(          XKB_KEY_KP_1, XKB_KEY_exclam,                     0),
 	TAGKEYS(          XKB_KEY_KP_2, XKB_KEY_at,                         1),
 	TAGKEYS(          XKB_KEY_KP_3, XKB_KEY_numbersign,                 2),
