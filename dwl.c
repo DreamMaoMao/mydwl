@@ -659,9 +659,11 @@ void show_scratchpad(Client *c) {
 void toggle_scratchpad(const Arg *arg) {
 	Client *c;
 	wl_list_for_each(c, &clients, link) {
-		// if(c->mon != selmon) {
-		// 	return;
-		// }
+		if (c->is_in_scratchpad && c->mon != selmon) {
+			c->geom.width = (int)(c->geom.width * selmon->m.width/c->mon->m.width);
+			c->geom.height = (int)(c->geom.height * selmon->m.height/c->mon->m.height);
+			setmon(c,selmon, 0);
+		}
 		if(c->is_in_scratchpad && c->is_scratchpad_show && (selmon->tagset[selmon->seltags] & c->tags) == 0 ) {
 			unsigned int target = get_tags_first_tag(selmon->tagset[selmon->seltags]); 
 			tag_client(&(Arg){.ui = target},c);
@@ -673,9 +675,6 @@ void toggle_scratchpad(const Arg *arg) {
 			wl_list_insert(clients.prev, &c->link); //插入尾部
 			return;
 		} else if ( c && c->is_in_scratchpad && !c->is_scratchpad_show) {
-			if (c->mon != selmon) {
-				setmon(c,selmon, 0);
-			}
 			show_scratchpad(c);
 			return;
 		} 
