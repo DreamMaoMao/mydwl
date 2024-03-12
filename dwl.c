@@ -659,6 +659,9 @@ void show_scratchpad(Client *c) {
 void toggle_scratchpad(const Arg *arg) {
 	Client *c;
 	wl_list_for_each(c, &clients, link) {
+		// if(c->mon != selmon) {
+		// 	return;
+		// }
 		if(c->is_in_scratchpad && c->is_scratchpad_show && (selmon->tagset[selmon->seltags] & c->tags) == 0 ) {
 			unsigned int target = get_tags_first_tag(selmon->tagset[selmon->seltags]); 
 			tag_client(&(Arg){.ui = target},c);
@@ -670,6 +673,9 @@ void toggle_scratchpad(const Arg *arg) {
 			wl_list_insert(clients.prev, &c->link); //插入尾部
 			return;
 		} else if ( c && c->is_in_scratchpad && !c->is_scratchpad_show) {
+			if (c->mon != selmon) {
+				setmon(c,selmon, 0);
+			}
 			show_scratchpad(c);
 			return;
 		} 
@@ -2591,7 +2597,7 @@ void set_minized(Client *c) {
   	  c->isglobal = 0;
   	  selmon->sel->tags = selmon->tagset[selmon->seltags];
   	}
-	c->oldtags = selmon->sel->tags;
+	c->oldtags = c->mon->sel->tags;
 	c->tags = 0;
 	c->isminied = 1;
 	c->is_in_scratchpad = 1;
@@ -3814,6 +3820,7 @@ tagmon(const Arg *arg)
 	Client *sel = focustop(selmon);
 	if (sel)
 		setmon(sel, dirtomon(arg->i), 0);
+	focusclient(sel,1);
 }
 
 void 
@@ -3831,7 +3838,7 @@ void grid(Monitor *m, unsigned int gappo, unsigned int gappi) {
   Client *tempClients[100];
   n = 0;
   wl_list_for_each(c, &clients, link)
-  	if (VISIBLEON(c, c->mon) ){
+  	if (VISIBLEON(c, c->mon) && c->mon == selmon){
 			tempClients[n] = c;
     		n++;
   	}
