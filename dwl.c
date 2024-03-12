@@ -381,6 +381,7 @@ static void motionnotify(uint32_t time);
 static void motionrelative(struct wl_listener *listener, void *data);
 static void moveresize(const Arg *arg);
 static void exchange_client(const Arg *arg);
+static void reset_foreign_tolevel(Client *c);
 static void exchange_two_client(Client *c1, Client *c2);
 static void outputmgrapply(struct wl_listener *listener, void *data);
 static void outputmgrapplyortest(struct wlr_output_configuration_v1 *config, int test);
@@ -636,6 +637,7 @@ void restore_minized(const Arg *arg) {
 
 void show_scratchpad(Client *c) {
 	c->is_scratchpad_show = 1;
+	logtofile("afsdfasdf");
   	if (c->isfullscreen || c->isfakefullscreen ||c->isrealfullscreen ) {
   		c->isfullscreen = 0; // 清除窗口全屏标志
 		c->isfakefullscreen = 0;
@@ -650,31 +652,61 @@ void show_scratchpad(Client *c) {
 		//重新计算居中的坐标
 		c->geom = setclient_coordinate_center(c->geom);		
 		resize(c, c->geom, 0);
+		logtofile("+++++++++++++++++++++++==");
 	}
 	c->oldtags = selmon->tagset[selmon->seltags];
 	show_hide_client(c);
 	setborder_color(c);
 }
 
+void reset_foreign_tolevel(Client *c) {
+	wlr_foreign_toplevel_handle_v1_destroy(c->foreign_toplevel);
+	c->foreign_toplevel = NULL;
+	// printstatus();
+	//创建外部顶层窗口的句柄,每一个顶层窗口都有一个
+	c->foreign_toplevel = wlr_foreign_toplevel_handle_v1_create(foreign_toplevel_manager);
+	//监听来自外部对于窗口的事件请求
+	if(c->foreign_toplevel){
+		LISTEN(&(c->foreign_toplevel->events.request_activate),
+				&c->foreign_activate_request,handle_foreign_activate_request);
+		LISTEN(&(c->foreign_toplevel->events.request_fullscreen),
+				&c->foreign_fullscreen_request,handle_foreign_fullscreen_request);
+		LISTEN(&(c->foreign_toplevel->events.request_close),
+				&c->foreign_close_request,handle_foreign_close_request);
+		LISTEN(&(c->foreign_toplevel->events.destroy),
+				&c->foreign_destroy,handle_foreign_destroy);
+		//设置外部顶层句柄的id为应用的id
+		const char *appid;
+    	appid = client_get_appid(c) ;
+		if(appid)
+			wlr_foreign_toplevel_handle_v1_set_app_id(c->foreign_toplevel,appid);
+		//设置外部顶层句柄的title为应用的title
+		const char *title;
+    	title = client_get_title(c) ;
+		if(title)
+			wlr_foreign_toplevel_handle_v1_set_title(c->foreign_toplevel,title);
+		//设置外部顶层句柄的显示监视器为当前监视器
+		wlr_foreign_toplevel_handle_v1_output_enter(
+				c->foreign_toplevel, c->mon->wlr_output);
+	}
+}
+
 void toggle_scratchpad(const Arg *arg) {
 	Client *c;
 	wl_list_for_each(c, &clients, link) {
-		if (c->is_in_scratchpad && c->mon != selmon) {
-			c->geom.width = (int)(c->geom.width * selmon->m.width/c->mon->m.width);
-			c->geom.height = (int)(c->geom.height * selmon->m.height/c->mon->m.height);
-			setmon(c,selmon, 0);
+		if(c->mon != selmon) {
+			continue;
 		}
 		if(c->is_in_scratchpad && c->is_scratchpad_show && (selmon->tagset[selmon->seltags] & c->tags) == 0 ) {
 			unsigned int target = get_tags_first_tag(selmon->tagset[selmon->seltags]); 
 			tag_client(&(Arg){.ui = target},c);
+						logtofile("2");
 			return;
 		} else if (c->is_in_scratchpad && c->is_scratchpad_show && (selmon->tagset[selmon->seltags] & c->tags) != 0) {
-			c->is_scratchpad_show = 0;
 			set_minized(c);
-			wl_list_remove(&c->link);            //从原来位置移除
-			wl_list_insert(clients.prev, &c->link); //插入尾部
 			return;
 		} else if ( c && c->is_in_scratchpad && !c->is_scratchpad_show) {
+						logtofile("3");
 			show_scratchpad(c);
 			return;
 		} 
@@ -2066,7 +2098,7 @@ focusclient(Client *c, int lift)
 	if (c && client_surface(c) == old)
 		return;
 
-	if(selmon && selmon->sel && selmon->sel->foreign_toplevel)
+	if(selmon && selmon->sel && selmon->sel->foreign_toplevel && selmon->sel->foreign_toplevel->state)
 		wlr_foreign_toplevel_handle_v1_set_activated(selmon->sel->foreign_toplevel,false);
 
 	if(selmon)
@@ -2127,14 +2159,15 @@ focusclient(Client *c, int lift)
 	client_activate_surface(client_surface(c), 1);
 }
 
-void //17
+void // 0.5
 focusmon(const Arg *arg)
 {
 	int i = 0, nmons = wl_list_length(&mons);
-	if (nmons)
+	if (nmons) {
 		do /* don't switch to disabled mons */
 			selmon = dirtomon(arg->i);
 		while (!selmon->wlr_output->enabled && i++ < nmons);
+	}
 	focusclient(focustop(selmon), 1);
 }
 
@@ -2167,13 +2200,14 @@ focusstack(const Arg *arg)
 /* We probably should change the name of this, it sounds like
  * will focus the topmost client of this mon, when actually will
  * only return that client */
-Client * //17
+Client * //0.5
 focustop(Monitor *m)
 {
 	Client *c;
-	wl_list_for_each(c, &fstack, flink)
+	wl_list_for_each(c, &fstack, flink) {
 		if (VISIBLEON(c, m))
 			return c;
+	}
 	return NULL;
 }
 
@@ -2596,6 +2630,7 @@ void set_minized(Client *c) {
   	  c->isglobal = 0;
   	  selmon->sel->tags = selmon->tagset[selmon->seltags];
   	}
+	c->is_scratchpad_show = 0;
 	c->oldtags = c->mon->sel->tags;
 	c->tags = 0;
 	c->isminied = 1;
@@ -2605,6 +2640,8 @@ void set_minized(Client *c) {
 	arrange(c->mon);
 	wlr_foreign_toplevel_handle_v1_set_activated(c->foreign_toplevel,false);
 	wlr_foreign_toplevel_handle_v1_set_minimized(c->foreign_toplevel,true);
+	wl_list_remove(&c->link);            //从原来位置移除
+	wl_list_insert(clients.prev, &c->link); //插入尾部
 
 }
 
@@ -3403,7 +3440,7 @@ setmfact(const Arg *arg)
 	arrange(selmon);
 }
 
-void //17
+void //0.5
 setmon(Client *c, Monitor *m, uint32_t newtags)
 {
 	Monitor *oldmon = c->mon;
@@ -3816,10 +3853,14 @@ tag(const Arg *arg) {
 void
 tagmon(const Arg *arg)
 {
-	Client *sel = focustop(selmon);
-	if (sel)
-		setmon(sel, dirtomon(arg->i), 0);
-	focusclient(sel,1);
+	Client *c = focustop(selmon);
+	if (c) {
+		setmon(c, dirtomon(arg->i), 0);
+		reset_foreign_tolevel(c);
+		selmon = c->mon;
+		focusclient(c,1);
+	}
+
 }
 
 void 
