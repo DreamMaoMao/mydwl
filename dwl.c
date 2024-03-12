@@ -904,7 +904,7 @@ Client *direction_select(const Arg *arg) {
 	  return NULL;
 
 	wl_list_for_each(c, &clients, link)
-		if (c && VISIBLEON(c, c->mon)){
+		if (c && VISIBLEON(c, c->mon) && c->mon == selmon){
 			last++;
 	  		tempClients[last] = c;
 		}
