@@ -206,7 +206,9 @@ static const Key keys[] = {
     { WLR_MODIFIER_ALT,   					XKB_KEY_comma, 			spawn, 						SHCMD("~/.config/hypr/scripts/volume.sh down") },  
     { WLR_MODIFIER_ALT,   					XKB_KEY_period, 		spawn, 						SHCMD("~/.config/hypr/scripts/volume.sh up") },  
     { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,   XKB_KEY_backslash, 		spawn, 						SHCMD("swaync-client -t") },  
-    { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,   XKB_KEY_BackSpace, 		spawn, 						SHCMD("swaync-client -C") },  
+    { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,   XKB_KEY_BackSpace, 		spawn, 						SHCMD("swaync-client -C") }, 
+    { WLR_MODIFIER_LOGO|WLR_MODIFIER_SHIFT, XKB_KEY_P, 				spawn, 						SHCMD("wlr-randr --output eDP-1 --on") },  
+    { WLR_MODIFIER_LOGO,   					XKB_KEY_p, 				spawn, 						SHCMD("wlr-randr --output eDP-1 --off") },   
 
 	{ WLR_MODIFIER_LOGO,                    XKB_KEY_Tab,          	focusstack,     			{.i = +1} },
 
