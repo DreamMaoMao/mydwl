@@ -1339,8 +1339,10 @@ closemon(Monitor *m)
 		if (c->isfloating && c->geom.x > m->m.width)
 			resize(c, (struct wlr_box){.x = c->geom.x - m->w.width, .y = c->geom.y,
 				.width = c->geom.width, .height = c->geom.height}, 0);
-		if (c->mon == m)
+		if (c->mon == m) {
 			setmon(c, selmon, c->tags);
+			reset_foreign_tolevel(c);
+		}
 	}
 	focusclient(focustop(selmon), 1);
 	printstatus();
