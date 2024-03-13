@@ -3858,6 +3858,11 @@ tagmon(const Arg *arg)
 		setmon(c, dirtomon(arg->i), 0);
 		reset_foreign_tolevel(c);
 		selmon = c->mon;
+		c->geom.width = (int)(c->geom.width * selmon->m.width/c->mon->m.width);
+		c->geom.height = (int)(c->geom.height * selmon->m.height/c->mon->m.height);
+		//重新计算居中的坐标
+		c->geom = setclient_coordinate_center(c->geom);
+		resize(c,c->geom,0);
 		focusclient(c,1);
 	}
 
