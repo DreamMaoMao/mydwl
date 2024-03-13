@@ -638,7 +638,6 @@ void restore_minized(const Arg *arg) {
 
 void show_scratchpad(Client *c) {
 	c->is_scratchpad_show = 1;
-	logtofile("afsdfasdf");
   	if (c->isfullscreen || c->isfakefullscreen ||c->isrealfullscreen ) {
   		c->isfullscreen = 0; // 清除窗口全屏标志
 		c->isfakefullscreen = 0;
@@ -653,7 +652,6 @@ void show_scratchpad(Client *c) {
 		//重新计算居中的坐标
 		c->geom = setclient_coordinate_center(c->geom);		
 		resize(c, c->geom, 0);
-		logtofile("+++++++++++++++++++++++==");
 	}
 	c->oldtags = selmon->tagset[selmon->seltags];
 	show_hide_client(c);
@@ -701,13 +699,11 @@ void toggle_scratchpad(const Arg *arg) {
 		if(c->is_in_scratchpad && c->is_scratchpad_show && (selmon->tagset[selmon->seltags] & c->tags) == 0 ) {
 			unsigned int target = get_tags_first_tag(selmon->tagset[selmon->seltags]); 
 			tag_client(&(Arg){.ui = target},c);
-						logtofile("2");
 			return;
 		} else if (c->is_in_scratchpad && c->is_scratchpad_show && (selmon->tagset[selmon->seltags] & c->tags) != 0) {
 			set_minized(c);
 			return;
 		} else if ( c && c->is_in_scratchpad && !c->is_scratchpad_show) {
-						logtofile("3");
 			show_scratchpad(c);
 			return;
 		} 
