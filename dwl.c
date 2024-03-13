@@ -1348,6 +1348,7 @@ closemon(Monitor *m)
 			reset_foreign_tolevel(c);
 		}
 	}
+	arrange(selmon);
 	focusclient(focustop(selmon), 1);
 	printstatus();
 }
