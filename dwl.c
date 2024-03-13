@@ -295,6 +295,8 @@ typedef struct {
 	struct wl_listener destroy;
 } SessionLock;
 
+static unsigned int cleaning_monitor = 0;
+
 /* function declarations */
 static void logtofile(const char *fmt, ...); //日志函数
 static void lognumtofile(unsigned int num);  //日志函数
@@ -1297,6 +1299,7 @@ cleanupkeyboard(struct wl_listener *listener, void *data)
 void //17
 cleanupmon(struct wl_listener *listener, void *data)
 {
+	cleaning_monitor = 1;
 	Monitor *m = wl_container_of(listener, m, destroy);
 	LayerSurface *l, *tmp;
 	int i;
@@ -1318,6 +1321,7 @@ cleanupmon(struct wl_listener *listener, void *data)
 
 	closemon(m);
 	free(m);
+	cleaning_monitor = 0;
 }
 
 void //17
@@ -1958,8 +1962,10 @@ static void dwl_ipc_output_destroy(struct wl_resource *resource) {
 
 void dwl_ipc_output_printstatus(Monitor *monitor) {
     DwlIpcOutput *ipc_output;
+	if(cleaning_monitor)
+		return;
     wl_list_for_each(ipc_output, &monitor->dwl_ipc_outputs, link)
-        dwl_ipc_output_printstatus_to(ipc_output);
+    	dwl_ipc_output_printstatus_to(ipc_output);
 }
 
 void dwl_ipc_output_printstatus_to(DwlIpcOutput *ipc_output) {
