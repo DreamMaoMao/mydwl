@@ -451,6 +451,7 @@ static void clear_fullscreen_flag(Client *c);
 static Client *direction_select(const Arg *arg);
 static void focusdir(const Arg *arg);
 static void toggleoverview(const Arg *arg);
+static void warp_cursor_to_selmon(const Monitor *m);
 unsigned int want_restore_fullscreen(Client *target_client);
 static void overview_restore(Client *c, const Arg *arg);
 static void overview_backup(Client *c);
@@ -2168,6 +2169,7 @@ focusmon(const Arg *arg)
 			selmon = dirtomon(arg->i);
 		while (!selmon->wlr_output->enabled && i++ < nmons);
 	}
+	warp_cursor_to_selmon(selmon);
 	focusclient(focustop(selmon), 1);
 }
 
@@ -3861,8 +3863,11 @@ tagmon(const Arg *arg)
 		c->geom.width = (int)(c->geom.width * selmon->m.width/c->mon->m.width);
 		c->geom.height = (int)(c->geom.height * selmon->m.height/c->mon->m.height);
 		//重新计算居中的坐标
-		c->geom = setclient_coordinate_center(c->geom);
-		resize(c,c->geom,0);
+		if(c->isfloating) {
+			c->geom = setclient_coordinate_center(c->geom);
+			resize(c,c->geom,0);
+		}
+		warp_cursor_to_selmon(c->mon);
 		focusclient(c,1);
 	}
 
@@ -4641,6 +4646,15 @@ warp_cursor(const Client *c) {
 			  NULL,
 			  c->geom.x + c->geom.width / 2.0,
 			  c->geom.y + c->geom.height / 2.0);
+}
+
+void
+warp_cursor_to_selmon(const Monitor *m) {
+
+	wlr_cursor_warp_closest(cursor,
+			  NULL,
+			  m->w.x + m->w.width / 2.0,
+			  m->w.y + m->w.height / 2.0);
 }
 
 void
