@@ -2925,6 +2925,9 @@ printstatus(void)
 	const char *appid, *title;
 
 	wl_list_for_each(m, &mons, link) {
+		if(!m->wlr_output->enabled) {
+			continue;
+		}
 		occ = urg = 0;
 		wl_list_for_each(c, &clients, link) {
 			if (c->mon != m)
