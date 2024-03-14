@@ -12,7 +12,10 @@
         "wlr_virtual_keyboard_v1.h": "c",
         "cstdlib": "cpp",
         "complex": "c",
-        "format": "c"
+        "format": "c",
+        "any": "c",
+        "memory": "c",
+        "optional": "c"
     },
     "mesonbuild.configureOnOpen": false
 }

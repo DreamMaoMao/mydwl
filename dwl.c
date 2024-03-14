@@ -1294,42 +1294,43 @@ cleanupkeyboard(struct wl_listener *listener, void *data)
 	free(kb);
 }
 
-void //17
+void //0.5
 cleanupmon(struct wl_listener *listener, void *data)
 {
 	Monitor *m = wl_container_of(listener, m, destroy);
 	LayerSurface *l, *tmp;
-	int i;
+	size_t i;
 
-    DwlIpcOutput *ipc_output;
-    wl_list_for_each(ipc_output, &m->dwl_ipc_outputs, link)
-        wl_resource_destroy(ipc_output->resource);
-	for (i = 0; i <= ZWLR_LAYER_SHELL_V1_LAYER_OVERLAY; i++)
+	/* m->layers[i] are intentionally not unlinked */
+	for (i = 0; i < LENGTH(m->layers); i++) {
 		wl_list_for_each_safe(l, tmp, &m->layers[i], link)
 			wlr_layer_surface_v1_destroy(l->layer_surface);
+	}
 
 	wl_list_remove(&m->destroy.link);
 	wl_list_remove(&m->frame.link);
 	wl_list_remove(&m->link);
+	wl_list_remove(&m->request_state.link);
 	m->wlr_output->data = NULL;
 	wlr_output_layout_remove(output_layout, m->wlr_output);
 	wlr_scene_output_destroy(m->scene_output);
-	wlr_scene_node_destroy(&m->fullscreen_bg->node);
 
 	closemon(m);
+	wlr_scene_node_destroy(&m->fullscreen_bg->node);
 	free(m);
 }
 
-void //17
-closemon(Monitor *m)
+
+void
+closemon(Monitor *m) //0.5
 {
 	/* update selmon if needed and
 	 * move closed monitor's clients to the focused one */
 	Client *c;
-	if (wl_list_empty(&mons)) {
+	int i = 0, nmons = wl_list_length(&mons);
+	if (!nmons) {
 		selmon = NULL;
 	} else if (m == selmon) {
-		int nmons = wl_list_length(&mons), i = 0;
 		do /* don't switch to disabled mons */
 			selmon = wl_container_of(mons.next, selmon, link);
 		while (!selmon->wlr_output->enabled && i++ < nmons);
@@ -1338,16 +1339,15 @@ closemon(Monitor *m)
 	wl_list_for_each(c, &clients, link) {
 		if (c->isfloating && c->geom.x > m->m.width)
 			resize(c, (struct wlr_box){.x = c->geom.x - m->w.width, .y = c->geom.y,
-				.width = c->geom.width, .height = c->geom.height}, 0);
+					.width = c->geom.width, .height = c->geom.height}, 0);
 		if (c->mon == m) {
 			setmon(c, selmon, c->tags);
 			reset_foreign_tolevel(c);
 		}
 	}
-	arrange(selmon);
 	focusclient(focustop(selmon), 1);
 	printstatus();
-}
+} 
 
 void //0.5
 commitlayersurfacenotify(struct wl_listener *listener, void *data)
@@ -4271,7 +4271,7 @@ unmapnotify(struct wl_listener *listener, void *data)
 	motionnotify(0);
 }
 
-void //17
+void //0.5
 updatemons(struct wl_listener *listener, void *data)
 {
 	/*
@@ -4281,8 +4281,8 @@ updatemons(struct wl_listener *listener, void *data)
 	 * positions, focus, and the stored configuration in wlroots'
 	 * output-manager implementation.
 	 */
-	struct wlr_output_configuration_v1 *config =
-		wlr_output_configuration_v1_create();
+	struct wlr_output_configuration_v1 *config
+			= wlr_output_configuration_v1_create();
 	Client *c;
 	struct wlr_output_configuration_head_v1 *config_head;
 	Monitor *m;
@@ -4296,14 +4296,14 @@ updatemons(struct wl_listener *listener, void *data)
 		/* Remove this output from the layout to avoid cursor enter inside it */
 		wlr_output_layout_remove(output_layout, m->wlr_output);
 		closemon(m);
-		memset(&m->m, 0, sizeof(m->m));
-		memset(&m->w, 0, sizeof(m->w));
+		m->m = m->w = (struct wlr_box){0};
 	}
 	/* Insert outputs that need to */
-	wl_list_for_each(m, &mons, link)
+	wl_list_for_each(m, &mons, link) {
 		if (m->wlr_output->enabled
 				&& !wlr_output_layout_get(output_layout, m->wlr_output))
 			wlr_output_layout_add_auto(output_layout, m->wlr_output);
+	}
 
 	/* Now that we update the output layout we can get its box */
 	wlr_output_layout_get_box(output_layout, NULL, &sgeom);
@@ -4318,8 +4318,8 @@ updatemons(struct wl_listener *listener, void *data)
 		config_head = wlr_output_configuration_head_v1_create(config, m->wlr_output);
 
 		/* Get the effective monitor geometry to use for surfaces */
-		wlr_output_layout_get_box(output_layout, m->wlr_output, &(m->m));
-		wlr_output_layout_get_box(output_layout, m->wlr_output, &(m->w));
+		wlr_output_layout_get_box(output_layout, m->wlr_output, &m->m);
+		m->w = m->m;
 		wlr_scene_output_set_position(m->scene_output, m->m.x, m->m.y);
 
 		wlr_scene_node_set_position(&m->fullscreen_bg->node, m->m.x, m->m.y);
@@ -4328,25 +4328,32 @@ updatemons(struct wl_listener *listener, void *data)
 		if (m->lock_surface) {
 			struct wlr_scene_tree *scene_tree = m->lock_surface->surface->data;
 			wlr_scene_node_set_position(&scene_tree->node, m->m.x, m->m.y);
-			wlr_session_lock_surface_v1_configure(m->lock_surface, m->m.width,
-					m->m.height);
+			wlr_session_lock_surface_v1_configure(m->lock_surface, m->m.width, m->m.height);
 		}
 
 		/* Calculate the effective monitor geometry to use for clients */
 		arrangelayers(m);
 		/* Don't move clients to the left output when plugging monitors */
 		arrange(m);
+		/* make sure fullscreen clients have the right size */
+		if ((c = focustop(m)) && c->isfullscreen)
+			resize(c, m->m, 0);
 
-		config_head->state.enabled = 1;
-		config_head->state.mode = m->wlr_output->current_mode;
+		/* Try to re-set the gamma LUT when updating monitors,
+		 * it's only really needed when enabling a disabled output, but meh. */
+		m->gamma_lut_changed = 1;
+
 		config_head->state.x = m->m.x;
 		config_head->state.y = m->m.y;
 	}
 
 	if (selmon && selmon->wlr_output->enabled) {
-		wl_list_for_each(c, &clients, link)
-			if (!c->mon && client_surface(c)->mapped)
+		wl_list_for_each(c, &clients, link) {
+			if (!c->mon && client_surface(c)->mapped) {
 				setmon(c, selmon, c->tags);
+				reset_foreign_tolevel(c);
+			}
+		}
 		focusclient(focustop(selmon), 1);
 		if (selmon->lock_surface) {
 			client_notify_enter(selmon->lock_surface->surface,
@@ -4354,6 +4361,13 @@ updatemons(struct wl_listener *listener, void *data)
 			client_activate_surface(selmon->lock_surface->surface, 1);
 		}
 	}
+
+	/* FIXME: figure out why the cursor image is at 0,0 after turning all
+	 * the monitors on.
+	 * Move the cursor image where it used to be. It does not generate a
+	 * wl_pointer.motion event for the clients, it's only the image what it's
+	 * at the wrong position after all. */
+	wlr_cursor_move(cursor, NULL, 0, 0);
 
 	wlr_output_manager_v1_set_configuration(output_mgr, config);
 }
