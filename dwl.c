@@ -647,7 +647,7 @@ void show_scratchpad(Client *c) {
 	/* return if fullscreen */
 	if(!c->isfloating) {
 		setfloating(c, 1);	
-		c->geom.width =  c->mon->w.width * 0.5;
+		c->geom.width =  c->mon->w.width * 0.7;
 		c->geom.height =  c->mon->w.height * 0.8;		
 		//重新计算居中的坐标
 		c->geom = setclient_coordinate_center(c->geom);		
