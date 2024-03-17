@@ -1,8 +1,12 @@
 
 
 
-https://github.com/DreamMaoMao/mydwl/assets/30348075/1975cdae-0a04-4b1a-9f0e-fefd16fe57ae
 
+https://github.com/DreamMaoMao/mydwl/assets/30348075/06cdbc16-2bdc-4321-a061-2c3c3a5e8186
+
+
+
+https://github.com/DreamMaoMao/mydwl/assets/30348075/f223b559-47dc-4a4a-929f-7a5da78df023
 
 
 
@@ -44,6 +48,7 @@ https://github.com/DreamMaoMao/mydwl/assets/30348075/1975cdae-0a04-4b1a-9f0e-fef
 - 添加sway的便签功能
 - 增加所有tag可见的全局窗口global状态
 - 平铺窗口可按方向交换位置
+- 多屏幕waybar支持
 
 # 运行需要的相关工具包
 ```
@@ -64,7 +69,7 @@ sudo pacman -S networkmanager
 sudo pacman -S gdm
 sudo pacman -S wl-clipboard
 
-yay -S blueman acpi swaync jq alsa-utils polkit-gnome  light  swappy swaybg lm_sensors  network-manager-applet playerctl python3  wlsunset  xorg-xinit xorg-xwayland wlroots wayland-protocols pavucontrol ttf-jetbrains-mono-nerd eww-wayland wofi xdg-desktop-portal-wlr xdg-desktop-portal-hyprland cpufrequtils
+yay -S blueman acpi swaync jq alsa-utils polkit-gnome  light  swappy swaybg lm_sensors  network-manager-applet playerctl python3  wlsunset  xorg-xinit xorg-xwayland wlroots wayland-protocols pavucontrol ttf-jetbrains-mono-nerd eww-wayland wofi xdg-desktop-portal-hyprland cpufrequtils
 cliphist wl-clip-persist  wlogout-git rofi wlr-randr xfce4-terminal yazi-git
 
 ```
