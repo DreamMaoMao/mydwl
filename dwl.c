@@ -932,7 +932,7 @@ Client *direction_select(const Arg *arg) {
 	  return NULL;
 
 	wl_list_for_each(c, &clients, link)
-		if (c && VISIBLEON(c, c->mon) && c->mon == selmon){
+		if (c && (c->tags & c->mon->tagset[c->mon->seltags])){
 			last++;
 	  		tempClients[last] = c;
 		}
@@ -2097,6 +2097,10 @@ focusclient(Client *c, int lift)
 
 	if (c && client_surface(c) == old)
 		return;
+
+	if (c && c->mon && c->mon != selmon) {
+		selmon = c->mon;
+	}
 
 	if(selmon && selmon->sel && selmon->sel->foreign_toplevel && selmon->sel->foreign_toplevel->state)
 		wlr_foreign_toplevel_handle_v1_set_activated(selmon->sel->foreign_toplevel,false);
