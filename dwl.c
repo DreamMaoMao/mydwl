@@ -2102,9 +2102,9 @@ focusclient(Client *c, int lift)
 		selmon = c->mon;
 	}
 
-	if(selmon && selmon->sel && selmon->sel->foreign_toplevel && selmon->sel->foreign_toplevel->state)
+	if(selmon && selmon->sel && selmon->sel->foreign_toplevel) {
 		wlr_foreign_toplevel_handle_v1_set_activated(selmon->sel->foreign_toplevel,false);
-
+	}
 	if(selmon)
 		selmon->sel  = c;
 	if(c && c->foreign_toplevel)
@@ -2463,18 +2463,12 @@ keypressmod(struct wl_listener *listener, void *data)
 
 void
 killclient(const Arg *arg)
-{
-	Client *sel = focustop(selmon);
-	if (sel)
-		client_send_close(sel);
-	else{
-		if(selmon->sel)
-			selmon->sel = NULL;
-		if(selmon->isoverview){
-			Arg arg = {0};
-			toggleoverview(&arg);
-		}
-		return;
+{	
+	Client *c;
+	c = selmon->sel;
+	if (c) {
+		selmon->sel = NULL;
+		client_send_close(c);
 	}
 		
 }
@@ -4239,6 +4233,9 @@ unmapnotify(struct wl_listener *listener, void *data)
 	/* Called when the surface is unmapped, and should no longer be shown. */
 	Client *c = wl_container_of(listener, c, unmap);
 
+	if (c == selmon->sel)
+		selmon->sel = NULL;
+
 	if (c == grabc) {
 		cursor_mode = CurNormal;
 		grabc = NULL;
@@ -4261,14 +4258,15 @@ unmapnotify(struct wl_listener *listener, void *data)
 		c->foreign_toplevel = NULL;
 	}
 
-	Client *selnext = focustop(selmon);
-	if(!selnext){
-		if(selmon->sel)
-			selmon->sel = NULL;
-		if(selmon->isoverview){
-			Arg arg = {0};
-			toggleoverview(&arg);
-		}		
+	Client *nextfocus = focustop(selmon);
+
+	if(nextfocus) {
+		focusclient(nextfocus,0);
+	}
+
+	if(!nextfocus && selmon->isoverview){
+		Arg arg = {0};
+		toggleoverview(&arg);
 	}
 
 	printstatus();
