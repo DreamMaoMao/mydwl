@@ -71,7 +71,8 @@ static const Rule rules[] = {
 	{ "Microsoft-edge-dev", 		 			NULL,       		1 << 4,       	0,   0, 	0,	0,-1, 0,0},
 	{ "Clash for Windows",  					NULL,       		0,       		1,   0, 	0,	0,-1, 1400,800},
 	{ "electron-netease-cloud-music",  			NULL,       		0,       		1,   0, 	0,	0,-1, 1300,900},
-	{ NULL,  									"图片查看器",   	0,       		1,   0, 	0,	0,-1, 600,800},
+	{ "yesplaymusic",  			NULL,       		0,       		1,   0, 	0,	0,-1, 1300,900},
+	{ NULL,  									"图片查看器",   	0,       		1,   0, 	0,	0,-1, 1200,800},
 	{ NULL,  									"图片查看",     	0,       		1,   0, 	0,	0,-1, 0,0},
 	{ NULL,  									"选择文件",     	0,       		1,   0, 	0,	0,-1, 1200,800},
 	{ "polkit-gnome-authentication-agent-1",  	NULL,       		0,       		1,   0, 	0,	0,-1, 0,0},
@@ -85,7 +86,7 @@ static const Rule rules[] = {
 	{ "baidunetdisk",  							NULL,       		0,       		1,   0, 	0,	0,-1, 1400,800},
 	{ "alixby3",  								NULL,       		0,       		1,   0, 	0,	0,-1, 1400,800},
 	{ "qxdrag.py",  							NULL,       		0,       		1,   0, 	0,	0,-1, 400,300},
-	{ NULL,  									"qxdrag.py",        0,       		1,   0, 	0,	0,-1, 400,300},
+	{ NULL,  									"qxdrag",        	0,       		1,   0, 	0,	0,-1, 400,300},
 	{ NULL,  									"rofi - Networks",  0,       		1,   0, 	1,	1,-1, 400,400},
 	{ "Rofi",  									NULL,        		0,       		1,   0, 	1,	1,-1, 900,900},
 
