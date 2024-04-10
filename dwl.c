@@ -1951,6 +1951,7 @@ void dwl_ipc_manager_release(struct wl_client *client, struct wl_resource *resou
     wl_resource_destroy(resource);
 }
 
+// 在外部ipc客户端结束的时候会发出销毁请求,比如kill掉waybar,就会销毁waybar绑定的ipc_output
 static void dwl_ipc_output_destroy(struct wl_resource *resource) {
     DwlIpcOutput *ipc_output = wl_resource_get_user_data(resource);
     wl_list_remove(&ipc_output->link);
