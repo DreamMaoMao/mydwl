@@ -75,7 +75,7 @@ static const Rule rules[] = {
 	{ NULL,  									"图片查看器",   	0,       		1,   0, 	0,	0,-1, 1200,800},
 	{ NULL,  									"图片查看",     	0,       		1,   0, 	0,	0,-1, 0,0},
 	{ NULL,  									"选择文件",     	0,       		1,   0, 	0,	0,-1, 1200,800},
-	{ "polkit-gnome-authentication-agent-1",  	NULL,       		0,       		1,   0, 	0,	0,-1, 0,0},
+	{ "polkit-gnome-authentication-agent-1",  	NULL,       		0,       		1,   0, 	1,	1,-1, 930,230},
 	{ "blueman-manager",  						NULL,       		0,       		1,   0, 	0,	0,-1, 700,600},
 	{ "clash-verge",  							NULL,       		0,       		1,   0, 	0,	0,-1, 1200,800},
 	{ "Gnome-system-monitor",  					NULL,       		0,       		0,   0, 	0,	0,-1, 700,600},
