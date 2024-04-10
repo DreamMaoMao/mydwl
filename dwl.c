@@ -1967,7 +1967,7 @@ void dwl_ipc_output_printstatus_to(DwlIpcOutput *ipc_output) {
     Monitor *monitor = ipc_output->monitor;
     Client *c, *focused;
     int tagmask, state, numclients, focused_client, tag;
-    const char *title, *appid;
+    const char *title, *appid,*symbol;
     focused = focustop(monitor);
     zdwl_ipc_output_v2_send_active(ipc_output->resource, monitor == selmon);
 
@@ -2001,11 +2001,12 @@ void dwl_ipc_output_printstatus_to(DwlIpcOutput *ipc_output) {
 
     title = focused ? client_get_title(focused) : "";
     appid = focused ? client_get_appid(focused) : "";
+	symbol = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt]->symbol;
 
     zdwl_ipc_output_v2_send_layout(ipc_output->resource, monitor->lt[monitor->sellt] - layouts);
     zdwl_ipc_output_v2_send_title(ipc_output->resource, title ? title : broken); 
     zdwl_ipc_output_v2_send_appid(ipc_output->resource, appid ? appid : broken);
-    zdwl_ipc_output_v2_send_layout_symbol(ipc_output->resource, monitor->lt[monitor->sellt]->symbol);
+    zdwl_ipc_output_v2_send_layout_symbol(ipc_output->resource, symbol);
     zdwl_ipc_output_v2_send_frame(ipc_output->resource);
 }
 
