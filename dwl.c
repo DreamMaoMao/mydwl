@@ -888,7 +888,7 @@ arrange(Monitor *m)
 	if(m->isoverview){
 		overviewlayout.arrange(m,0,0);
 	}else if (m && m->lt[m->sellt]->arrange){
-		m->lt[m->sellt]->arrange(m,0,0);
+		m->lt[m->sellt]->arrange(m,gappoh,0);
 	}
 
 	motionnotify(0);

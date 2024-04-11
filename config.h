@@ -30,8 +30,8 @@ static const float scratchpadcolor[]       = COLOR(0x516c93ff);
 static const float globalcolor[]       	   = COLOR(0xb153a7ff);
 // static const char *cursor_theme = "Bibata-Modern-Ice";
 
-static const int overviewgappi = 24; /* overview时 窗口与边缘 缝隙大小 */
-static const int overviewgappo = 60; /* overview时 窗口与窗口 缝隙大小 */
+static const int overviewgappi = 5; /* overview时 窗口与边缘 缝隙大小 */
+static const int overviewgappo = 30; /* overview时 窗口与窗口 缝隙大小 */
 
 /* To conform the xdg-protocol, set the alpha to zero to restore the old behavior */
 static const float fullscreen_bg[]         = {0.1, 0.1, 0.1, 1.0};
@@ -201,6 +201,7 @@ static const Key keys[] = {
     { WLR_MODIFIER_LOGO,   					XKB_KEY_space, 			spawn, 						SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show website") },  
     { WLR_MODIFIER_LOGO|WLR_MODIFIER_ALT,   XKB_KEY_Return, 		spawn, 						SHCMD("rofi -normal-window -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/tool/movie.py") },  
     { WLR_MODIFIER_CTRL,   					XKB_KEY_space, 			spawn, 						SHCMD("rofi -normal-window -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/search.py") },  
+    { WLR_MODIFIER_LOGO,   					XKB_KEY_c, 				spawn, 						SHCMD("rofi -normal-window -theme  ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/history.py") },  
 
     { WLR_MODIFIER_CTRL,   					XKB_KEY_comma, 			spawn, 						SHCMD("~/.config/hypr/scripts/brightness.sh down") },  
     { WLR_MODIFIER_CTRL,   					XKB_KEY_period, 		spawn, 						SHCMD("~/.config/hypr/scripts/brightness.sh up") },  
