@@ -1226,7 +1226,7 @@ chvt(const Arg *arg)
 	wlr_session_change_vt(session, arg->ui);
 }
 
-void //17
+void // 0.5
 checkidleinhibitor(struct wlr_surface *exclude)
 {
 	int inhibited = 0, unused_lx, unused_ly;
@@ -1645,7 +1645,7 @@ createmon(struct wl_listener *listener, void *data)
 
 
 
-void //17
+void //fix for 0.5
 createnotify(struct wl_listener *listener, void *data)
 {
 	/* This event is raised when wlr_xdg_shell receives a new xdg surface from a
@@ -1658,18 +1658,18 @@ createnotify(struct wl_listener *listener, void *data)
 	LayerSurface *l = NULL;
 
 	if (xdg_surface->role == WLR_XDG_SURFACE_ROLE_POPUP) {
+		struct wlr_xdg_popup *popup = xdg_surface->popup;
 		struct wlr_box box;
-		int type = toplevel_from_wlr_surface(xdg_surface->surface, &c, &l);
-		if (!xdg_surface->popup->parent || type < 0)
+		if (toplevel_from_wlr_surface(popup->base->surface, &c, &l) < 0)
 			return;
-		xdg_surface->surface->data = wlr_scene_xdg_surface_create(
-				xdg_surface->popup->parent->data, xdg_surface);
+		popup->base->surface->data = wlr_scene_xdg_surface_create(
+				popup->parent->data, popup->base);
 		if ((l && !l->mon) || (c && !c->mon))
 			return;
-		box = type == LayerShell ? l->mon->m : c->mon->w;
-		box.x -= (type == LayerShell ? l->geom.x : c->geom.x);
-		box.y -= (type == LayerShell ? l->geom.y : c->geom.y);
-		wlr_xdg_popup_unconstrain_from_box(xdg_surface->popup, &box);
+		box = l ? l->mon->m : c->mon->w;
+		box.x -= (l ? l->geom.x : c->geom.x);
+		box.y -= (l ? l->geom.y : c->geom.y);
+		wlr_xdg_popup_unconstrain_from_box(popup, &box);
 		return;
 	} else if (xdg_surface->role == WLR_XDG_SURFACE_ROLE_NONE)
 		return;
@@ -1695,44 +1695,44 @@ createnotify(struct wl_listener *listener, void *data)
 			minimizenotify);
 }
 
-void //17
+void // 0.5
 createpointer(struct wlr_pointer *pointer)
 {
-	if (wlr_input_device_is_libinput(&pointer->base)) {
-		struct libinput_device *libinput_device = (struct libinput_device*)
-			wlr_libinput_get_device_handle(&pointer->base);
+	struct libinput_device *device;
+	if (wlr_input_device_is_libinput(&pointer->base)
+			&& (device = wlr_libinput_get_device_handle(&pointer->base))) {
 
-		if (libinput_device_config_tap_get_finger_count(libinput_device)) {
-			libinput_device_config_tap_set_enabled(libinput_device, tap_to_click);
-			libinput_device_config_tap_set_drag_enabled(libinput_device, tap_and_drag);
-			libinput_device_config_tap_set_drag_lock_enabled(libinput_device, drag_lock);
-			libinput_device_config_tap_set_button_map(libinput_device, button_map);
+		if (libinput_device_config_tap_get_finger_count(device)) {
+			libinput_device_config_tap_set_enabled(device, tap_to_click);
+			libinput_device_config_tap_set_drag_enabled(device, tap_and_drag);
+			libinput_device_config_tap_set_drag_lock_enabled(device, drag_lock);
+			libinput_device_config_tap_set_button_map(device, button_map);
 		}
 
-		if (libinput_device_config_scroll_has_natural_scroll(libinput_device))
-			libinput_device_config_scroll_set_natural_scroll_enabled(libinput_device, natural_scrolling);
+		if (libinput_device_config_scroll_has_natural_scroll(device))
+			libinput_device_config_scroll_set_natural_scroll_enabled(device, natural_scrolling);
 
-		if (libinput_device_config_dwt_is_available(libinput_device))
-			libinput_device_config_dwt_set_enabled(libinput_device, disable_while_typing);
+		if (libinput_device_config_dwt_is_available(device))
+			libinput_device_config_dwt_set_enabled(device, disable_while_typing);
 
-		if (libinput_device_config_left_handed_is_available(libinput_device))
-			libinput_device_config_left_handed_set(libinput_device, left_handed);
+		if (libinput_device_config_left_handed_is_available(device))
+			libinput_device_config_left_handed_set(device, left_handed);
 
-		if (libinput_device_config_middle_emulation_is_available(libinput_device))
-			libinput_device_config_middle_emulation_set_enabled(libinput_device, middle_button_emulation);
+		if (libinput_device_config_middle_emulation_is_available(device))
+			libinput_device_config_middle_emulation_set_enabled(device, middle_button_emulation);
 
-		if (libinput_device_config_scroll_get_methods(libinput_device) != LIBINPUT_CONFIG_SCROLL_NO_SCROLL)
-			libinput_device_config_scroll_set_method (libinput_device, scroll_method);
+		if (libinput_device_config_scroll_get_methods(device) != LIBINPUT_CONFIG_SCROLL_NO_SCROLL)
+			libinput_device_config_scroll_set_method (device, scroll_method);
 
-		if (libinput_device_config_click_get_methods(libinput_device) != LIBINPUT_CONFIG_CLICK_METHOD_NONE)
-			libinput_device_config_click_set_method (libinput_device, click_method);
+		if (libinput_device_config_click_get_methods(device) != LIBINPUT_CONFIG_CLICK_METHOD_NONE)
+			libinput_device_config_click_set_method (device, click_method);
 
-		if (libinput_device_config_send_events_get_modes(libinput_device))
-			libinput_device_config_send_events_set_mode(libinput_device, send_events_mode);
+		if (libinput_device_config_send_events_get_modes(device))
+			libinput_device_config_send_events_set_mode(device, send_events_mode);
 
-		if (libinput_device_config_accel_is_available(libinput_device)) {
-			libinput_device_config_accel_set_profile(libinput_device, accel_profile);
-			libinput_device_config_accel_set_speed(libinput_device, accel_speed);
+		if (libinput_device_config_accel_is_available(device)) {
+			libinput_device_config_accel_set_profile(device, accel_profile);
+			libinput_device_config_accel_set_speed(device, accel_speed);
 		}
 	}
 
@@ -4207,27 +4207,25 @@ toggleview(const Arg *arg)
 	printstatus();
 }
 
-void //17
+void // 0.5
 unlocksession(struct wl_listener *listener, void *data)
 {
 	SessionLock *lock = wl_container_of(listener, lock, unlock);
 	destroylock(lock, 1);
 }
 
-void //17
+void // 0.5
 unmaplayersurfacenotify(struct wl_listener *listener, void *data)
 {
-	LayerSurface *layersurface = wl_container_of(listener, layersurface, unmap);
+	LayerSurface *l = wl_container_of(listener, l, unmap);
 
-	layersurface->mapped = 0;
-	wlr_scene_node_set_enabled(&layersurface->scene->node, 0);
-	if (layersurface == exclusive_focus)
+	l->mapped = 0;
+	wlr_scene_node_set_enabled(&l->scene->node, 0);
+	if (l == exclusive_focus)
 		exclusive_focus = NULL;
-	if (layersurface->layer_surface->output
-			&& (layersurface->mon = layersurface->layer_surface->output->data))
-		arrangelayers(layersurface->mon);
-	if (layersurface->layer_surface->surface ==
-			seat->keyboard_state.focused_surface)
+	if (l->layer_surface->output && (l->mon = l->layer_surface->output->data))
+		arrangelayers(l->mon);
+	if (l->layer_surface->surface == seat->keyboard_state.focused_surface)
 		focusclient(focustop(selmon), 1);
 	motionnotify(0);
 }
