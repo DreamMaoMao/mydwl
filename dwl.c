@@ -795,7 +795,7 @@ applyrulesgeom(Client *c)
 
 	for (r = rules; r < END(rules); r++) {
 		if ((!r->title || strstr(title, r->title))
-				&& (!r->id || strstr(appid, r->id))) {	
+				&& (!r->id || strstr(appid, r->id)) && r->width !=0 && r->height != 0) {	
 			c->geom.width = r->width;
 			c->geom.height =  r->height;
 			//重新计算居中的坐标
