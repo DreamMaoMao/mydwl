@@ -211,6 +211,8 @@ static const Key keys[] = {
     { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,   XKB_KEY_BackSpace, 		spawn, 						SHCMD("swaync-client -C") }, 
     { WLR_MODIFIER_LOGO|WLR_MODIFIER_SHIFT, XKB_KEY_P, 				spawn, 						SHCMD("wlr-randr --output eDP-1 --on") },    //打开笔记本显示器
     { WLR_MODIFIER_LOGO,   					XKB_KEY_p, 				spawn, 						SHCMD("bash ~/.config/dwl/scripts/monitor.sh") },   //关闭笔记本显示器
+    { WLR_MODIFIER_LOGO,   					XKB_KEY_k, 				spawn, 						SHCMD("bash ~/tool/wshowkey.sh") },   //显示按键
+
 
 	{ WLR_MODIFIER_LOGO,                    XKB_KEY_Tab,          	focusstack,     			{.i = +1} },
 

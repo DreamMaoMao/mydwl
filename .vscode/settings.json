@@ -15,7 +15,9 @@
         "format": "c",
         "any": "c",
         "memory": "c",
-        "optional": "c"
+        "optional": "c",
+        "wlr_renderer.h": "c",
+        "wlr_texture.h": "c"
     },
     "mesonbuild.configureOnOpen": false
 }
