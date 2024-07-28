@@ -1,6 +1,8 @@
 #! /bin/bash
 # DWL自启动脚本 仅作参考
 
+set +e
+
 pkill xdg
 pkill clash
 
@@ -23,7 +25,7 @@ cp ~/.local/share/wayland/konsole -r ~/.local/share/
 cp ~/.config/zellij/configwayland.kdl ~/.config/zellij/config.kdl
 cp ~/.config/fcitx/dwm_profile ~/.config/fcitx/profile -f
 # 开启输入法
-fcitx &
+fcitx5 &
 systemctl --user mask xdg-desktop-portal-gnome
 systemctl --user mask xdg-desktop-portal-hyprland
 # /usr/libexec/xdg-desktop-portal &
