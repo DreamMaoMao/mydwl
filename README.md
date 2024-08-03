@@ -13,7 +13,7 @@ https://github.com/DreamMaoMao/mydwl/assets/30348075/f223b559-47dc-4a4a-929f-7a5
 
 
 > [!NOTE]
-> 该dwl目前基于wlroots-0.17.1 release 其他wlroots版本可能编译不过去
+> 该dwl目前基于wlroots-0.17.2 release 其他wlroots版本可能编译不过去
 > waybar要使用下面推荐地定制waybar,不然协议可能不通用
 
 # dwl - dwm for Wayland
@@ -51,14 +51,13 @@ https://github.com/DreamMaoMao/mydwl/assets/30348075/f223b559-47dc-4a4a-929f-7a5
 - 增加所有tag可见的全局窗口global状态
 - 平铺窗口可按方向交换位置
 - 多屏幕waybar支持
+- 支持text-input-v3 协议
 
 # 运行需要的相关工具包
 ```
 sudo pacman -S network-manager-applet
 sudo pacman -S nemo
 sudo pacman -S foot
-sudo pacman -S gnome-system-monitor 
-sudo pacman -S fcitx-qt5 fcitx fcitx-configtool
 sudo pacman -S brightnessctl 
 sudo pacman -S bluez bluez-utils 
 sudo pacman -S sysstat
@@ -71,14 +70,14 @@ sudo pacman -S networkmanager
 sudo pacman -S gdm
 sudo pacman -S wl-clipboard
 
-yay -S blueman acpi swaync jq alsa-utils polkit-gnome  light  swappy swaybg lm_sensors  network-manager-applet playerctl python3  wlsunset  xorg-xinit xorg-xwayland wlroots wayland-protocols pavucontrol ttf-jetbrains-mono-nerd eww-wayland wofi xdg-desktop-portal-hyprland cpufrequtils
-cliphist wl-clip-persist  wlogout-git rofi wlr-randr yazi-git
+yay -S blueman acpi swaync jq alsa-utils polkit-gnome  light  swappy swaybg lm_sensors  network-manager-applet playerctl python3  wlsunset  xorg-xinit xorg-xwayland wlroots wayland-protocols pavucontrol ttf-jetbrains-mono-nerd eww-wayland wofi xdg-desktop-portal-hyprland cpufrequtils system-monitoring-center
+cliphist wl-clip-persist  wlogout-git rofi wlr-randr yazi fcitx5 fcitx5-im fcitx5-qt fcitx5-chinese-addon 
 
 ```
 
-# 安装wlroots(0.17.1)
+# 安装wlroots(0.17.2)
 ```
-git clone -b 0.17.1 https://gitlab.freedesktop.org/wlroots/wlroots.git 
+git clone -b 0.17.2 https://gitlab.freedesktop.org/wlroots/wlroots.git 
 cd wlroots
 meson build -Dprefix=/usr
 sudo ninja -C build install
@@ -86,7 +85,7 @@ sudo ninja -C build install
 
 # 安装waybar
 ```
-git clone https://github.com/DreamMaoMao/mywaybar.git
+git clone https://gitee.com/DreamMaoMao/mywaybar.git
 cd mywaybar
 meson build -Dprefix=/usr
 sudo ninja -C build install
@@ -95,7 +94,7 @@ sudo ninja -C build install
 # 拷贝相关配置
 ```
 cd ~/.config
-git clone https://github.com/DreamMaoMao/mydwl.git
+git clone https://gitee.com/DreamMaoMao/mydwl.git
 
 cd mydwl
 
