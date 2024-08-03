@@ -4753,6 +4753,9 @@ xytonode(double x, double y, struct wlr_surface **psurface,
 	int layer;
 
 	for (layer = NUM_LAYERS - 1; !surface && layer >= 0; layer--) {
+	#ifdef IM
+		        if (layer == LyrIMPopup) continue;
+	#endif
 		if (!(node = wlr_scene_node_at(&layers[layer]->node, x, y, nx, ny)))
 			continue;
 
