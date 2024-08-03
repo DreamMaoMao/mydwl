@@ -95,7 +95,7 @@
     "cpu": {
         "interval": 2,
         "format": "{load}% ",
-        "on-click-right":"gnome-system-monitor",
+        "on-click-right":"system-monitoring-center",
         "on-click":"nwg-drawer -ovl"
         // "on-click-right":"bash ~/.config/eww/scripts/launcher toggle_menu quicksettings",
         // "max-length": 10
