@@ -56,7 +56,7 @@ https://github.com/DreamMaoMao/mydwl/assets/30348075/f223b559-47dc-4a4a-929f-7a5
 ```
 sudo pacman -S network-manager-applet
 sudo pacman -S nemo
-sudo pacman -S konsole
+sudo pacman -S foot
 sudo pacman -S gnome-system-monitor 
 sudo pacman -S fcitx-qt5 fcitx fcitx-configtool
 sudo pacman -S brightnessctl 
@@ -72,7 +72,7 @@ sudo pacman -S gdm
 sudo pacman -S wl-clipboard
 
 yay -S blueman acpi swaync jq alsa-utils polkit-gnome  light  swappy swaybg lm_sensors  network-manager-applet playerctl python3  wlsunset  xorg-xinit xorg-xwayland wlroots wayland-protocols pavucontrol ttf-jetbrains-mono-nerd eww-wayland wofi xdg-desktop-portal-hyprland cpufrequtils
-cliphist wl-clip-persist  wlogout-git rofi wlr-randr xfce4-terminal yazi-git
+cliphist wl-clip-persist  wlogout-git rofi wlr-randr yazi-git
 
 ```
 
@@ -106,14 +106,13 @@ sudo ninja -C build install
 //拷贝配置
 cp swaync -r ~/.config/
 cp fish -r ~/.config/
-cp konsole -r ~/.local/share/
 cp eww -r ~/.config/
 
 sed -i s#/home/user#$HOME#g dwl.desktop
 sudo cp dwl.desktop /usr/share/wayland-sessions/
 ```
 
-# 终端设置(默认用的konsole)
+# 终端设置(默认用的foot)
 ```
 chsh -s /usr/bin/fish
 
