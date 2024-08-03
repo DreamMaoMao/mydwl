@@ -68,7 +68,7 @@ window#waybar {
     /* background: linear-gradient(45deg, rgba(202,158,230,1) 0%, rgba(245,194,231,1) 43%, rgba(180,190,254,1) 80%, rgba(137,180,250,1) 100%);  */
     background-size: 300% 300%;
     /* animation: gradient 10s ease infinite; */
-    color: #ece3eb;
+    color: #fdfafd;
     border: none;
     border-bottom: 6px solid rgb(144, 101, 171);
     border-radius: 15px;
