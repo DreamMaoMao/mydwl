@@ -181,6 +181,7 @@ typedef struct {
 	int is_scratchpad_show;
 	int isglobal;
 	int isnoborder;
+	int iskilling;
 	struct wlr_box bounds;
 } Client;
 
@@ -2099,7 +2100,8 @@ focusclient(Client *c, int lift)
 	if (locked)
 		return;
 
-
+    if (c && c->iskilling)
+		return;
 	/* Warp cursor to center of client if it is outside */
 	if (warpcursor && c)
 		warp_cursor(c);
@@ -2516,6 +2518,7 @@ killclient(const Arg *arg)
 	Client *c;
 	c = selmon->sel;
 	if (c) {
+		c->iskilling = 1;
 		selmon->sel = NULL;
 		client_send_close(c);
 	}
