@@ -2175,9 +2175,13 @@ focusclient(Client *c, int lift)
 	/* Have a client, so focus its top-level wlr_surface */
 	client_notify_enter(client_surface(c), wlr_seat_get_keyboard(seat));
 
-	#ifdef IM
-		dwl_input_method_relay_set_focus(input_relay, client_surface(c));
-	#endif
+#ifdef IM
+		struct wlr_keyboard *keyboard;
+		keyboard = wlr_seat_get_keyboard(seat);
+		uint32_t mods = keyboard ? wlr_keyboard_get_modifiers(keyboard) : 0;
+		if (mods == 0)
+			dwl_input_method_relay_set_focus(input_relay, client_surface(c));
+#endif
 	/* Activate the new client */
 	client_activate_surface(client_surface(c), 1);
 }
@@ -2433,6 +2437,11 @@ keypress(struct wl_listener *listener, void *data)
 	uint32_t mods = wlr_keyboard_get_modifiers(kb->wlr_keyboard);
 
 	wlr_idle_notifier_v1_notify_activity(idle_notifier, seat);
+#ifdef IM
+	if (!locked && event->state == WL_KEYBOARD_KEY_STATE_RELEASED && (keycode == 133 ||keycode == 37 || keycode == 64 || keycode == 50 || keycode == 134 || keycode == 105 || keycode == 108 || keycode == 62)  && selmon->sel) {
+		dwl_input_method_relay_set_focus(input_relay, client_surface(selmon->sel));
+	}	
+#endif		
 
 	/* On _press_ if there is no active screen locker,
 	 * attempt to process a compositor keybinding. */

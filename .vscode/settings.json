@@ -17,7 +17,8 @@
         "memory": "c",
         "optional": "c",
         "wlr_renderer.h": "c",
-        "wlr_texture.h": "c"
+        "wlr_texture.h": "c",
+        "cstdint": "c"
     },
     "mesonbuild.configureOnOpen": false
 }
