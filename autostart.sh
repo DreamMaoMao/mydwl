@@ -38,7 +38,7 @@ blueman-applet &
 nm-applet &
 /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
 # numlockx on
-[ -e /dev/sda1 ] && udisksctl mount -t ntfs -b /dev/sda4
+[ -e /dev/sda4 ] && udisksctl mount -t ext4 -b /dev/sda4
 python3 ~/tool/sign.py &
 eww daemon &
 

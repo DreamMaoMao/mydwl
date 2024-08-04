@@ -221,10 +221,11 @@ static const Key keys[] = {
     { WLR_MODIFIER_ALT,                  	XKB_KEY_Up,           	focusdir,         			{.i = UP } },              /* alt up             |  本tag内切换聚焦窗口 */
     { WLR_MODIFIER_ALT,                  	XKB_KEY_Down,         	focusdir,         			{.i = DOWN } },    
 
+
 	{ WLR_MODIFIER_LOGO,                    XKB_KEY_e,          	incnmaster,     			{.i = +1} },
 	{ WLR_MODIFIER_LOGO,                    XKB_KEY_t,          	incnmaster,     			{.i = -1} },
-	{ WLR_MODIFIER_LOGO, 					XKB_KEY_comma,          setmfact,       			{.f = -0.05} },
-	{ WLR_MODIFIER_LOGO, 					XKB_KEY_period,         setmfact,       			{.f = +0.05} },
+	{ WLR_MODIFIER_ALT|WLR_MODIFIER_CTRL,   XKB_KEY_Left,          	setmfact,       			{.f = -0.01} },
+	{ WLR_MODIFIER_ALT|WLR_MODIFIER_CTRL,   XKB_KEY_Right,         	setmfact,       			{.f = +0.01} },
 	{ MODKEY,                    			XKB_KEY_s,          	zoom,           			{0} },
     { WLR_MODIFIER_LOGO|WLR_MODIFIER_SHIFT, XKB_KEY_Up,           	exchange_client,  			{.i = UP } },              /* super shift up       | 二维交换窗口 (仅平铺) */
     { WLR_MODIFIER_LOGO|WLR_MODIFIER_SHIFT, XKB_KEY_Down,         	exchange_client,  			{.i = DOWN } },            /* super shift down     | 二维交换窗口 (仅平铺) */
@@ -248,8 +249,8 @@ static const Key keys[] = {
 	{ WLR_MODIFIER_LOGO,                    XKB_KEY_i,          	minized, 					{0} },  //最小化,放入便签
 	{ WLR_MODIFIER_LOGO|WLR_MODIFIER_SHIFT, XKB_KEY_I,          	restore_minized, 			{0} },
 	{ WLR_MODIFIER_ALT, 					XKB_KEY_z,          	toggle_scratchpad, 			{0} },  //便签循环切换
-	{ WLR_MODIFIER_CTRL,                    XKB_KEY_KP_0,          	view,           			{.ui = ~0} },
-	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO, 	XKB_KEY_KP_0, 			tag,            			{.ui = ~0} },
+	// { WLR_MODIFIER_CTRL,                    XKB_KEY_KP_0,          	view,           			{.ui = ~0} },
+	// { WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO, 	XKB_KEY_KP_0, 			tag,            			{.ui = ~0} },
 	{ WLR_MODIFIER_LOGO,                    XKB_KEY_bracketleft,    focusmon,       			{.i = WLR_DIRECTION_LEFT} },  //super + [
 	{ WLR_MODIFIER_LOGO,                    XKB_KEY_bracketright,   focusmon,       			{.i = WLR_DIRECTION_RIGHT} }, // suepr + ]
 	{ WLR_MODIFIER_LOGO|WLR_MODIFIER_CTRL, XKB_KEY_bracketleft,    tagmon,         			{.i = WLR_DIRECTION_LEFT} },
