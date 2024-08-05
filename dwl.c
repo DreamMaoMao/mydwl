@@ -2600,7 +2600,7 @@ mapnotify(struct wl_listener *listener, void *data)
 	c->isrealfullscreen = 0;	
 	c->istiled = 0;
 	c->ignore_clear_fullscreen = 0;
-
+	c->iskilling = 0;
 	//nop
 	if (new_is_master)
 		// tile at the top
