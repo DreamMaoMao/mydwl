@@ -18,7 +18,10 @@
         "optional": "c",
         "wlr_renderer.h": "c",
         "wlr_texture.h": "c",
-        "cstdint": "c"
+        "cstdint": "c",
+        "array": "c",
+        "string_view": "c",
+        "span": "c"
     },
     "mesonbuild.configureOnOpen": false
 }

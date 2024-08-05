@@ -2165,7 +2165,7 @@ focusclient(Client *c, int lift)
 		if(selmon && selmon->sel)
 			selmon->sel  = NULL; //这个很关键,因为很多地方用到当前窗口做计算,不重置成NULL就会到处有野指针
 		#ifdef IM
-		                dwl_input_method_relay_set_focus(input_relay, NULL);
+		    dwl_input_method_relay_set_focus(input_relay, NULL);
 		#endif
 		wlr_seat_keyboard_notify_clear_focus(seat);
 		return;
@@ -3192,6 +3192,9 @@ void
 resize(Client *c, struct wlr_box geo, int interact)
 {	
 
+	if (!c || !c->mon || !client_surface(c)->mapped)
+		return;
+
 	struct wlr_box *bbox = interact ? &sgeom : &c->mon->w;//去掉这个推荐的窗口大小,因为有时推荐的窗口特别大导致平铺异常
 	struct wlr_box clip;
 	struct wlr_box surface = {0};
@@ -3323,8 +3326,9 @@ setfloating(Client *c, int floating)
 	Client *p = client_get_parent(c);
 	c->isfloating = floating;
 
-	if (!c->mon)
+	if (!c || !c->mon || !client_surface(c)->mapped)
 		return;
+
 	wlr_scene_node_reparent(&c->scene->node, layers[c->isfullscreen ||
 			(p && p->isfullscreen) ? LyrFS
 			: c->isfloating ? LyrFloat : LyrTile]);
@@ -3354,7 +3358,7 @@ setfakefullscreen(Client *c, int fakefullscreen)
 {
 	c->isfakefullscreen = fakefullscreen;
 	struct wlr_box  fakefullscreen_box;
-	if (!c->mon)
+	if (!c || !c->mon || !client_surface(c)->mapped)
 		return;
 	// c->bw = fullscreen ? 0 : borderpx;
 	// client_set_fullscreen(c, fullscreen);
@@ -3390,7 +3394,7 @@ setrealfullscreen(Client *c, int realfullscreen)
 {
 	c->isrealfullscreen = realfullscreen;
 
-	if (!c->mon)
+	if (!c || !c->mon || !client_surface(c)->mapped)
 		return;
 
 	if (realfullscreen) {
@@ -3417,7 +3421,7 @@ setfullscreen(Client *c, int realfullscreen) //用自定义全屏代理自带全
 {
 	c->isrealfullscreen = realfullscreen;
 
-	if (!c->mon)
+	if (!c || !c->mon || !client_surface(c)->mapped)
 		return;
 
 	if (realfullscreen) {
