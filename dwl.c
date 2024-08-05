@@ -3601,8 +3601,10 @@ handle_foreign_fullscreen_request(
 void
 handle_foreign_close_request(struct wl_listener *listener, void *data) {
 	Client *c = wl_container_of(listener, c, foreign_close_request);
-	if(c)
+	if(c) {
+		c->iskilling = 1;
 		client_send_close(c);
+	}
 }
 
 void
