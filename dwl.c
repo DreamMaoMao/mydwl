@@ -1565,7 +1565,7 @@ createmon(struct wl_listener *listener, void *data)
 	m->sel = NULL;
 	m->is_in_hotarea = 0;
 	m->tagset[0] = m->tagset[1] = 1;
-	int scale = 1;
+	float scale = 1;
 	m->mfact = 0.5;
 	m->nmaster = 1;
 	enum wl_output_transform rr = WL_OUTPUT_TRANSFORM_NORMAL;
