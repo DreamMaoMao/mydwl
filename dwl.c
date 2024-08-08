@@ -919,11 +919,6 @@ arrange(Monitor *m)
 	#endif
 	motionnotify(0, NULL, 0, 0, 0, 0);
 	checkidleinhibitor(NULL);
-
-    // c = focustop(selmon);
-
-	// if (c && warpcursor) //布局后将光标移动到client中间
-	// 	warp_cursor(c);
 }
 
 void //0.5
@@ -1084,7 +1079,8 @@ void focusdir(const Arg *arg) {
 	c = direction_select(arg);
 	if(c) {
 		focusclient(c,1);
-		warp_cursor(c);
+		if(warpcursor)
+			warp_cursor(c);
 	}
 }
 
@@ -2173,9 +2169,6 @@ focusclient(Client *c, int lift)
 
     if (c && c->iskilling)
 		return;
-	/* Warp cursor to center of client if it is outside */
-	if (warpcursor && c)
-		warp_cursor(c);
 
 	/* Raise client in stacking order if requested */
 	if (c && lift)

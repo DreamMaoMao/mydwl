@@ -36,7 +36,7 @@ static const int overviewgappo = 30; /* overview时 窗口与窗口 缝隙大小
 /* To conform the xdg-protocol, set the alpha to zero to restore the old behavior */
 static const float fullscreen_bg[]         = {0.1, 0.1, 0.1, 1.0};
 
-static int warpcursor = 0; /* Warp cursor to focused client */
+static int warpcursor = 1; /* Warp cursor to focused client */
 
 /* Autostart */
 static const char *const autostart[] = {
