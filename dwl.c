@@ -1082,8 +1082,10 @@ Client *direction_select(const Arg *arg) {
 void focusdir(const Arg *arg) {
 	Client *c;
 	c = direction_select(arg);
-	if(c)
+	if(c) {
 		focusclient(c,1);
+		warp_cursor(c);
+	}
 }
 
 void //0.5
