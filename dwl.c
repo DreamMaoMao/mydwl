@@ -2833,9 +2833,20 @@ motionnotify(uint32_t time, struct wlr_input_device *device, double dx, double d
 	double sx = 0, sy = 0, sx_confined, sy_confined;
 	Client *c = NULL, *w = NULL;
 	LayerSurface *l = NULL;
-	int type;
 	struct wlr_surface *surface = NULL;
 	struct wlr_pointer_constraint_v1 *constraint;
+
+	/* Find the client under the pointer and send the event along. */
+	xytonode(cursor->x, cursor->y, &surface, &c, NULL, &sx, &sy);
+
+	if (cursor_mode == CurPressed && !seat->drag
+			&& surface != seat->pointer_state.focused_surface
+			&& toplevel_from_wlr_surface(seat->pointer_state.focused_surface, &w, &l) >= 0) {
+		c = w;
+		surface = seat->pointer_state.focused_surface;
+		sx = cursor->x - (l ? l->geom.x : w->geom.x);
+		sy = cursor->y - (l ? l->geom.y : w->geom.y);
+	}
 
 	/* time is 0 in internal calls meant to restore pointer focus. */
 	if (time) {
@@ -2883,19 +2894,6 @@ motionnotify(uint32_t time, struct wlr_input_device *device, double dx, double d
 		resize(grabc, (struct wlr_box){.x = grabc->geom.x, .y = grabc->geom.y,
 			.width = cursor->x - grabc->geom.x, .height = cursor->y - grabc->geom.y}, 1);
 		return;
-	}
-
-	/* Find the client under the pointer and send the event along. */
-	xytonode(cursor->x, cursor->y, &surface, &c, NULL, &sx, &sy);
-
-	if (cursor_mode == CurPressed && !seat->drag) {
-		if ((type = toplevel_from_wlr_surface(
-				 seat->pointer_state.focused_surface, &w, &l)) >= 0) {
-			c = w;
-			surface = seat->pointer_state.focused_surface;
-			sx = cursor->x - (type == LayerShell ? l->geom.x : w->geom.x);
-			sy = cursor->y - (type == LayerShell ? l->geom.y : w->geom.y);
-		}
 	}
 
 	/* If there's no client surface under the cursor, set the cursor image to a
