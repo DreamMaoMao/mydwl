@@ -2264,6 +2264,8 @@ focusmon(const Arg *arg)
 		do /* don't switch to disabled mons */
 			selmon = dirtomon(arg->i);
 		while (!selmon->wlr_output->enabled && i++ < nmons);
+		if (!selmon->wlr_output->enabled)
+			selmon = NULL;
 	}
 	warp_cursor_to_selmon(selmon);
 	focusclient(focustop(selmon), 1);
@@ -4520,6 +4522,9 @@ updatemons(struct wl_listener *listener, void *data)
 
 		config_head->state.x = m->m.x;
 		config_head->state.y = m->m.y;
+		if (!selmon) {
+			selmon = m;
+		}
 	}
 
 	if (selmon && selmon->wlr_output->enabled) {
