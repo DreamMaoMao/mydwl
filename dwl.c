@@ -3050,7 +3050,7 @@ pointerfocus(Client *c, struct wlr_surface *surface, double sx, double sy,
 		focusclient(c, 0);
 
 	/* If surface is NULL, try use the focused client surface to set pointer foucs */
-	if (!surface && selmon && selmon->sel) {
+	if (time == 0 && !surface && selmon && selmon->sel) {
 		surface = client_surface(selmon->sel);
 	}
 
