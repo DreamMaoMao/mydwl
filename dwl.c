@@ -4866,11 +4866,11 @@ void
 virtualpointer(struct wl_listener *listener, void *data)
 {
 	struct wlr_virtual_pointer_v1_new_pointer_event *event = data;
-	struct wlr_pointer pointer = event->new_pointer->pointer;
+	struct wlr_input_device *device = &event->new_pointer->pointer.base;
 
-	wlr_cursor_attach_input_device(cursor, &pointer.base);
+	wlr_cursor_attach_input_device(cursor, device);
 	if (event->suggested_output)
-		wlr_cursor_map_input_to_output(cursor, &pointer.base, event->suggested_output);
+		wlr_cursor_map_input_to_output(cursor, device, event->suggested_output);
 }
 
 Monitor *
