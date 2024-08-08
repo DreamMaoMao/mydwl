@@ -3020,7 +3020,7 @@ apply_or_test:
 		if (!test && wlr_output->enabled && (m->m.x != config_head->state.x || m->m.y != config_head->state.y))
 			wlr_output_layout_add(output_layout, wlr_output,
 					config_head->state.x, config_head->state.y);
-					
+
 		wlr_output_state_finish(&state);
 	}
 
@@ -3301,9 +3301,15 @@ resize(Client *c, struct wlr_box geo, int interact)
 	if (!c || !c->mon || !client_surface(c)->mapped)
 		return;
 
-	struct wlr_box *bbox = interact ? &sgeom : &c->mon->w;//去掉这个推荐的窗口大小,因为有时推荐的窗口特别大导致平铺异常
+	struct wlr_box *bbox;
 	struct wlr_box clip;
 	struct wlr_box surface = {0};
+
+	
+	if (!c->mon)
+		return;
+
+	bbox = interact ? &sgeom : &c->mon->w;
 	
 	client_set_bounds(c, geo.width, geo.height); //去掉这个推荐的窗口大小,因为有时推荐的窗口特别大导致平铺异常
 	c->geom = geo;
