@@ -3304,8 +3304,6 @@ resize(Client *c, struct wlr_box geo, int interact)
 
 	struct wlr_box *bbox;
 	struct wlr_box clip;
-	struct wlr_box surface = {0};
-
 	
 	if (!c->mon)
 		return;
@@ -3320,33 +3318,24 @@ resize(Client *c, struct wlr_box geo, int interact)
 	if(c->isnoborder) {
 		c->bw = 0;
 	}
-
-	surface = (struct wlr_box){	.x = 0,
-								.y = 0,
-								.width = c->geom.width - 2 * c->bw,
-								.height = c->geom.height - 2 * c->bw};
 		
 	/* Update scene-graph, including borders */
 	wlr_scene_node_set_position(&c->scene->node, c->geom.x, c->geom.y);
 	wlr_scene_node_set_position(&c->scene_surface->node, c->bw, c->bw);
 	wlr_scene_rect_set_size(c->border[0], c->geom.width, c->bw);
 	wlr_scene_rect_set_size(c->border[1], c->geom.width, c->bw);
-	if(!c->isnoclip){
-		wlr_scene_rect_set_size(c->border[2], c->bw, surface.height);
-		wlr_scene_rect_set_size(c->border[3], c->bw, surface.height);
-	}else{
-		wlr_scene_rect_set_size(c->border[2], c->bw, c->geom.height - 2 * c->bw);
-		wlr_scene_rect_set_size(c->border[3], c->bw, c->geom.height - 2 * c->bw);
-	}
-
+	wlr_scene_rect_set_size(c->border[2], c->bw, c->geom.height - 2 * c->bw);
+	wlr_scene_rect_set_size(c->border[3], c->bw, c->geom.height - 2 * c->bw);
+	wlr_scene_node_set_position(&c->border[1]->node, 0, c->geom.height - c->bw);
+	wlr_scene_node_set_position(&c->border[2]->node, 0, c->bw);
+	wlr_scene_node_set_position(&c->border[3]->node, c->geom.width - c->bw, c->bw);
 	wlr_scene_node_set_position(&c->border[1]->node, 0, c->geom.height - c->bw);
 	wlr_scene_node_set_position(&c->border[2]->node, 0, c->bw);
 	wlr_scene_node_set_position(&c->border[3]->node, c->geom.width - c->bw, c->bw);
 
 	if(!c->isnoclip){
-		//使用裁剪的窗口大小,避免窗口拒绝重置大小导致布局混乱
 		c->resize = client_set_size(c, c->geom.width - 2 * c->bw,
-			c->geom.height - 2 * c->bw);
+				c->geom.height - 2 * c->bw);
 		client_get_clip(c, &clip);
 		wlr_scene_subsurface_tree_set_clip(&c->scene_surface->node, &clip);
 	}else {
