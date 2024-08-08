@@ -30,13 +30,8 @@ if xcb.found() and xlibs.found()
 executable('dwl',
   'dwl.c',
   'util.c',
-  'dwl-ipc-unstable-v2-protocol.c',
-  'dwl-ipc-unstable-v2-protocol.h',
   'wlr_foreign_toplevel_management_v1.c',
   'wlr_foreign_toplevel_management_v1.h',
-  'wlr-foreign-toplevel-management-unstable-v1-protocol.c',
-  'wlr-foreign-toplevel-management-unstable-v1-protocol.h',
-  'IM.h',
   wayland_sources,
   dependencies : [
     libm,

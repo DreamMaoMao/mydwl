@@ -21,7 +21,10 @@
         "cstdint": "c",
         "array": "c",
         "string_view": "c",
-        "span": "c"
+        "span": "c",
+        "wlr_pointer_constraints_v1.h": "c",
+        "region.h": "c",
+        "wlr_relative_pointer_v1.h": "c"
     },
     "mesonbuild.configureOnOpen": false
 }
