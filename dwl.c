@@ -2882,7 +2882,7 @@ motionnotify(uint32_t time, struct wlr_input_device *device, double dx, double d
 		/* Update selmon (even while dragging a window) */
 		if (sloppyfocus)
 			selmon = xytomon(cursor->x, cursor->y);
-	}
+		}
 
 	/* Update drag icon's position */
 	wlr_scene_node_set_position(&drag_icon->node, cursor->x, cursor->y);
@@ -3054,7 +3054,12 @@ pointerfocus(Client *c, struct wlr_surface *surface, double sx, double sy,
 			sloppyfocus && time && c && !client_is_unmanaged(c))
 		focusclient(c, 0);
 
-	/* If surface is NULL, clear pointer focus */
+	/* If surface is NULL, try use the focused client surface to set pointer foucs */
+	if (!surface && selmon && selmon->sel) {
+		surface = client_surface(selmon->sel);
+	}
+
+	/* If surface is still NULL, clear pointer focus */
 	if (!surface) {
 		wlr_seat_pointer_notify_clear_focus(seat);
 		return;
