@@ -4974,10 +4974,9 @@ activatex11(struct wl_listener *listener, void *data)
 	}
 }
 
-void
+void //0.7
 configurex11(struct wl_listener *listener, void *data)
 {
-
 	Client *c = wl_container_of(listener, c, configure);
 	struct wlr_xwayland_surface_configure_event *event = data;
 	if (!client_surface(c) || !client_surface(c)->mapped) {
@@ -4985,7 +4984,6 @@ configurex11(struct wl_listener *listener, void *data)
 				event->x, event->y, event->width, event->height);
 		return;
 	}
-
 	if ((c->isfloating && c != grabc)
 			|| client_is_unmanaged(c) || !c->mon->lt[c->mon->sellt]->arrange)
 		resize(c, (struct wlr_box){.x = event->x - c->bw, .y = event->y - c->bw,
