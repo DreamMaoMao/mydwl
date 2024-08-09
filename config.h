@@ -90,6 +90,7 @@ static const Rule rules[] = {
 	{ NULL,  									"qxdrag",        	0,       		1,   0, 	0,	0,-1, 400,300},
 	{ NULL,  									"rofi - Networks",  0,       		1,   0, 	1,	1,-1, 0,0},
 	{ "Rofi",  									NULL,        		0,       		1,   0, 	1,	1,-1, 0,0},
+	{ "wofi",  									NULL,        		0,       		1,   0, 	1,	1,-1, 0,0},
 
 };
 
@@ -188,7 +189,7 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 static const Key keys[] = {
 	/* Note that Shift changes certain key codes: c -> C, 2 -> at, etc. */
 	/* modifier                  			key                 	function        			argument */
-	{ MODKEY,					 			XKB_KEY_space,      	spawn,          			SHCMD("wofi -c $DWL/wofi/config_menu -s $DWL/wofi/style.css") },
+	{ MODKEY,					 			XKB_KEY_space,      	spawn,          			SHCMD("wofi --normal-window -c $DWL/wofi/config -s $DWL/wofi/style.css") },
 	{ MODKEY, 					 			XKB_KEY_Return,     	spawn,          			SHCMD("foot") },
     { WLR_MODIFIER_LOGO,         			XKB_KEY_Return, 		spawn, 						SHCMD("google-chrome") },
     { WLR_MODIFIER_LOGO,         			XKB_KEY_space, 			spawn, 						SHCMD("microsoft-edge") },

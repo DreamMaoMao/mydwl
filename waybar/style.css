@@ -467,7 +467,10 @@ label:focus {
     margin-left: 1px;
     padding-top: 3px;
     padding-bottom: 3px;
-    background-color:#f9e2af ;
+    background-color: #a6e3a1 ;
+    border: none;
+    border-bottom: 7px solid #79b574;
+    border-radius: 15px;
 }
 
 

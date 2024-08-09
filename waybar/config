@@ -40,7 +40,7 @@
         "markup": true,
         "on-click": "activate",
         "on-click-right": "close",
-        "ignore-list": ["Rofi"]
+        "ignore-list": ["Rofi","wofi"]
       },
  "pulseaudio": {
         "interval":1,
@@ -154,7 +154,7 @@
     "network": {
         "interval": 2,
         "format-wifi": "{essid} ({signalStrength}%)\uf1eb",
-        "format-ethernet": "\uf796 ",
+        "format-ethernet": "󰈀  {ifname}",
         "format-linked": "\uf059 No IP ({ifname})",
         "format-disconnected": "\uf071 Disconnected",
         "tooltip-format": "{ifname} {ipaddr}/{cidr} via {gwaddr}",
