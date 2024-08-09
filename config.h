@@ -75,6 +75,7 @@ static const Rule rules[] = {
 	{ NULL,  									"图片查看器",   	0,       		1,   0, 	0,	0,-1, 0,0},
 	{ NULL,  									"图片查看",     	0,       		1,   0, 	0,	0,-1, 0,0},
 	{ NULL,  									"选择文件",     	0,       		1,   0, 	0,	0,-1, 1200,800},
+	{ NULL,  									"打开文件",     	0,       		1,   0, 	0,	0,-1, 1200,800},
 	{ "polkit-gnome-authentication-agent-1",  	NULL,       		0,       		1,   0, 	1,	1,-1, 930,230},
 	{ "blueman-manager",  						NULL,       		0,       		1,   0, 	0,	0,-1, 700,600},
 	{ "clash-verge",  							NULL,       		0,       		1,   0, 	0,	0,-1, 1200,800},
@@ -87,8 +88,8 @@ static const Rule rules[] = {
 	{ "alixby3",  								NULL,       		0,       		1,   0, 	0,	0,-1, 1400,800},
 	{ "qxdrag.py",  							NULL,       		0,       		1,   0, 	0,	0,-1, 400,300},
 	{ NULL,  									"qxdrag",        	0,       		1,   0, 	0,	0,-1, 400,300},
-	{ NULL,  									"rofi - Networks",  0,       		1,   0, 	1,	1,-1, 400,400},
-	{ "Rofi",  									NULL,        		0,       		1,   0, 	1,	1,-1, 900,900},
+	{ NULL,  									"rofi - Networks",  0,       		1,   0, 	1,	1,-1, 0,0},
+	{ "Rofi",  									NULL,        		0,       		1,   0, 	1,	1,-1, 0,0},
 
 };
 
