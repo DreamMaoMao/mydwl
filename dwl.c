@@ -74,9 +74,6 @@
 #include "wlr_foreign_toplevel_management_v1.h"
 
 
-#define WheelUp			0xfffffff1
-#define WheelDown		0x0000000f
-
 /* macros */
 #define MAX(A, B)               ((A) > (B) ? (A) : (B))
 #define MIN(A, B)               ((A) < (B) ? (A) : (B))
@@ -93,6 +90,7 @@
 /* enums */
 enum { CurNormal, CurPressed, CurMove, CurResize }; /* cursor */
 enum { XDGShell, LayerShell, X11 }; /* client types */
+enum { AxisUp, AxisRight, AxisDown, AxisLeft }; //滚轮滚动的方向
 enum { LyrBg, LyrBottom, LyrTile, LyrFloat, LyrFS, LyrTop, LyrOverlay,
 #ifdef IM
        LyrIMPopup,
@@ -120,10 +118,10 @@ typedef struct {
 
 typedef struct {
 	unsigned int mod;
-	double wheel;
+	unsigned int dir;
 	void (*func)(const Arg *);
 	const Arg arg;
-} Wheel;  //滚轮
+} Axis;
 
 typedef struct Pertag Pertag;
 typedef struct Monitor Monitor;
@@ -1157,7 +1155,8 @@ axisnotify(struct wl_listener *listener, void *data)
 	struct wlr_pointer_axis_event *event = data;
 	struct wlr_keyboard *keyboard;
 	uint32_t mods;
-	const Wheel *w;
+	const Axis *a;
+	unsigned int adir;
 	// IDLE_NOTIFY_ACTIVITY;
 	wlr_idle_notifier_v1_notify_activity(idle_notifier, seat);
 	keyboard = wlr_seat_get_keyboard(seat);
@@ -1165,11 +1164,16 @@ axisnotify(struct wl_listener *listener, void *data)
 	//获取当前按键的mask,比如alt+super或者alt+ctrl
 	mods = keyboard ? wlr_keyboard_get_modifiers(keyboard) : 0;
 
+	if (event->orientation == WLR_AXIS_ORIENTATION_VERTICAL)
+		adir = event->delta > 0 ? AxisDown : AxisUp;
+	else
+		adir = event->delta > 0 ? AxisRight : AxisLeft;
+
 	//处理滚轮事件绑定的函数
-	for (w = wheels; w < END(wheels); w++) {
-		if (CLEANMASK(mods) == CLEANMASK(w->mod) && //按键一致
-				(unsigned int)event->delta == w->wheel && w->func) { //滚轮方向判断一致且处理函数存在
-			w->func(&w->arg);
+	for (a = axes; a < END(axes); a++) {
+		if (CLEANMASK(mods) == CLEANMASK(a->mod) && //按键一致
+				adir == a->dir && a->func) { //滚轮方向判断一致且处理函数存在
+			a->func(&a->arg);
 			return; //如果成功匹配就不把这个滚轮事件传送给客户端了
 		}
 	}

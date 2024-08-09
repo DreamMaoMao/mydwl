@@ -90,7 +90,7 @@ static const Rule rules[] = {
 	{ NULL,  									"qxdrag",        	0,       		1,   0, 	0,	0,-1, 400,300},
 	{ NULL,  									"rofi - Networks",  0,       		1,   0, 	1,	1,-1, 0,0},
 	{ "Rofi",  									NULL,        		0,       		1,   0, 	1,	1,-1, 0,0},
-	{ "wofi",  									NULL,        		0,       		1,   0, 	1,	1,-1, 0,0},
+	{ "wofi",  									NULL,        		0,       		1,   0, 	0,	1,-1, 0,0},
 
 };
 
@@ -287,7 +287,7 @@ static const Button buttons[] = {
 	{ 0, 					BTN_RIGHT,  	killclient,     			{0} },
 };
 
-static const Wheel wheels[] = {
-	{ WLR_MODIFIER_LOGO, WheelUp, 	viewtoleft_have_client, 	{0} }, //中键+super向前切换工作区
-	{ WLR_MODIFIER_LOGO, WheelDown, viewtoright_have_client, 	{0} }, //中键+super向后切换工作区
+static const Axis axes[] = {
+	{ WLR_MODIFIER_LOGO, AxisUp, 	viewtoleft_have_client, 	{0} }, //中键+super向前切换工作区
+	{ WLR_MODIFIER_LOGO, AxisDown, viewtoright_have_client, 	{0} }, //中键+super向后切换工作区
 };
