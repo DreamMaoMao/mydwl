@@ -1233,6 +1233,7 @@ buttonpress(struct wl_listener *listener, void *data)
 			/* Drop the window off on its new monitor */
 			selmon = xytomon(cursor->x, cursor->y);
 			setmon(grabc, selmon, 0);
+			grabc = NULL;
 			return;
 		} else {
 			cursor_mode = CurNormal;
@@ -4979,15 +4980,16 @@ configurex11(struct wl_listener *listener, void *data)
 
 	Client *c = wl_container_of(listener, c, configure);
 	struct wlr_xwayland_surface_configure_event *event = data;
-	if (!c->mon) {
+	if (!client_surface(c) || !client_surface(c)->mapped) {
 		wlr_xwayland_surface_configure(c->surface.xwayland,
 				event->x, event->y, event->width, event->height);
 		return;
 	}
-	if (c->isfloating || client_is_unmanaged(c)){
-		resize(c, (struct wlr_box){.x = event->x, .y = event->y,
-				.width = event->width, .height = event->height}, 0);
-	}
+
+	if ((c->isfloating && c != grabc)
+			|| client_is_unmanaged(c) || !c->mon->lt[c->mon->sellt]->arrange)
+		resize(c, (struct wlr_box){.x = event->x - c->bw, .y = event->y - c->bw,
+				.width = event->width + c->bw * 2, .height = event->height + c->bw * 2}, 0);
 	else
 		arrange(c->mon);
 }
