@@ -21,8 +21,8 @@ wlsunset -T 3501 -t 3500 &
 swaybg -i $DWL/wallpaper/caoyuan.jpg & # 壁纸
 waybar -c $DWL/waybar/config -s $DWL/waybar/style.css &
 echo "Xft.dpi: 140" | xrdb -merge #dpi缩放
-cp ~/.config/zellij/configwayland.kdl ~/.config/zellij/config.kdl
-cp ~/.config/fcitx/dwm_profile ~/.config/fcitx/profile -f
+# cp ~/.config/zellij/configwayland.kdl ~/.config/zellij/config.kdl
+# cp ~/.config/fcitx/dwm_profile ~/.config/fcitx/profile -f
 # 开启输入法
 fcitx5 &
 systemctl --user mask xdg-desktop-portal-gnome
