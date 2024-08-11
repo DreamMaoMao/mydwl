@@ -4988,8 +4988,13 @@ configurex11(struct wl_listener *listener, void *data)
 				event->x, event->y, event->width, event->height);
 		return;
 	}
-	if ((c->isfloating && c != grabc)
-			|| client_is_unmanaged(c) || !c->mon->lt[c->mon->sellt]->arrange)
+	if (client_is_unmanaged(c)) {
+		wlr_scene_node_set_position(&c->scene->node, event->x, event->y);
+		wlr_xwayland_surface_configure(c->surface.xwayland,
+				event->x, event->y, event->width, event->height);
+		return;
+	}
+	if ((c->isfloating && c != grabc) || !c->mon->lt[c->mon->sellt]->arrange)
 		resize(c, (struct wlr_box){.x = event->x - c->bw, .y = event->y - c->bw,
 				.width = event->width + c->bw * 2, .height = event->height + c->bw * 2}, 0);
 	else
