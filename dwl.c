@@ -4172,8 +4172,7 @@ void overview_restore(Client *c, const Arg *arg) {
     // XRaiseWindow(dpy, c->win); // 提升悬浮窗口到顶层
     resizeclient(c, c->overview_backup_x, c->overview_backup_y, c->overview_backup_w,
            c->overview_backup_h, 1);
-  }
-  if (c->isfullscreen ||c->isfakefullscreen ||c->isrealfullscreen) {
+  } else if (c->isfullscreen ||c->isfakefullscreen ||c->isrealfullscreen) {
 	if (want_restore_fullscreen(c)) { //如果同tag有其他窗口,且其他窗口是将要聚焦的,那么不恢复该窗口的全屏状态
     	resizeclient(c, c->overview_backup_x, c->overview_backup_y,
     	             c->overview_backup_w, c->overview_backup_h,1);
@@ -4182,9 +4181,12 @@ void overview_restore(Client *c, const Arg *arg) {
 		c->isfakefullscreen = 0;
 		c->isrealfullscreen = 0;
 	}
+  } else {
+    resizeclient(c, c->overview_backup_x, c->overview_backup_y, c->overview_backup_w,
+           c->overview_backup_h, 0);	
   }
 
-  if(c->bw == 0 && !c->isrealfullscreen) { //如果是在ov模式中创建的窗口,没有bw记录
+  if(c->bw == 0 && !c->isnoborder && !c->isrealfullscreen) { //如果是在ov模式中创建的窗口,没有bw记录
 	c->bw = borderpx;
   }
 
