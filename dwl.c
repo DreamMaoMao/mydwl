@@ -889,6 +889,10 @@ void //17
 arrange(Monitor *m)
 {
 	Client *c;
+
+	if (!m->wlr_output->enabled)
+		return;
+
 	wl_list_for_each(c, &clients, link) {
 		if(c->mon == m && c->isglobal) {
 			c->tags =  m->tagset[m->seltags];
