@@ -40,6 +40,7 @@ nm-applet &
 # numlockx on
 [ -e /dev/sda4 ] && udisksctl mount -t ext4 -b /dev/sda4
 python3 ~/tool/sign.py &
+cp ~/.config/eww/System-Menu/eww.yuck.hyprland  ~/.config/eww/System-Menu/eww.yuck
 eww daemon &
 
 ~/.config/hypr/scripts/idle.sh &
