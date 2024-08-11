@@ -4996,7 +4996,6 @@ configurex11(struct wl_listener *listener, void *data)
 		arrange(c->mon);
 }
 
-
 /*创建窗口监测函数*/
 void
 createnotifyx11(struct wl_listener *listener, void *data)
