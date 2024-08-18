@@ -3476,6 +3476,11 @@ setfakefullscreen(Client *c, int fakefullscreen)
 	// wlr_scene_node_reparent(&c->scene->node, layers[fullscreen
 	// 		? LyrFS : c->isfloating ? LyrFloat : LyrTile]);
 
+	if (selmon->isoverview) {
+		Arg arg = {0};
+		toggleoverview(&arg);
+	}
+
 	if (fakefullscreen) {
 		c->prev = c->geom;
 		fakefullscreen_box.x = c->mon->w.x + gappov;
