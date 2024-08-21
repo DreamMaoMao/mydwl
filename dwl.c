@@ -3468,12 +3468,12 @@ setfakefullscreen(Client *c, int fakefullscreen)
 	// wlr_scene_node_reparent(&c->scene->node, layers[fullscreen
 	// 		? LyrFS : c->isfloating ? LyrFloat : LyrTile]);
 
-	if (selmon->isoverview) {
-		Arg arg = {0};
-		toggleoverview(&arg);
-	}
-
 	if (fakefullscreen) {
+		if (selmon->isoverview) {
+			Arg arg = {0};
+			toggleoverview(&arg);
+		}
+
 		c->prev = c->geom;
 		fakefullscreen_box.x = c->mon->w.x + gappov;
 		fakefullscreen_box.y = c->mon->w.y + gappoh;
@@ -3503,14 +3503,15 @@ setfullscreen(Client *c, int fullscreen) //用自定义全屏代理自带全屏
 	if (!c || !c->mon || !client_surface(c)->mapped)
 		return;
 
-	if (selmon->isoverview) {
-		Arg arg = {0};
-		toggleoverview(&arg);
-	}
-
 	client_set_fullscreen(c, fullscreen);
 
 	if (fullscreen) {
+
+		if (selmon->isoverview) {
+			Arg arg = {0};
+			toggleoverview(&arg);
+		}
+
 		c->bw = 0;
 		wlr_scene_node_raise_to_top(&c->scene->node); //将视图提升到顶层
 		resize(c, c->mon->m, 0);
