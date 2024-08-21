@@ -2316,20 +2316,11 @@ focustop(Monitor *m)
 	return NULL;
 }
 
-void
+void // 0.6
 fullscreennotify(struct wl_listener *listener, void *data)
 {
-	// Client *c = wl_container_of(listener, c, fullscreen);
-	// setfullscreen(c, client_wants_fullscreen(c));
-	Client *c = selmon->sel;
-	if(!c){
-		return;  //没有聚焦的窗口就什么也不操作
-	}
-	if(c->isrealfullscreen){
-		setrealfullscreen(c,0); //自带的全屏函数容易黑屏有bug,换这个就没有问题
-	}else {
-		setrealfullscreen(c,1);
-	}
+	Client *c = wl_container_of(listener, c, fullscreen);
+	setfullscreen(c, client_wants_fullscreen(c));
 }
 
 void
