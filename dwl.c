@@ -3427,9 +3427,7 @@ setfloating(Client *c, int floating)
 	if (!c || !c->mon || !client_surface(c)->mapped)
 		return;
 
-	wlr_scene_node_reparent(&c->scene->node, layers[c->isfullscreen ||
-			(p && p->isfullscreen) ? LyrFS
-			: c->isfloating ? LyrFloat : LyrTile]);
+	wlr_scene_node_reparent(&c->scene->node, layers[c->isfloating ? LyrFloat : LyrTile]);
 
 	if (floating == 1) { 
 		if(c->istiled) {
