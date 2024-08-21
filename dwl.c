@@ -83,7 +83,7 @@
 #define END(A)                  ((A) + LENGTH(A))
 #define TAGMASK                 ((1 << LENGTH(tags)) - 1)
 #define LISTEN(E, L, H)         wl_signal_add((E), ((L)->notify = (H), (L)))
-#define ISFULLSCREEN(A)			((A)->isfullscreen || (A)->isfakefullscreen || (A)->isrealfullscreen || (A)->overview_isfakefullscreenbak || (A)->overview_isfullscreenbak || (A)->overview_isrealfullscreenbak)
+#define ISFULLSCREEN(A)			((A)->isfullscreen || (A)->isfakefullscreen || (A)->overview_isfakefullscreenbak || (A)->overview_isfullscreenbak)
 #define LISTEN_STATIC(E, H)     do { static struct wl_listener _l = {.notify = (H)}; wl_signal_add((E), &_l); } while (0)
 
 /* enums */
@@ -159,12 +159,12 @@ typedef struct {
 	unsigned int tags,oldtags;
 	struct wlr_foreign_toplevel_handle_v1 *foreign_toplevel;
 	int isfloating, isurgent, isfullscreen, istiled, isminied;
-	int isfakefullscreen,isrealfullscreen;
+	int isfakefullscreen;
   	int overview_backup_x, overview_backup_y, overview_backup_w,
   	    overview_backup_h, overview_backup_bw;
   	int fullscreen_backup_x, fullscreen_backup_y, fullscreen_backup_w,
   	    fullscreen_backup_h;
-	int overview_isfullscreenbak,overview_isfakefullscreenbak,overview_isrealfullscreenbak,overview_isfloatingbak;
+	int overview_isfullscreenbak,overview_isfakefullscreenbak,overview_isfloatingbak;
 	uint32_t resize; /* configure serial of a pending resize */
 
 	struct wlr_xdg_toplevel_decoration_v1 *decoration;
@@ -239,7 +239,7 @@ struct Monitor {
 	struct wl_list link;
 	struct wlr_output *wlr_output;
 	struct wlr_scene_output *scene_output;
-	struct wlr_scene_rect *fullscreen_bg; /* See createmon() for info */
+	// struct wlr_scene_rect *fullscreen_bg; /* See createmon() for info */
 	struct wl_listener frame;
 	struct wl_listener destroy;
 	struct wl_listener request_state;
@@ -436,7 +436,6 @@ static void grid(Monitor *m, unsigned int gappo, unsigned int uappi);
 static void togglefloating(const Arg *arg);
 static void togglefullscreen(const Arg *arg);
 static void togglefakefullscreen(const Arg *arg);
-static void togglerealfullscreen(const Arg *arg);
 static void togglegaps(const Arg *arg);
 static void toggletag(const Arg *arg);
 static void toggleview(const Arg *arg);
@@ -605,10 +604,9 @@ applybounds(Client *c, struct wlr_box *bbox)
 
 /*清除全屏标志,还原全屏时清0的border*/
 void clear_fullscreen_flag(Client *c) {
-  if (c->isfullscreen || c->isfakefullscreen || c->isrealfullscreen ) {
+  if (c->isfullscreen || c->isfakefullscreen) {
     c->isfullscreen = 0;
     c->isfakefullscreen = 0;
-    c->isrealfullscreen = 0;
     c->bw = borderpx;
 	client_set_fullscreen(c, false);
   }
@@ -657,10 +655,9 @@ void restore_minized(const Arg *arg) {
 
 void show_scratchpad(Client *c) {
 	c->is_scratchpad_show = 1;
-  	if (c->isfullscreen || c->isfakefullscreen ||c->isrealfullscreen ) {
+  	if (c->isfullscreen || c->isfakefullscreen) {
   		c->isfullscreen = 0; // 清除窗口全屏标志
 		c->isfakefullscreen = 0;
-		c->isrealfullscreen = 0;
 		c->bw = borderpx; // 恢复非全屏的border
   	}
 	/* return if fullscreen */
@@ -858,7 +855,6 @@ applyrules(Client *c)
 				c->geom = setclient_coordinate_center(c->geom);
 			}
 			if(r->isfullscreen){
-				c->isrealfullscreen =1;
 				c->isfullscreen =1;
 				c->ignore_clear_fullscreen = 1;
 			}
@@ -875,7 +871,7 @@ applyrules(Client *c)
   		if (fc && !c->ignore_clear_fullscreen && c->tags & fc->tags && ISFULLSCREEN(fc) && !c->isfloating ) {
   		  	clear_fullscreen_flag(fc);
 			arrange(c->mon);
-  		}else if(c->ignore_clear_fullscreen && c->isrealfullscreen){
+  		}else if(c->ignore_clear_fullscreen && c->isfullscreen){
 			setfullscreen(c,1);
 		}
 
@@ -903,8 +899,9 @@ arrange(Monitor *m)
 		}
 	}
 
-	wlr_scene_node_set_enabled(&m->fullscreen_bg->node,
-			(c = focustop(m)) && c->isfullscreen);
+	// 给全屏窗口设置背景为黑色 好像要跟LyrFS图层一起使用，我不用这个图层，所以注释掉
+	// wlr_scene_node_set_enabled(&m->fullscreen_bg->node,
+	// 		(c = focustop(m)) && c->isfullscreen);
 
 
 
@@ -950,7 +947,7 @@ Client *direction_select(const Arg *arg) {
 		return NULL;
 
 	if (tc &&
-	    (tc->isfullscreen || tc->isfakefullscreen || tc->isrealfullscreen )) /* no support for focusstack with fullscreen windows */
+	    (tc->isfullscreen || tc->isfakefullscreen)) /* no support for focusstack with fullscreen windows */
 	  return NULL;
 
 	wl_list_for_each(c, &clients, link)
@@ -1349,7 +1346,7 @@ cleanupmon(struct wl_listener *listener, void *data)
 	wlr_scene_output_destroy(m->scene_output);
 
 	closemon(m);
-	wlr_scene_node_destroy(&m->fullscreen_bg->node);
+	// wlr_scene_node_destroy(&m->fullscreen_bg->node);
 	free(m);
 }
 
@@ -1660,8 +1657,8 @@ createmon(struct wl_listener *listener, void *data)
 	 *
 	 */
 	/* updatemons() will resize and set correct position */
-	m->fullscreen_bg = wlr_scene_rect_create(layers[LyrFS], 0, 0, fullscreen_bg);
-	wlr_scene_node_set_enabled(&m->fullscreen_bg->node, 0);
+	// m->fullscreen_bg = wlr_scene_rect_create(layers[LyrFS], 0, 0, fullscreen_bg);
+	// wlr_scene_node_set_enabled(&m->fullscreen_bg->node, 0);
 
 	/* Adds this to the output layout in the order it was configured in.
 	 *
@@ -2662,7 +2659,7 @@ mapnotify(struct wl_listener *listener, void *data)
 	c->geom.width += 2 * c->bw;
 	c->geom.height += 2 * c->bw;
 	c->isfakefullscreen = 0;
-	c->isrealfullscreen = 0;	
+	c->isfullscreen = 0;	
 	c->istiled = 0;
 	c->ignore_clear_fullscreen = 0;
 	c->iskilling = 0;
@@ -3288,7 +3285,7 @@ void exchange_two_client(Client *c1, Client *c2) {
 
 void exchange_client(const Arg *arg) {
   Client *c = selmon->sel;
-  if (!c || c->isfloating || c->isfullscreen || c->isfakefullscreen || c->isrealfullscreen)
+  if (!c || c->isfloating || c->isfullscreen || c->isfakefullscreen)
     return;
   exchange_two_client(c, direction_select(arg));
 }
@@ -3457,12 +3454,13 @@ setfloating(Client *c, int floating)
 void
 setfakefullscreen(Client *c, int fakefullscreen)
 {
-	c->isfakefullscreen = fakefullscreen;
 	struct wlr_box  fakefullscreen_box;
 	if (!c || !c->mon || !client_surface(c)->mapped)
 		return;
+	c->isfakefullscreen = fakefullscreen;
+
 	// c->bw = fullscreen ? 0 : borderpx;
-	// client_set_fullscreen(c, fullscreen);
+	// client_set_fullscreen(c, fakefullscreen);
 	// wlr_scene_node_reparent(&c->scene->node, layers[fullscreen
 	// 		? LyrFS : c->isfloating ? LyrFloat : LyrTile]);
 
@@ -3488,32 +3486,33 @@ setfakefullscreen(Client *c, int fakefullscreen)
 		c->bw = borderpx;
 		c->isfakefullscreen = 0;
 		c->isfullscreen = 0;
-		c->isrealfullscreen = 0;
 		arrange(c->mon);
 		client_set_fullscreen(c, false);
 	}
 }
 
 void
-setfullscreen(Client *c, int realfullscreen) //用自定义全屏代理自带全屏
+setfullscreen(Client *c, int fullscreen) //用自定义全屏代理自带全屏
 {
-	c->isrealfullscreen = realfullscreen;
+	c->isfullscreen = fullscreen;
 
 	if (!c || !c->mon || !client_surface(c)->mapped)
 		return;
 
-	if (realfullscreen) {
+	client_set_fullscreen(c, fullscreen);
+
+	if (fullscreen) {
 		c->bw = 0;
 		wlr_scene_node_raise_to_top(&c->scene->node); //将视图提升到顶层
 		resize(c, c->mon->m, 0);
-		c->isrealfullscreen = 1;
+		c->isfullscreen = 1;
 		c->isfloating = 0;
 	} else {
 		/* restore previous size instead of arrange for floating windows since
 		 * client positions are set by the user and cannot be recalculated */
 		// resize(c, c->prev, 0);
 		c->bw = borderpx;
-		c->isrealfullscreen = 0;
+		c->isfullscreen = 0;
 		c->isfullscreen = 0;
 		c->isfakefullscreen = 0;
 		arrange(c->mon);
@@ -4103,7 +4102,7 @@ void overview_backup(Client *c) {
   c->overview_isfloatingbak = c->isfloating;
   c->overview_isfullscreenbak = c->isfullscreen;
   c->overview_isfakefullscreenbak = c->isfakefullscreen;
-  c->overview_isrealfullscreenbak = c->isrealfullscreen;
+  c->overview_isfullscreenbak = c->isfullscreen;
   c->overview_backup_x = c->geom.x;
   c->overview_backup_y = c->geom.y;
   c->overview_backup_w = c->geom.width;
@@ -4112,14 +4111,13 @@ void overview_backup(Client *c) {
   if (c->isfloating) {
     c->isfloating = 0;
   }
-  if (c->isfullscreen || c->isfakefullscreen ||c->isrealfullscreen ) {
+  if (c->isfullscreen || c->isfakefullscreen) {
     // if (c->bw == 0) { // 真全屏窗口清除x11全屏属性
     //   XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
     //                   PropModeReplace, (unsigned char *)0, 0);
     // }
     c->isfullscreen = 0; // 清除窗口全屏标志
 	c->isfakefullscreen = 0;
-	c->isrealfullscreen = 0;
   }
   c->bw = borderpx; // 恢复非全屏的border
 }
@@ -4129,31 +4127,28 @@ void overview_restore(Client *c, const Arg *arg) {
   c->isfloating = c->overview_isfloatingbak;
   c->isfullscreen = c->overview_isfullscreenbak;
   c->isfakefullscreen = c->overview_isfakefullscreenbak;
-  c->isrealfullscreen = c->overview_isrealfullscreenbak;
   c->overview_isfloatingbak = 0;
   c->overview_isfullscreenbak = 0;
   c->overview_isfakefullscreenbak = 0;
-  c->overview_isrealfullscreenbak = 0;
   c->bw = c->overview_backup_bw;
   if (c->isfloating) {
     // XRaiseWindow(dpy, c->win); // 提升悬浮窗口到顶层
     resizeclient(c, c->overview_backup_x, c->overview_backup_y, c->overview_backup_w,
            c->overview_backup_h, 1);
-  } else if (c->isfullscreen ||c->isfakefullscreen ||c->isrealfullscreen) {
+  } else if (c->isfullscreen ||c->isfakefullscreen) {
 	if (want_restore_fullscreen(c)) { //如果同tag有其他窗口,且其他窗口是将要聚焦的,那么不恢复该窗口的全屏状态
     	resizeclient(c, c->overview_backup_x, c->overview_backup_y,
     	             c->overview_backup_w, c->overview_backup_h,1);
 	} else {
 		c->isfullscreen = 0;
 		c->isfakefullscreen = 0;
-		c->isrealfullscreen = 0;
 	}
   } else {
     resizeclient(c, c->overview_backup_x, c->overview_backup_y, c->overview_backup_w,
            c->overview_backup_h, 0);	
   }
 
-  if(c->bw == 0 && !c->isnoborder && !c->isrealfullscreen) { //如果是在ov模式中创建的窗口,没有bw记录
+  if(c->bw == 0 && !c->isnoborder && !c->isfullscreen) { //如果是在ov模式中创建的窗口,没有bw记录
 	c->bw = borderpx;
   }
 
@@ -4212,7 +4207,7 @@ tile(Monitor *m,unsigned int gappo, unsigned int uappi)
 	Client *c;
 
 	wl_list_for_each(c, &clients, link)
-		if (VISIBLEON(c, m) && !c->isfloating && !c->isfullscreen && !c->isrealfullscreen && !c->isfakefullscreen)
+		if (VISIBLEON(c, m) && !c->isfloating && !c->isfullscreen && !c->isfakefullscreen)
 			n++;
 	if (n == 0)
 		return;
@@ -4228,7 +4223,7 @@ tile(Monitor *m,unsigned int gappo, unsigned int uappi)
 	i = 0;
 	my = ty = m->gappoh*oe;
 	wl_list_for_each(c, &clients, link) {
-		if (!VISIBLEON(c, m) || c->isfloating || c->isfullscreen ||c->isrealfullscreen || c->isfakefullscreen )
+		if (!VISIBLEON(c, m) || c->isfloating || c->isfullscreen || c->isfakefullscreen )
 			continue;
 		if (i < m->nmaster) {
 			r = MIN(n, m->nmaster) - i;
@@ -4256,10 +4251,9 @@ togglefloating(const Arg *arg)
 	if(!sel)
 		return;
 
-  	if (sel->isfullscreen || sel->isfakefullscreen ||sel->isrealfullscreen ) {
+  	if (sel->isfullscreen || sel->isfakefullscreen) {
   		sel->isfullscreen = 0; // 清除窗口全屏标志
 		sel->isfakefullscreen = 0;
-		sel->isrealfullscreen = 0;
 		sel->bw = borderpx; // 恢复非全屏的border
   	}
 	/* return if fullscreen */
@@ -4271,14 +4265,19 @@ void
 togglefullscreen(const Arg *arg)
 {
 	Client *sel = focustop(selmon);
-	if (!sel)
+	if(!sel)
 		return;
+
 	if(sel->isfloating)
 		setfloating(sel, 0);
 
+	if (sel->isfullscreen || sel->isfakefullscreen)
+		setfullscreen(sel, 0);
+	else
+		setfullscreen(sel, 1);
+
 	sel->is_scratchpad_show = 0;
 	sel->is_in_scratchpad = 0;
-	setfullscreen(sel, !sel->isfullscreen);
 }
 
 void
@@ -4291,29 +4290,10 @@ togglefakefullscreen(const Arg *arg)
 	if(sel->isfloating)
 		setfloating(sel, 0);
 
-	if (sel->isfullscreen || sel->isfakefullscreen || sel->isrealfullscreen)
+	if (sel->isfullscreen || sel->isfakefullscreen)
 		setfakefullscreen(sel, 0);
 	else
 		setfakefullscreen(sel, 1);
-
-	sel->is_scratchpad_show = 0;
-	sel->is_in_scratchpad = 0;
-}
-
-void
-togglerealfullscreen(const Arg *arg)
-{
-	Client *sel = focustop(selmon);
-	if(!sel)
-		return;
-
-	if(sel->isfloating)
-		setfloating(sel, 0);
-
-	if (sel->isfullscreen || sel->isfakefullscreen || sel->isrealfullscreen)
-		setfullscreen(sel, 0);
-	else
-		setfullscreen(sel, 1);
 
 	sel->is_scratchpad_show = 0;
 	sel->is_in_scratchpad = 0;
@@ -4475,8 +4455,8 @@ updatemons(struct wl_listener *listener, void *data)
 		m->w = m->m;
 		wlr_scene_output_set_position(m->scene_output, m->m.x, m->m.y);
 
-		wlr_scene_node_set_position(&m->fullscreen_bg->node, m->m.x, m->m.y);
-		wlr_scene_rect_set_size(m->fullscreen_bg, m->m.width, m->m.height);
+		// wlr_scene_node_set_position(&m->fullscreen_bg->node, m->m.x, m->m.y);
+		// wlr_scene_rect_set_size(m->fullscreen_bg, m->m.width, m->m.height);
 
 		if (m->lock_surface) {
 			struct wlr_scene_tree *scene_tree = m->lock_surface->surface->data;

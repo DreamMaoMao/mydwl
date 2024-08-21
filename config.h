@@ -247,7 +247,7 @@ static const Key keys[] = {
 	{ WLR_MODIFIER_LOGO,                    XKB_KEY_n,          	switch_layout,      		{0} },
 	{ WLR_MODIFIER_ALT, 					XKB_KEY_backslash,      togglefloating, 			{0} },
 	{ MODKEY,                    			XKB_KEY_a,          	togglefakefullscreen, 		{0} },
-	{ MODKEY,                    			XKB_KEY_f,          	togglerealfullscreen, 		{0} },
+	{ MODKEY,                    			XKB_KEY_f,          	togglefullscreen, 		{0} },
 	{ WLR_MODIFIER_LOGO,                    XKB_KEY_i,          	minized, 					{0} },  //最小化,放入便签
 	{ WLR_MODIFIER_LOGO|WLR_MODIFIER_SHIFT, XKB_KEY_I,          	restore_minized, 			{0} },
 	{ WLR_MODIFIER_ALT, 					XKB_KEY_z,          	toggle_scratchpad, 			{0} },  //便签循环切换
