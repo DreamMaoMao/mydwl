@@ -416,7 +416,6 @@ static void setcursor(struct wl_listener *listener, void *data);
 static void setfloating(Client *c, int floating);
 static void setfullscreen(Client *c, int fullscreen);
 static void setfakefullscreen(Client *c, int fakefullscreen);
-static void setrealfullscreen(Client *c, int realfullscreen);
 static void setgaps(int oh, int ov, int ih, int iv);
 static void setlayout(const Arg *arg);
 static void switch_layout(const Arg *arg);
@@ -877,7 +876,7 @@ applyrules(Client *c)
   		  	clear_fullscreen_flag(fc);
 			arrange(c->mon);
   		}else if(c->ignore_clear_fullscreen && c->isrealfullscreen){
-			setrealfullscreen(c,1);
+			setfullscreen(c,1);
 		}
 
 	if(!(c->tags & ( 1 << (selmon->pertag->curtag - 1) ))){
@@ -3495,34 +3494,6 @@ setfakefullscreen(Client *c, int fakefullscreen)
 	}
 }
 
-
-void
-setrealfullscreen(Client *c, int realfullscreen)
-{
-	c->isrealfullscreen = realfullscreen;
-
-	if (!c || !c->mon || !client_surface(c)->mapped)
-		return;
-
-	if (realfullscreen) {
-		c->bw = 0;
-		wlr_scene_node_raise_to_top(&c->scene->node); //将视图提升到顶层
-		resize(c, c->mon->m, 0);
-		c->isrealfullscreen = 1;
-		c->isfloating = 0;
-	} else {
-		/* restore previous size instead of arrange for floating windows since
-		 * client positions are set by the user and cannot be recalculated */
-		// resize(c, c->prev, 0);
-		c->bw = borderpx;
-		c->isrealfullscreen = 0;
-		c->isfullscreen = 0;
-		c->isfakefullscreen = 0;
-		arrange(c->mon);
-		// client_set_fullscreen(c, false);
-	}
-}
-
 void
 setfullscreen(Client *c, int realfullscreen) //用自定义全屏代理自带全屏
 {
@@ -4340,9 +4311,9 @@ togglerealfullscreen(const Arg *arg)
 		setfloating(sel, 0);
 
 	if (sel->isfullscreen || sel->isfakefullscreen || sel->isrealfullscreen)
-		setrealfullscreen(sel, 0);
+		setfullscreen(sel, 0);
 	else
-		setrealfullscreen(sel, 1);
+		setfullscreen(sel, 1);
 
 	sel->is_scratchpad_show = 0;
 	sel->is_in_scratchpad = 0;
