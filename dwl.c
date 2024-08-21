@@ -3421,12 +3421,14 @@ void //0.5
 setfloating(Client *c, int floating)
 {	
 
+	Client *fc;
 	c->isfloating = floating;
 
 	if (!c || !c->mon || !client_surface(c)->mapped)
 		return;
 
 	wlr_scene_node_reparent(&c->scene->node, layers[c->isfloating ? LyrFloat : LyrTile]);
+
 
 	if (floating == 1) { 
 		if(c->istiled) {
@@ -3442,6 +3444,11 @@ setfloating(Client *c, int floating)
 		c->istiled = 1; 
 		c->is_scratchpad_show = 0;
 		c->is_in_scratchpad = 0;
+  		//让当前tag中的全屏窗口退出全屏参与平铺
+		wl_list_for_each(fc, &clients, link)
+  			if (fc  && c->tags & fc->tags && ISFULLSCREEN(fc)) {
+  			  	clear_fullscreen_flag(fc);
+  			}
 	}
 
 	arrange(c->mon);
