@@ -3421,7 +3421,6 @@ void //0.5
 setfloating(Client *c, int floating)
 {	
 
-	Client *p = client_get_parent(c);
 	c->isfloating = floating;
 
 	if (!c || !c->mon || !client_surface(c)->mapped)
