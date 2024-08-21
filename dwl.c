@@ -3490,8 +3490,8 @@ setfakefullscreen(Client *c, int fakefullscreen)
 		c->bw = borderpx;
 		c->isfakefullscreen = 0;
 		c->isfullscreen = 0;
-		arrange(c->mon);
 		client_set_fullscreen(c, false);
+		arrange(c->mon);
 	}
 }
 
