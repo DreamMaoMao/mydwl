@@ -4146,6 +4146,7 @@ void overview_restore(Client *c, const Arg *arg) {
 	} else {
 		c->isfullscreen = 0;
 		c->isfakefullscreen = 0;
+		client_set_fullscreen(c,false);
 	}
   } else {
     resizeclient(c, c->overview_backup_x, c->overview_backup_y, c->overview_backup_w,
