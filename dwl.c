@@ -3503,6 +3503,11 @@ setfullscreen(Client *c, int fullscreen) //用自定义全屏代理自带全屏
 	if (!c || !c->mon || !client_surface(c)->mapped)
 		return;
 
+	if (selmon->isoverview) {
+		Arg arg = {0};
+		toggleoverview(&arg);
+	}
+
 	client_set_fullscreen(c, fullscreen);
 
 	if (fullscreen) {
