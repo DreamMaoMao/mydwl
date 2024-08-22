@@ -71,7 +71,7 @@ sudo pacman -S gdm
 sudo pacman -S wl-clipboard
 
 yay -S blueman acpi swaync jq alsa-utils polkit-gnome  light  swappy swaybg lm_sensors  network-manager-applet playerctl python3  wlsunset  xorg-xinit xorg-xwayland wlroots wayland-protocols pavucontrol ttf-jetbrains-mono-nerd eww-wayland wofi xdg-desktop-portal-hyprland cpufrequtils system-monitoring-center
-cliphist wl-clip-persist  wlogout-git rofi wlr-randr yazi fcitx5 fcitx5-im fcitx5-qt fcitx5-chinese-addon 
+cliphist wl-clip-persist  wlogout-git rofi wlr-randr yazi fcitx5 fcitx5-im fcitx5-qt fcitx5-chinese-addon  cinnamon-translations nemo-fileroller
 
 ```
 
