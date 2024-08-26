@@ -4064,13 +4064,12 @@ void grid(Monitor *m, unsigned int gappo, unsigned int gappi) {
     return;
   }
   if (n == 2) {
-    c = tempClients[0];
     cw = (m->w.width - 2 * gappo - gappi) / 2;
     ch = (m->w.height- 2 * gappo) * 0.65;
-    resizeclient(c, m->m.x + cw + gappo + gappi, m->m.y + (m->m.height - ch) / 2 + gappo,
-           cw - 2 * c->bw, ch - 2 * c->bw, 0);
-    resizeclient(tempClients[1], m->m.x + gappo, m->m.y + (m->m.height - ch) / 2 + gappo,
-           cw - 2 * c->bw, ch - 2 * c->bw, 0);
+    resizeclient(tempClients[1], m->m.x + cw + gappo + gappi, m->m.y + (m->m.height - ch) / 2 + gappo,
+           cw - 2 * tempClients[1]->bw, ch - 2 * tempClients[1]->bw, 0);
+    resizeclient(tempClients[0], m->m.x + gappo, m->m.y + (m->m.height - ch) / 2 + gappo,
+           cw - 2 * tempClients[0]->bw, ch - 2 * tempClients[0]->bw, 0);
 
     return;
   }
