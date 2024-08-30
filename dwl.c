@@ -4209,7 +4209,7 @@ void toggleoverview(const Arg *arg) {
 		}
   	} else {
 		wl_list_for_each(c, &clients, link){
-			if(c && c->iskilling && client_surface(c)->mapped)
+			if(c && !c->iskilling && client_surface(c)->mapped)
   	    		overview_restore(c, &(Arg){.ui = target});
 		}
   	}
