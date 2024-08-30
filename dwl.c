@@ -606,6 +606,7 @@ applybounds(Client *c, struct wlr_box *bbox)
 void clear_fullscreen_flag(Client *c) {
   if (c->isfullscreen || c->isfakefullscreen) {
     c->isfullscreen = 0;
+	c->isfloating = 0;
     c->isfakefullscreen = 0;
     c->bw = borderpx;
 	client_set_fullscreen(c, false);
@@ -2879,12 +2880,16 @@ motionnotify(uint32_t time, struct wlr_input_device *device, double dx, double d
 	/* If we are currently grabbing the mouse, handle and return */
 	if (cursor_mode == CurMove) {
 		/* Move the grabbed client to the new position. */
-		resize(grabc, (struct wlr_box){.x = cursor->x - grabcx, .y = cursor->y - grabcy,
+		grabc->oldgeom = (struct wlr_box){.x = cursor->x - grabcx, .y = cursor->y - grabcy, 
+			.width = grabc->geom.width, .height = grabc->geom.height};
+		resize(grabc, (struct wlr_box){.x = cursor->x - grabcx, .y = cursor->y - grabcy, 
 			.width = grabc->geom.width, .height = grabc->geom.height}, 1);
 		return;
 	} else if (cursor_mode == CurResize) {
+		grabc->oldgeom = (struct wlr_box){.x = grabc->geom.x, .y = grabc->geom.y,
+			.width = cursor->x - grabc->geom.x, .height = cursor->y - grabc->geom.y};
 		resize(grabc, (struct wlr_box){.x = grabc->geom.x, .y = grabc->geom.y,
-			.width = cursor->x - grabc->geom.x, .height = cursor->y - grabc->geom.y}, 1);
+		 	.width = cursor->x - grabc->geom.x, .height = cursor->y - grabc->geom.y} , 1);
 		return;
 	}
 
@@ -3301,7 +3306,6 @@ resize(Client *c, struct wlr_box geo, int interact)
 	
 	if (!c->mon)
 		return;
-
 	bbox = interact ? &sgeom : &c->mon->w;
 	
 	client_set_bounds(c, geo.width, geo.height); //去掉这个推荐的窗口大小,因为有时推荐的窗口特别大导致平铺异常
@@ -3436,7 +3440,11 @@ setfloating(Client *c, int floating)
 		//重新计算居中的坐标
 		c->geom = setclient_coordinate_center(c->geom);
 		applyrulesgeom(c);
-		resize(c,c->geom,0);
+		if (c->oldgeom.width > 0 && c->oldgeom.height >0) {
+			resize(c,c->oldgeom,0);
+		} else {
+			resize(c,c->geom,0);
+		}
 		c->istiled = 0; 
 	} else {
 		c->istiled = 1; 
@@ -3463,8 +3471,8 @@ setfakefullscreen(Client *c, int fakefullscreen)
 
 	// c->bw = fullscreen ? 0 : borderpx;
 	// client_set_fullscreen(c, fakefullscreen);
-	// wlr_scene_node_reparent(&c->scene->node, layers[fullscreen
-	// 		? LyrFS : c->isfloating ? LyrFloat : LyrTile]);
+	wlr_scene_node_reparent(&c->scene->node, layers[fakefullscreen
+			? LyrTile : c->isfloating ? LyrFloat : LyrTile]);
 
 	if (fakefullscreen) {
 		if (selmon->isoverview) {
@@ -3480,7 +3488,7 @@ setfakefullscreen(Client *c, int fakefullscreen)
 		wlr_scene_node_raise_to_top(&c->scene->node); //将视图提升到顶层
 		resize(c, fakefullscreen_box, 0);
 		c->isfakefullscreen = 1;
-		c->isfloating = 0;
+		// c->isfloating = 0;
 	} else {
 		/* restore previous size instead of arrange for floating windows since
 		 * client positions are set by the user and cannot be recalculated */
@@ -3489,6 +3497,7 @@ setfakefullscreen(Client *c, int fakefullscreen)
 		c->isfakefullscreen = 0;
 		c->isfullscreen = 0;
 		client_set_fullscreen(c, false);
+		if (c->isfloating) setfloating(c,1);
 		arrange(c->mon);
 	}
 }
@@ -3502,6 +3511,8 @@ setfullscreen(Client *c, int fullscreen) //用自定义全屏代理自带全屏
 		return;
 
 	client_set_fullscreen(c, fullscreen);
+	wlr_scene_node_reparent(&c->scene->node, layers[fullscreen
+			? LyrTile : c->isfloating ? LyrFloat : LyrTile]);
 
 	if (fullscreen) {
 
@@ -3514,7 +3525,7 @@ setfullscreen(Client *c, int fullscreen) //用自定义全屏代理自带全屏
 		wlr_scene_node_raise_to_top(&c->scene->node); //将视图提升到顶层
 		resize(c, c->mon->m, 0);
 		c->isfullscreen = 1;
-		c->isfloating = 0;
+		// c->isfloating = 0;
 	} else {
 		/* restore previous size instead of arrange for floating windows since
 		 * client positions are set by the user and cannot be recalculated */
@@ -3523,6 +3534,7 @@ setfullscreen(Client *c, int fullscreen) //用自定义全屏代理自带全屏
 		c->isfullscreen = 0;
 		c->isfullscreen = 0;
 		c->isfakefullscreen = 0;
+		if (c->isfloating) setfloating(c,1);
 		arrange(c->mon);
 	}
 }
@@ -4276,8 +4288,8 @@ togglefullscreen(const Arg *arg)
 	if(!sel)
 		return;
 
-	if(sel->isfloating)
-		setfloating(sel, 0);
+	// if(sel->isfloating)
+	// 	setfloating(sel, 0);
 
 	if (sel->isfullscreen || sel->isfakefullscreen)
 		setfullscreen(sel, 0);
@@ -4295,8 +4307,8 @@ togglefakefullscreen(const Arg *arg)
 	if(!sel)
 		return;
 
-	if(sel->isfloating)
-		setfloating(sel, 0);
+	// if(sel->isfloating)
+	// 	setfloating(sel, 0);
 
 	if (sel->isfullscreen || sel->isfakefullscreen)
 		setfakefullscreen(sel, 0);
