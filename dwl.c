@@ -2882,14 +2882,12 @@ motionnotify(uint32_t time, struct wlr_input_device *device, double dx, double d
 		/* Move the grabbed client to the new position. */
 		grabc->oldgeom = (struct wlr_box){.x = cursor->x - grabcx, .y = cursor->y - grabcy, 
 			.width = grabc->geom.width, .height = grabc->geom.height};
-		resize(grabc, (struct wlr_box){.x = cursor->x - grabcx, .y = cursor->y - grabcy, 
-			.width = grabc->geom.width, .height = grabc->geom.height}, 1);
+		resize(grabc, grabc->oldgeom, 1);
 		return;
 	} else if (cursor_mode == CurResize) {
 		grabc->oldgeom = (struct wlr_box){.x = grabc->geom.x, .y = grabc->geom.y,
 			.width = cursor->x - grabc->geom.x, .height = cursor->y - grabc->geom.y};
-		resize(grabc, (struct wlr_box){.x = grabc->geom.x, .y = grabc->geom.y,
-		 	.width = cursor->x - grabc->geom.x, .height = cursor->y - grabc->geom.y} , 1);
+		resize(grabc, grabc->oldgeom, 1);
 		return;
 	}
 
