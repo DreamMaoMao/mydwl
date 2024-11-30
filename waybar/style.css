@@ -19,26 +19,25 @@ window#waybar {
 
 #tags{
     background-color: transparent;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    margin-right: 1px;
-    margin-left: 1px;
+    margin-top: 14px;
+    margin-bottom: 14px;
+    margin-right: 8px;
+    margin-left: 10px;
 }
 
 #tags button{
     box-shadow: rgba(0, 0, 0, 0.5) 0 -3 5 5px;
-    background-color: rgb(185, 161, 122) ;
-    border-radius: 15px;
-    margin-right: 5px;
-    margin-left: 5px;
-    padding-top: 4px;
-    padding-bottom: 2px;
-    padding-right: 10px;
-    padding-left: 10px;
+    background-color: #fff ;
+    padding-bottom: 1px;
+    padding-top: 1px;
+    margin-right: 8px;
+    padding-right: 7px;
+    padding-left: 7px;
+    background-size: 300% 300%;
     font-weight: bolder;
-    color: 	#e7e0d4 ;
+    color: 	#a585cd ;
     border: none;
-    border-bottom: 6px solid rgb(135, 114, 81);
+    border-bottom: 6px solid #d6cdcd;
     border-radius: 15px;
 }
 
@@ -46,14 +45,15 @@ window#waybar {
 
 #tags button.occupied{
     box-shadow: rgba(0, 0, 0, 0.5) 0 -3 5 5px;
-    background-color: #edebe6 ;
-    border-radius: 15px;
-    padding-top: 4px;
-    padding-bottom: 2px;
-    padding-right: 10px;
-    padding-left: 10px;
+    background-color: #fff ;
+    padding-bottom: 1px;
+    padding-top: 1px;
+    margin-right: 8px;
+    padding-right: 7px;
+    padding-left: 7px;
+    background-size: 300% 300%;
     font-weight: bolder;
-    color: 	#9d75ce ;
+    color: 	#a585cd ;
     border: none;
     border-bottom: 6px solid #d6cdcd;
     border-radius: 15px;
@@ -61,16 +61,17 @@ window#waybar {
 
 #tags button.focused{
     box-shadow: rgba(0, 0, 0, 0.5) 0 -3 5 5px;
-    padding-right: 20px;
-    padding-left: 20px;
-    padding-bottom: 3px;
-    background: rgb(202,158,230);
-    /* background: linear-gradient(45deg, rgba(202,158,230,1) 0%, rgba(245,194,231,1) 43%, rgba(180,190,254,1) 80%, rgba(137,180,250,1) 100%);  */
+    background-color: rgb(186, 142, 213);
+    padding-bottom: 1px;
+    padding-top: 1px;
+    margin-right: 8px;
+    padding-right: 15px;
+    padding-left: 15px;
     background-size: 300% 300%;
-    /* animation: gradient 10s ease infinite; */
-    color: #fdfafd;
+    font-weight: bolder;
+    color: 	#fff ;
     border: none;
-    border-bottom: 6px solid rgb(144, 101, 171);
+    border-bottom: 6px solid rgb(143, 102, 168);
     border-radius: 15px;
 }
 
@@ -213,8 +214,8 @@ window#waybar {
     background-color: #cdd6f4;
     color: #516079;
     box-shadow: rgba(0, 0, 0, 0.116) 2 2 5 2px;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin-top: 12px;
+    margin-bottom: 12px;
     margin-right: 3px;
 }
 
