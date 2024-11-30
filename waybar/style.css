@@ -77,8 +77,11 @@ window#waybar {
 
 #tags button.urgent{
     box-shadow: rgba(0, 0, 0, 0.5) 0 -3 5 5px;
-    padding-right: 20px;
-    padding-left: 20px;
+    padding-bottom: 1px;
+    padding-top: 1px;
+    margin-right: 8px;
+    padding-right: 7px;
+    padding-left: 7px;
     padding-bottom: 3px;
     background: rgb(171, 101, 101);
     /* background: linear-gradient(45deg, rgba(202,158,230,1) 0%, rgba(245,194,231,1) 43%, rgba(180,190,254,1) 80%, rgba(137,180,250,1) 100%);  */
