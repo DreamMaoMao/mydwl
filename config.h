@@ -200,10 +200,10 @@ static const Key keys[] = {
 	{ WLR_MODIFIER_LOGO,         			XKB_KEY_l,          	spawn, 						SHCMD("swaylock -f -c 000000") }, 
     { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,   XKB_KEY_Return, 		spawn, 						SHCMD("foot -e ~/tool/ter-multiplexer.sh") },  
     // { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,   XKB_KEY_Return, 		spawn, 						SHCMD("foot -e \"zellij -s temp --config /home/wrq/.config/zellij/tempconfigwayland.kdl\"") },  
-    { WLR_MODIFIER_LOGO,   					XKB_KEY_space, 			spawn, 						SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show website") },  
-    { WLR_MODIFIER_LOGO|WLR_MODIFIER_ALT,   XKB_KEY_Return, 		spawn, 						SHCMD("rofi -normal-window -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/tool/movie.py") },  
+    /* { WLR_MODIFIER_LOGO,   					XKB_KEY_space, 			spawn, 						SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show website") },   */
+    // { WLR_MODIFIER_LOGO|WLR_MODIFIER_ALT,   XKB_KEY_Return, 		spawn, 						SHCMD("rofi -normal-window -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/tool/movie.py") },  
     { WLR_MODIFIER_CTRL,   					XKB_KEY_space, 			spawn, 						SHCMD("rofi -normal-window -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/search.py") },  
-    { WLR_MODIFIER_LOGO,   					XKB_KEY_c, 				spawn, 						SHCMD("rofi -normal-window -theme  ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/history.py") },  
+    { WLR_MODIFIER_LOGO,   					XKB_KEY_space, 				spawn, 						SHCMD("rofi -normal-window -theme  ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/history.py") },  
 
     { WLR_MODIFIER_CTRL,   					XKB_KEY_comma, 			spawn, 						SHCMD("~/.config/hypr/scripts/brightness.sh down") },  
     { WLR_MODIFIER_CTRL,   					XKB_KEY_period, 		spawn, 						SHCMD("~/.config/hypr/scripts/brightness.sh up") },  
