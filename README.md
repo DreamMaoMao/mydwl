@@ -85,7 +85,7 @@ sudo ninja -C build install
 
 # 安装waybar
 ```
-git clone https://gitee.com/DreamMaoMao/mywaybar.git
+git clone https://gitee.com/DreamMaoMao/Waybar.git
 cd mywaybar
 meson build -Dprefix=/usr
 sudo ninja -C build install
