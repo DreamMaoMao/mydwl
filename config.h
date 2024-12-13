@@ -67,11 +67,12 @@ static const Rule rules[] = {
 	/* examples:
 	{ "Gimp",     NULL,       0,            1,           -1,800,600 },
 	*/
+	{ NULL,  						"QQ",       		1 << 2,       	0,   0, 	0,	0,-1, 0,0},
 	{ "Google-chrome",  						NULL,       		1 << 3,       	0,   0, 	0,	0,-1, 0,0},
 	{ "Microsoft-edge-dev", 		 			NULL,       		1 << 4,       	0,   0, 	0,	0,-1, 0,0},
 	{ "Clash for Windows",  					NULL,       		0,       		1,   0, 	0,	0,-1, 1400,800},
 	{ "electron-netease-cloud-music",  			NULL,       		0,       		1,   0, 	0,	0,-1, 1300,900},
-	{ "yesplaymusic",  			NULL,       		0,       		1,   0, 	0,	0,-1, 1500,900},
+	{ "yesplaymusic",  			NULL,       		1 << 4,       		1,   0, 	0,	0,-1, 1500,900},
 	{ NULL,  									"图片查看器",   	0,       		1,   0, 	0,	0,-1, 0,0},
 	{ NULL,  									"图片查看",     	0,       		1,   0, 	0,	0,-1, 0,0},
 	{ NULL,  									"选择文件",     	0,       		1,   0, 	0,	0,-1, 1200,800},
