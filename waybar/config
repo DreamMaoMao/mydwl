@@ -5,7 +5,7 @@
     "spacing": 5, 
 
     "margin-bottom":-11,
-    "modules-left": ["dwl/tags","wlr/taskbar"],
+    "modules-left": ["dwl/tags","wlr/taskbar","dwl/window"],
     "modules-center": ["hyprland/window"],
     "modules-right": ["custom/notification","tray","network","cpu","temperature","memory","clock","pulseaudio","backlight","battery"],
     "dwl/tags": {
@@ -34,7 +34,7 @@
       },
     "wlr/taskbar": {
         "format": "{icon}",
-        "icon-size": 30,
+        "icon-size": 24,
         "all-outputs": false,
         "tooltip-format": "{title}",
         "markup": true,
