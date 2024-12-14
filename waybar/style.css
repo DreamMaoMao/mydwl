@@ -438,6 +438,7 @@ label:focus {
 
 #backlight {
     box-shadow: rgba(0, 0, 0, 0.5) 0 -6 3 1px;
+    font-weight: bolder;
     margin-right: 3px;
     margin-left: 1px;
     padding-top: 3px;
@@ -452,6 +453,7 @@ label:focus {
 
 #network{
     box-shadow: rgba(0, 0, 0, 0.5) 0 -6 3 1px;
+    font-weight: bolder;
     margin-right: 3px;
     margin-left: 1px;
     padding-top: 3px;
@@ -511,6 +513,7 @@ label:focus {
 
 #pulseaudio {
     box-shadow: rgba(0, 0, 0, 0.5) 0 -6 3 1px;
+    font-weight: bolder;
     margin-right: 3px;
     margin-left: 1px;
     padding-top: 3px;
@@ -552,6 +555,7 @@ label:focus {
 
 #temperature {
     box-shadow: rgba(0, 0, 0, 0.5) 0 -6 3 1px;
+    font-weight: bolder;
     margin-right: 3px;
     margin-left: 1px;
     padding-top: 3px;
@@ -561,6 +565,7 @@ label:focus {
 }
 #temperature.critical {
     box-shadow: rgba(0, 0, 0, 0.5) 0 -6 3 1px;
+    font-weight: bolder;
     margin-right: 3px;
     margin-left: 1px;
     padding-top: 3px;
