@@ -184,23 +184,23 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
 /* commands */
-// static const char *termcmd[] = { "foot", NULL };
+// static const char *termcmd[] = { "st", NULL };
 // static const char *menucmd[] = { "wofi --conf $DWL/wofi/config_menu", NULL };
 
 static const Key keys[] = {
 	/* Note that Shift changes certain key codes: c -> C, 2 -> at, etc. */
 	/* modifier                  			key                 	function        			argument */
 	{ MODKEY,					 			XKB_KEY_space,      	spawn,          			SHCMD("wofi --normal-window -c $DWL/wofi/config -s $DWL/wofi/style.css") },
-	{ MODKEY, 					 			XKB_KEY_Return,     	spawn,          			SHCMD("foot") },
+	{ MODKEY, 					 			XKB_KEY_Return,     	spawn,          			SHCMD("st") },
     { WLR_MODIFIER_LOGO,         			XKB_KEY_Return, 		spawn, 						SHCMD("google-chrome") },
     { WLR_MODIFIER_LOGO,         			XKB_KEY_space, 			spawn, 						SHCMD("microsoft-edge") },
 	{ WLR_MODIFIER_CTRL,         			XKB_KEY_Return,         spawn, 						SHCMD("bash ~/tool/clash.sh") }, 
-    { WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO,  XKB_KEY_Return, 		spawn, 						SHCMD("foot -e /usr/local/bin/yazi") },  
+    { WLR_MODIFIER_CTRL|WLR_MODIFIER_LOGO,  XKB_KEY_Return, 		spawn, 						SHCMD("st -e /usr/local/bin/yazi") },  
     { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,   XKB_KEY_a, 		 		spawn, 						SHCMD("grim -g \"$(slurp)\" - | swappy -f -") }, 
     { WLR_MODIFIER_LOGO,   					XKB_KEY_h, 		 		spawn, 						SHCMD("bash ~/tool/hide_waybar_dwl.sh") }, 
 	{ WLR_MODIFIER_LOGO,         			XKB_KEY_l,          	spawn, 						SHCMD("swaylock -f -c 000000") }, 
-    { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,   XKB_KEY_Return, 		spawn, 						SHCMD("foot -e ~/tool/ter-multiplexer.sh") },  
-    // { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,   XKB_KEY_Return, 		spawn, 						SHCMD("foot -e \"zellij -s temp --config /home/wrq/.config/zellij/tempconfigwayland.kdl\"") },  
+    { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,   XKB_KEY_Return, 		spawn, 						SHCMD("st -e ~/tool/ter-multiplexer.sh") },  
+    // { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,   XKB_KEY_Return, 		spawn, 						SHCMD("st -e \"zellij -s temp --config /home/wrq/.config/zellij/tempconfigwayland.kdl\"") },  
     /* { WLR_MODIFIER_LOGO,   					XKB_KEY_space, 			spawn, 						SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show website") },   */
     // { WLR_MODIFIER_LOGO|WLR_MODIFIER_ALT,   XKB_KEY_Return, 		spawn, 						SHCMD("rofi -normal-window -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/tool/movie.py") },  
     { WLR_MODIFIER_LOGO|WLR_MODIFIER_ALT,   XKB_KEY_Return, 		spawn, 						SHCMD("mpv --player-operation-mode=pseudo-gui") },
