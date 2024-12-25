@@ -3477,7 +3477,8 @@ setfakefullscreen(Client *c, int fakefullscreen)
 			? LyrTile : c->isfloating ? LyrFloat : LyrTile]);
 
 	if (fakefullscreen) {
-		c->oldgeom = c->geom;
+		if (c->isfloating)
+			c->oldgeom = c->geom;
 		if (selmon->isoverview) {
 			Arg arg = {0};
 			toggleoverview(&arg);
@@ -3518,7 +3519,8 @@ setfullscreen(Client *c, int fullscreen) //用自定义全屏代理自带全屏
 			? LyrTile : c->isfloating ? LyrFloat : LyrTile]);
 
 	if (fullscreen) {
-		c->oldgeom = c->geom;
+		if (c->isfloating)
+			c->oldgeom = c->geom;
 		if (selmon->isoverview) {
 			Arg arg = {0};
 			toggleoverview(&arg);
