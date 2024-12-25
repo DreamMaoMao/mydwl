@@ -3230,6 +3230,9 @@ void setborder_color(Client *c){
 	} else if(c->isfakefullscreen && c == selmon->sel){
 		for (i = 0; i < 4; i++)
 		wlr_scene_rect_set_color(c->border[i], fakefullscreencolor);
+	} else if(c == selmon->sel && c->isfloating) {
+		for (i = 0; i < 4; i++)
+		wlr_scene_rect_set_color(c->border[i], floatcolor);
 	} else if(c == selmon->sel) {
 		for (i = 0; i < 4; i++)
 		wlr_scene_rect_set_color(c->border[i], focuscolor);
@@ -3465,6 +3468,7 @@ setfakefullscreen(Client *c, int fakefullscreen)
 	struct wlr_box  fakefullscreen_box;
 	if (!c || !c->mon || !client_surface(c)->mapped)
 		return;
+	
 	c->isfakefullscreen = fakefullscreen;
 
 	// c->bw = fullscreen ? 0 : borderpx;
@@ -3473,6 +3477,7 @@ setfakefullscreen(Client *c, int fakefullscreen)
 			? LyrTile : c->isfloating ? LyrFloat : LyrTile]);
 
 	if (fakefullscreen) {
+		c->oldgeom = c->geom;
 		if (selmon->isoverview) {
 			Arg arg = {0};
 			toggleoverview(&arg);
@@ -3513,7 +3518,7 @@ setfullscreen(Client *c, int fullscreen) //用自定义全屏代理自带全屏
 			? LyrTile : c->isfloating ? LyrFloat : LyrTile]);
 
 	if (fullscreen) {
-
+		c->oldgeom = c->geom;
 		if (selmon->isoverview) {
 			Arg arg = {0};
 			toggleoverview(&arg);
