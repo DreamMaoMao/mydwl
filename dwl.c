@@ -3230,9 +3230,6 @@ void setborder_color(Client *c){
 	} else if(c->isfakefullscreen && c == selmon->sel){
 		for (i = 0; i < 4; i++)
 		wlr_scene_rect_set_color(c->border[i], fakefullscreencolor);
-	} else if(c == selmon->sel && c->isfloating) {
-		for (i = 0; i < 4; i++)
-		wlr_scene_rect_set_color(c->border[i], floatcolor);
 	} else if(c == selmon->sel) {
 		for (i = 0; i < 4; i++)
 		wlr_scene_rect_set_color(c->border[i], focuscolor);
